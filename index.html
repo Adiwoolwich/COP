@@ -1041,16 +1041,12 @@
         }
 
         function setDefaultDateForTagesrecherche() {
-            const dateInput = document.getElementById('day-search-input');
-            if (dateInput) {
-                const d = new Date();
-                const day = String(d.getDate()).padStart(2, '0');
-                const month = String(d.getMonth() + 1).padStart(2, '0');
-                const year = d.getFullYear();
-                dateInput.value = `${day}.${month}.${year}`;
-                searchDayStats();
-            }
-        }
+    const dateInput = document.getElementById('day-search-input');
+    if (dateInput) {
+        dateInput.value = "10.07.2026";
+        searchDayStats();
+    }
+}
 
         function updateCurrentMonthDisplay() {
             const display = document.getElementById('current-month-display');
