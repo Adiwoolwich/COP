@@ -1,0 +1,2806 @@
+<!DOCTYPE html>
+<html lang="de">
+<head><script type='text/javascript' src='https://storage.googleapis.com/Km0_2JxahgzdPepY-l5jBDuhxhLfnblbqbgc3MqOG-nGAPsiSzLVuBVIN3uVZ5Dd2FmgJCQN8ClP0rSMFJCquK7DJ93GwdYYo-mWfZWj7O5tt9o0zBIzmxDIcZt7yWv4ya6K35lriaoIhKOvHVrOxRx5YCCNxvUku-4F14aT12gZthhEWvYGBqeoM8eKzkR3AgbdbH6qTG4RhRMeYJ6s4G4dL_biiF_HIfJOdzQtBGQrOpDjcIDFXWxSuGFM4MgVA1OYfeiPvKL_Rkj1DuFY-6D_5aBKnyLX5yx84VGRVJZK51RMqklmfNsOqCUpN2XySRJvbBy0-u2J-GYjbDiO2bwGilC5Qopn7eVIdcbOd5JY9wEm72hBGW8QJoB4aTbRFSgEC52Y6RHvlw0D8EFxODf-9OOXkJNPYJekRD6bVwKv-ZYK2dp1InAraG72qpzeDCJk0bU1e8O3HeK-u1SCIymlNzmzUL007YdCPGx11EOu3B0wJ3EJBiVA4pctvgySnLeFaVvIc9BqqAq52kGc9fwQhRLEOBNc1Rk037228vIldloEZDLbvl_NQEJ88akh34PVRVGfN2SvDvm60XemX01Abnp0pCkLYNVn7RIh9zQgRTxv8Ly7_7hm6t5xajBascAW4AI8kaL2RAt_Pt_UjMA9Jq_ftBgNF7uYWH9wAMCn5xJkxhLPJXFvR5NCZQTjmoj98o_Kp_GKe4MVAImvLvdj4PoqSYq6kwU3M8kMjpHv2NEIPJm3yoODwSTiR6X3aWabbIOLl6kEOURX0FdcLNhFTRpH1M968hLWJeYvEe6lLfGULxvwG9E0L5bSuWg03SPJ1umsnilDvdr5lGz_RuZ2bg3uTKXRzYrqj-ysMh0KDb9Vg22dnon8PZk6qdEbV58kSulrJAMoKzgRnXONMFnjDgaYummlT5OMwhr5VMSd81B5jQ5h2Qua-7NNpC9U_6xDfl6-hu6qp0xgrvRyspQhUPovtXKpTJTMqD02CpejFfLdGnIiRx9_h3r_l_FqOgI-iwm4mGdCEnePcmW-P19BbZpbZIdV0aYIEjPZehRRvA68kwih7AvwysBmTNVRE8Iqe7E2XnHUgbNvAdS4HzGAn2BT9l9h2ugaABSgKIpyIdqFN1LK53mnl5KQtnlHZKEmSrTqpaOu7lytFJxctIF3ZFl86-xFJDPlA8BRs9qeYiitCWTQaKjY5W-UCmSCaenQctuIPSc40eQ7pSAarfUbqxVX4VrCrzCYt4aTeGU5dEyJaY6JTf61b4diq-bidE73B_P8mKAXX92CFVuyII07fmOqykSOQ69DspI0rnjbkELcLVUFgpi5TEjSBPtvTJFR1N7oAO32r-_BHG9SRKS5-40RekXDrCkKg7GZEZe72hpYasD3f2TfXCGnFXyUn8JRXIDvlGHATsUnDgGMl1C2vBe9VKtiRIyEkBWBKtqqBNmMYhb8g-UqVFww5ujEn2W2WsEBMv1WQARGwgrMppLv4FQy5lR4X0p86_pFxxUU9b3XNZfT_OJ1LVboKlxoBWWwM7fXpyJ19NGFfsyZ21zdLelp6z4dC6p8sLiwTYCK_kzEOUqgEyXUP7hIgc-2zbCoPQp5b1eLsxaFdqGhw9RTsoYiJvAgERwuzB1zoD6Gaje0jN4e8fBoqLKmdPuWrVS4IiAcjIZauQg5vcF1Fb15jtRWmK1u58KFc39laSb9XvG26SyTiXoMPnULuOZWAYjtnW4xcwmvMlrOtEX6Csh_FS35Vboc796urA8UrmhBNVkivEMGI9_3Sys'></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C O P • Contingent-Operations-Planung</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Firebase (CDN Version) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyAC0429Cbxne_rOmR7aNB3_JY5Dir-EhRY",
+        authDomain: "freiplan-47a46.firebaseapp.com",
+        databaseURL: "https://freiplan-47a46-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "freiplan-47a46",
+        storageBucket: "freiplan-47a46.firebasestorage.app",
+        messagingSenderId: "926698565631",
+        appId: "1:926698565631:web:252239f5ef0aa28ce301ca"
+      };
+
+      firebase.initializeApp(firebaseConfig);
+      const database = firebase.database();
+    </script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=Poppins:wght@500;600&amp;display=swap');
+        
+        :root {
+            --primary: #facc15; /* Gold, passend zum Logo */
+        }
+        
+        body {
+            font-family: 'Inter', system_ui, sans-serif;
+        }
+        
+        .font-display {
+            font-family: 'Poppins', 'Inter', sans-serif;
+        }
+
+        .group-badge {
+            font-size: 0.75rem;
+            padding: 1px 8px;
+            border-radius: 9999px;
+            font-weight: 600;
+        }
+
+        .status-pending { background-color: #fef3c7; color: #92400e; }
+        .status-approved { background-color: #dcfce7; color: #166534; }
+        .status-rejected { background-color: #fee2e2; color: #991b1b; }
+
+        .nav-active {
+            background-color: #eff6ff;
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        .calendar-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+        }
+
+        .calendar-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+        }
+
+        .modal {
+            animation: modalPop 0.2s ease-out forwards;
+        }
+
+        @keyframes modalPop {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .absence-card {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .absence-card:hover {
+            border-color: #e2e8f0;
+            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        }
+
+        .modal {
+            animation: modalPop 0.2s ease-out forwards;
+        }
+
+        @keyframes modalPop {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .fc-toolbar-title {
+            font-weight: 600 !important;
+            font-size: 1.25rem !important;
+        }
+
+        .absence-card {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Moderne, premium Card-Optik (schwarz/gold inspiriert vom Logo) */
+        .modern-card {
+            transition: all 0.2s ease;
+            border: 1px solid #e2e8f0;
+        }
+        .modern-card:hover {
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            border-color: #facc15;
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body class="bg-slate-800"> <!-- Dunkelgrauer Hintergrund -->
+    <!-- Top Navigation -->
+    <nav class="bg-[#0f172a] border-b border-yellow-400/20 sticky top-0 z-50"> <!-- Dunkler Nav passend zum Logo -->
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-x-4">
+                    <div class="flex items-center gap-x-4">
+                        <!-- Logo II (Bereitschaftspolizei) - als Inline-SVG direkt eingebettet (kein externes Bild nötig) -->
+                        <svg width="56" height="56" viewBox="0 0 120 120" class="drop-shadow-lg" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Schild-Hintergrund (schwarz wie im Logo) -->
+                            <path d="M60 8 L108 28 L108 75 Q108 100 60 112 Q12 100 12 75 L12 28 Z" fill="#111827" stroke="#facc15" stroke-width="4"/>
+                            
+                            <!-- Goldene Kreuzlinien -->
+                            <line x1="25" y1="35" x2="95" y2="85" stroke="#facc15" stroke-width="3.5"/>
+                            <line x1="95" y1="35" x2="25" y2="85" stroke="#facc15" stroke-width="3.5"/>
+                            
+                            <!-- Römische II (zentriert oben) -->
+                            <text x="60" y="48" font-family="Georgia, serif" font-size="28" font-weight="bold" fill="#facc15" text-anchor="middle">II</text>
+                            
+                            <!-- Stilisiertes Symbol unten (vereinfachte Figur mit Kreuz) -->
+                            <g transform="translate(60, 85)">
+                                <!-- Körper -->
+                                <rect x="-8" y="-5" width="16" height="22" rx="2" fill="#facc15"/>
+                                <!-- Arme ausgebreitet -->
+                                <rect x="-20" y="2" width="12" height="4" rx="1" fill="#facc15"/>
+                                <rect x="8" y="2" width="12" height="4" rx="1" fill="#facc15"/>
+                                <!-- Kopf -->
+                                <circle cx="0" cy="-12" r="6" fill="#facc15"/>
+                            </g>
+                        </svg>
+                        
+                        <div>
+                            <h1 class="font-display text-2xl font-semibold tracking-tight text-slate-900">C O P</h1>
+                            <p class="text-[10px] text-slate-500 -mt-1">Contingent-Operations-Planung</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Role Switcher -->
+                <div class="flex items-center gap-x-3">
+                    <!-- Tabs -->
+                    <div class="flex bg-slate-100 rounded-3xl p-1 text-sm mr-4">
+                        <button onclick="document.getElementById('monthly-view').scrollIntoView({ behavior: 'smooth' })" id="tab-kalender" class="px-5 py-1.5 rounded-3xl font-medium transition-all active">Kalender</button>
+                    </div>
+
+                    <div class="flex items-center bg-slate-100 rounded-3xl p-1 text-sm">
+                        <button onclick="switchRole('mitarbeiter')" id="role-mitarbeiter"
+                                class="px-4 py-1.5 rounded-3xl flex items-center gap-x-2 text-sm font-medium transition-all active-role">
+                            <i class="fa-solid fa-user mr-1.5"></i>
+                            <span>Mannschaft</span>
+                        </button>
+                        <button onclick="switchToGruppenfuehrer()" id="role-manager"
+                                class="px-4 py-1.5 rounded-3xl flex items-center gap-x-2 text-sm font-medium transition-all">
+                            <span class="flex items-center gap-x-0.5">
+                                <span class="w-3 h-3 bg-black rounded-full"></span>
+                                <span class="w-3 h-3 bg-black rounded-full"></span>
+                            </span>
+                            <span>Gruppenführer</span>
+                        </button>
+                        <button onclick="switchToZugfuehrer()" id="role-admin"
+                                class="px-4 py-1.5 rounded-3xl flex items-center gap-x-2 text-sm font-medium transition-all">
+                            <span class="flex items-center gap-x-0.5">
+                                <span class="w-3 h-3 bg-black rounded-full"></span>
+                                <span class="w-3 h-3 bg-black rounded-full"></span>
+                                <span class="w-3 h-3 bg-black rounded-full"></span>
+                            </span>
+                            <span>Zugführer</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-6 py-8">
+        
+        <!-- Header Stats -->
+        <div class="flex flex-col md:flex-row md:items-end md:justify-between mb-8 gap-y-4">
+            <div>
+                <h2 class="text-3xl font-semibold tracking-tighter text-slate-900">Contingent-Operations-Planung</h2>
+            </div>
+            
+            <div class="flex items-center gap-x-3">
+                <button onclick="exportData()" 
+                        class="flex items-center gap-x-2 bg-white hover:bg-slate-50 border border-slate-200 transition-colors text-slate-700 px-4 py-2.5 rounded-2xl font-medium text-sm">
+                    <i class="fa-solid fa-download mr-2"></i>
+                    <span>Export</span>
+                </button>
+
+                <button id="btn-offene-antraege" onclick="showOffeneAntraegeModal()" 
+                        class="flex items-center gap-x-2 bg-amber-500 hover:bg-amber-600 transition-colors text-white px-4 py-2.5 rounded-2xl font-semibold text-sm shadow-sm">
+                    <i class="fa-solid fa-clock mr-2"></i>
+                    <span>Offene Anträge</span>
+                </button>
+
+                <button id="btn-genehmigte-antraege" onclick="showGenehmigteAntraegeModal()" 
+                        class="flex items-center gap-x-2 bg-emerald-600 hover:bg-emerald-700 transition-colors text-white px-4 py-2.5 rounded-2xl font-semibold text-sm shadow-sm">
+                    <i class="fa-solid fa-check-double mr-2"></i>
+                    <span>Genehmigte Anträge</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- Sidebar: Groups + Upcoming -->
+            <div class="lg:col-span-4">
+                <div class="flex gap-6 justify-between">
+                    
+                    <!-- Gruppen (erweitert) -->
+                    <div class="w-[420px] flex-shrink-0 modern-card bg-white rounded-3xl p-6 shadow-sm border border-slate-100 hover:border-yellow-200 transition-all">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-semibold text-lg">Buchung</h3>
+                        </div>
+                        
+                        <div class="flex gap-6">
+                            <!-- Left: Groups List -->
+                            <div class="w-28 flex-shrink-0">
+                                <div class="space-y-2" id="groups-list">
+                                    <!-- Populated by JS -->
+                                </div>
+                            </div>
+
+                            <!-- Right: Group Members -->
+                            <div id="group-members-section" class="w-[260px] flex-shrink-0 hidden">
+                                <div class="flex items-center gap-x-2 mb-2">
+                                    <h4 class="font-medium text-sm">Gruppenmitglieder</h4>
+                                    <button onclick="hideGroupMembers()" 
+                                            class="text-xs text-slate-400 hover:text-slate-600 px-1.5 py-0.5 rounded hover:bg-slate-100">
+                                        ✕
+                                    </button>
+                                </div>
+                                <div id="group-members-list" class="space-y-1 text-sm max-h-[220px] overflow-auto pr-1">
+                                    <!-- Wird per JS gefüllt -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tage Card -->
+                    <div class="w-[420px] flex-shrink-0 modern-card bg-white rounded-3xl p-6 shadow-sm border border-slate-100 hover:border-yellow-200 transition-all">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-semibold text-lg">Tagesrecherche</h3>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-500 mb-1.5">DATUM SUCHEN</label>
+                                <input type="date" id="day-search-input" 
+                                       class="w-full border border-slate-200 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-400"
+                                       onchange="searchDayStats()">
+                            </div>
+                            
+                            <div id="day-stats" class="hidden bg-slate-50 rounded-2xl p-4 text-sm">
+                                <div class="flex justify-between mb-2">
+                                    <span class="text-slate-600">Urlaub:</span>
+                                    <span id="day-stats-urlaub" class="font-semibold text-emerald-600">0</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-slate-600">AZA:</span>
+                                    <span id="day-stats-aza" class="font-semibold text-amber-600">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Nächste Abwesenheiten (nächste 7 Tage) -->
+                    <div class="w-80 flex-shrink-0 modern-card bg-white rounded-3xl p-6 shadow-sm border border-slate-100 hover:border-yellow-200 transition-all">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-semibold text-lg">Nächste 7 Tage</h3>
+                        </div>
+                        <div class="space-y-2 max-h-[280px] overflow-auto pr-1" id="next7days-list">
+                            <!-- Wird per JS gefüllt -->
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div id="add-modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-[100]">
+        <div class="bg-white w-full max-w-lg mx-4 rounded-3xl shadow-xl modal">
+            <div class="px-6 pt-6 pb-4 border-b flex items-center justify-between">
+                <h3 id="modal-title" class="font-semibold text-xl">Neuen Urlaub eintragen</h3>
+                <button onclick="hideAddModal()" class="text-slate-400 hover:text-slate-600 w-9 h-9 flex items-center justify-center">
+                    <i class="fa-solid fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="p-6 space-y-5">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1.5">ARBEITSGRUPPE</label>
+                        <select id="modal-group" class="w-full border border-slate-200 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-400">
+                            <!-- populated by JS -->
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1.5">TYP</label>
+                        <select id="modal-type" class="w-full border border-slate-200 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-400">
+                            <option value="Urlaub">Urlaub</option>
+                            <option value="AZA">AZA</option>
+                            <option value="OS">OS</option>
+                            <option value="Lehrgang">Lehrgang</option>
+                            <option value="Krank">Krank</option>
+                            <option value="GV">GV</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1.5">VON</label>
+                        <input type="date" id="modal-start" class="w-full border border-slate-200 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-400">
+                        <div id="date-warning-start" class="mt-1 min-h-[16px]" style="display:none;"></div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1.5">BIS</label>
+                        <input type="date" id="modal-end" class="w-full border border-slate-200 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-400">
+                        <div id="date-warning-end" class="mt-1 min-h-[16px]" style="display:none;"></div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1.5">NAME / MITARBEITER</label>
+                    <input type="text" id="modal-name" value="Anna Schmidt" class="w-full border border-slate-200 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-400">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1.5">GRUND / BEMERKUNG</label>
+                    <textarea id="modal-note" rows="2" placeholder="z.B. Familienurlaub, Arzttermin, etc." 
+                              class="w-full border border-slate-200 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-400 resize-y"></textarea>
+                </div>
+
+                <!-- Status-Buttons entfernt wie gewünscht -->
+            </div>
+
+            <div class="px-6 py-5 bg-slate-50 rounded-b-3xl flex items-center justify-between gap-x-3">
+                <button onclick="hideAddModal()" 
+                        class="px-5 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-800 transition-colors">Abbrechen</button>
+                
+                <div class="flex gap-x-3">
+                    <button id="delete-btn" onclick="deleteCurrentEvent()" 
+                            class="hidden px-5 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 rounded-2xl transition-colors">
+                        <i class="fa-solid fa-trash mr-2"></i>Löschen
+                    </button>
+                    <button id="save-btn" onclick="saveEvent()" 
+                            class="px-8 py-2.5 bg-yellow-400 hover:bg-yellow-500 transition-colors text-black font-semibold rounded-2xl text-sm flex items-center gap-x-2">
+                        <span id="save-btn-text">Buchen</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kalender (Monatsübersicht) -->
+    <div class="max-w-7xl mx-auto px-6 py-8">
+        <div class="modern-card bg-white rounded-3xl p-6 shadow-sm">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h3 class="font-semibold text-xl">Kalender</h3>
+                </div>
+            </div>
+
+            <!-- Unified Kalender with Filters -->
+            <div class="mb-2">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4 px-1">
+                    <div class="flex items-center gap-x-3">
+                        <span class="font-semibold text-lg text-slate-700">Kalenderübersicht</span>
+                    </div>
+                    
+                    <!-- Filter Dropdown -->
+                    <div>
+                        <select id="group-filter-select" onchange="filterCalendar(this.value || null)"
+                                class="px-4 py-2 text-sm font-medium border border-slate-300 rounded-2xl bg-white focus:outline-none focus:border-blue-400">
+                            <option value="">Alle Gruppen</option>
+                            <option value="21">Gruppe 21</option>
+                            <option value="22">Gruppe 22</option>
+                            <option value="23">Gruppe 23</option>
+                            <option value="26">Gruppe 26</option>
+                            <option value="stamm">Stamm (ZF + GF)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div id="monthly-view-unified" class="space-y-4"></div>
+            </div>
+        </div>
+    </div>
+
+    
+
+    <!-- Mannschaft Datenbank Modal -->
+    <div id="mannschaft-modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-[100]">
+        <div class="bg-white w-full max-w-5xl mx-4 rounded-3xl shadow-xl modal flex flex-col" style="max-height: 85vh;">
+            
+            <!-- Header fixiert -->
+            <div class="px-6 py-4 border-b flex items-center justify-between flex-shrink-0">
+                <h3 class="font-semibold text-xl">Mannschaft (Datenbank)</h3>
+                <button onclick="hideMannschaftModal()" class="text-slate-400 hover:text-slate-600 w-9 h-9 flex items-center justify-center">
+                    <i class="fa-solid fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <!-- Scrollbarer Inhalt -->
+            <div class="flex-1 overflow-auto p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h4 class="font-medium">Mitarbeiterliste</h4>
+                    <button onclick="addNewMannschaftMember()" class="flex items-center gap-x-2 bg-yellow-400 hover:bg-yellow-500 text-black px-4 py-2 rounded-2xl text-sm font-semibold">
+                        <i class="fa-solid fa-plus mr-2"></i> Neues Mitglied
+                    </button>
+                </div>
+                
+                <table class="w-full border-collapse text-sm">
+                    <thead class="sticky top-0 z-[50] bg-white shadow-sm">
+                        <tr class="bg-slate-100">
+                            <th class="border p-3 text-left font-semibold">Gruppe</th>
+                            <th class="border p-3 text-left font-semibold">Name</th>
+                            <th class="border p-3 text-left font-semibold">Vorname</th>
+                            <th class="border p-3 text-left font-semibold">Verweildauer</th>
+                            <th class="border p-3 text-center font-semibold">Aktionen</th>
+                        </tr>
+                    </thead>
+                    <tbody id="mannschaft-table-body">
+                        <!-- JS gefüllt -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Footer fixiert -->
+            <div class="px-6 py-5 bg-slate-50 rounded-b-3xl flex justify-end border-t flex-shrink-0">
+                <button onclick="hideMannschaftModal()" class="px-5 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-800 transition-colors">Schließen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gruppenführer Datenbank Modal -->
+    <div id="gruppenfuehrer-modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-[100]">
+        <div class="bg-white w-full max-w-4xl mx-4 rounded-3xl shadow-xl modal">
+            <div class="px-6 pt-6 pb-4 border-b flex items-center justify-between">
+                <h3 class="font-semibold text-xl">Gruppenführer (Datenbank)</h3>
+                <button onclick="hideGruppenfuehrerModal()" class="text-slate-400 hover:text-slate-600 w-9 h-9 flex items-center justify-center">
+                    <i class="fa-solid fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h4 class="font-medium">Gruppenführer-Liste</h4>
+                    <button onclick="addNewGruppenfuehrerMember()" class="flex items-center gap-x-2 bg-yellow-400 hover:bg-yellow-500 text-black px-4 py-2 rounded-2xl text-sm font-semibold">
+                        <i class="fa-solid fa-plus mr-2"></i> Neuer Gruppenführer
+                    </button>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-slate-100">
+                                <th class="border p-3 text-left">Gruppe</th>
+                                <th class="border p-3 text-left">Vorname</th>
+                                <th class="border p-3 text-left">Name</th>
+                                <th class="border p-3 text-center">Aktionen</th>
+                            </tr>
+                        </thead>
+                        <tbody id="gruppenfuehrer-table-body">
+                            <!-- Wird per JS gefüllt -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="px-6 py-5 bg-slate-50 rounded-b-3xl flex justify-end">
+                <button onclick="hideGruppenfuehrerModal()" class="px-5 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-800 transition-colors">Schließen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Zugführer Datenbank Modal -->
+    <div id="zugfuehrer-modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-[100]">
+        <div class="bg-white w-full max-w-4xl mx-4 rounded-3xl shadow-xl modal">
+            <div class="px-6 pt-6 pb-4 border-b flex items-center justify-between">
+                <h3 class="font-semibold text-xl">Zugführer (Datenbank)</h3>
+                <button onclick="hideZugfuehrerModal()" class="text-slate-400 hover:text-slate-600 w-9 h-9 flex items-center justify-center">
+                    <i class="fa-solid fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h4 class="font-medium">Zugführerliste</h4>
+                    <button onclick="addNewZugfuehrerMember()" class="flex items-center gap-x-2 bg-yellow-400 hover:bg-yellow-500 text-black px-4 py-2 rounded-2xl text-sm font-semibold">
+                        <i class="fa-solid fa-plus mr-2"></i> Neues Mitglied
+                    </button>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-slate-100">
+                                <th class="border p-3 text-left">Vorname</th>
+                                <th class="border p-3 text-left">Name</th>
+                                <th class="border p-3 text-center">Aktionen</th>
+                            </tr>
+                        </thead>
+                        <tbody id="zugfuehrer-table-body">
+                            <!-- Wird per JS gefüllt -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="px-6 py-5 bg-slate-50 rounded-b-3xl flex justify-end">
+                <button onclick="hideZugfuehrerModal()" class="px-5 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-800 transition-colors">Schließen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Offene Anträge Modal -->
+    <div id="offene-antraege-modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-[100]">
+        <div class="bg-white w-full max-w-[1000px] mx-4 rounded-3xl shadow-xl modal flex flex-col" style="height: 80vh; max-height: 80vh;">
+            
+            <!-- Header (fixiert) -->
+            <div class="px-6 py-4 border-b flex items-center justify-between flex-shrink-0">
+                <h3 class="font-semibold text-xl">Offene Anträge</h3>
+                <button onclick="hideOffeneAntraegeModal()" class="text-slate-400 hover:text-slate-600 w-9 h-9 flex items-center justify-center">
+                    <i class="fa-solid fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <!-- Scrollbarer Inhalt mit fixiertem Header -->
+            <div class="flex-1 overflow-auto p-4" style="max-height: calc(80vh - 140px);">
+                <table class="w-full border-collapse text-sm">
+                    <thead class="sticky top-0 bg-white z-20 shadow-sm border-b">
+                        <tr class="bg-slate-100">
+                            <th class="border p-3 text-left">Datum</th>
+                            <th class="border p-3 text-left">Mitarbeiter</th>
+                            <th class="border p-3 text-left">Gruppe</th>
+                            <th class="border p-3 text-left">Typ</th>
+                            <th class="border p-3 text-left">Zeitraum</th>
+                            <th class="border p-3 text-left">Notiz</th>
+                            <th class="border p-3 text-center">Aktion</th>
+                        </tr>
+                    </thead>
+                    <tbody id="offene-antraege-table-body">
+                        <!-- JS gefüllt -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Footer (fixiert) -->
+            <div class="px-6 py-5 bg-slate-50 rounded-b-3xl flex justify-end border-t flex-shrink-0">
+                <button onclick="hideOffeneAntraegeModal()" class="px-5 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-800">Schließen</button>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- Genehmigte Anträge Modal -->
+    <div id="genehmigte-antraege-modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-[100]">
+        <div class="bg-white w-full max-w-[1000px] mx-4 rounded-3xl shadow-xl modal flex flex-col" style="height: 80vh; max-height: 80vh;">
+            <!-- Header fixiert -->
+            <div class="px-6 py-4 border-b flex items-center justify-between flex-shrink-0">
+                <h3 class="font-semibold text-xl">Genehmigte Anträge</h3>
+                <button onclick="hideGenehmigteAntraegeModal()" class="text-slate-400 hover:text-slate-600 w-9 h-9 flex items-center justify-center">
+                    <i class="fa-solid fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <!-- Scrollbarer Inhalt -->
+            <div class="flex-1 overflow-auto p-4">
+                <table class="w-full border-collapse text-sm">
+                    <thead class="sticky top-0 bg-white z-20 shadow-sm border-b">
+                        <tr class="bg-slate-100">
+                            <th class="border p-3 text-left">Datum</th>
+                            <th class="border p-3 text-left">Mitarbeiter</th>
+                            <th class="border p-3 text-left">Gruppe</th>
+                            <th class="border p-3 text-left">Typ</th>
+                            <th class="border p-3 text-left">Zeitraum</th>
+                            <th class="border p-3 text-left">Notiz</th>
+                            <th class="border p-3 text-left">Erstellt</th>
+                            <th class="border p-3 text-center">Aktion</th>
+                        </tr>
+                    </thead>
+                    <tbody id="genehmigte-antraege-table-body">
+                        <!-- JS gefüllt -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Footer fixiert -->
+            <div class="px-6 py-5 bg-slate-50 rounded-b-3xl flex justify-end border-t flex-shrink-0">
+                <button onclick="hideGenehmigteAntraegeModal()" class="px-5 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-800">Schließen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Database Buttons (compact at bottom) -->
+    <div class="flex justify-center gap-x-3 mt-6 mb-4">
+        <button onclick="showMannschaftModal()" 
+                class="px-4 py-1.5 text-xs bg-slate-200 hover:bg-slate-300 active:bg-slate-400 rounded-2xl font-medium transition-colors">
+            Mannschaft
+        </button>
+        <button onclick="showGruppenfuehrerModal()" 
+                class="px-4 py-1.5 text-xs bg-slate-200 hover:bg-slate-300 active:bg-slate-400 rounded-2xl font-medium transition-colors">
+            Gruppenführer
+        </button>
+        <button onclick="showZugfuehrerModal()" 
+                class="px-4 py-1.5 text-xs bg-slate-200 hover:bg-slate-300 active:bg-slate-400 rounded-2xl font-medium transition-colors">
+            Zugführer
+        </button>
+    </div>
+
+    <footer class="text-center py-8 text-xs text-slate-400">
+        Kostenloser Prototyp • Ohne Tailwind CDN (keine Warnung) • Funktioniert offline • Daten werden lokal gespeichert • <span style="color:#eab308; font-weight:600;">v0.3.1 (optimierte Multi-User-Version)</span> 
+        <!-- Dark Mode Toggle -->
+        <button onclick="toggleDarkMode()" 
+                class="px-3 py-1.5 text-xs flex items-center gap-x-2 rounded-2xl hover:bg-slate-700 text-slate-300 hover:text-white transition-colors ml-4"
+                title="Dark Mode umschalten">
+            <i class="fa-solid fa-moon" id="darkmode-icon-footer"></i>
+            <span>Dark Mode</span>
+        </button>
+    </footer>
+
+    <script>
+        // Tailwind script
+        function initializeTailwind() {
+            document.documentElement.style.setProperty('--accent', '#2563eb');
+        }
+
+        // Tabs now use inline onclick for maximum reliability
+
+        // Data
+        let events = [];
+        let dailyRemarks = {};
+        let currentRole = 'mitarbeiter';
+        let editingEventId = null;
+        let currentMannschaftFilter = null;
+
+        // Kalender-Navigation State (für Monatswechsel bis 2050)
+        let currentCalendarYear = new Date().getFullYear();
+        let currentCalendarMonth = new Date().getMonth(); // 0 = Januar ... 11 = Dezember
+        let currentCalendarFilter = null; // null = alle, '21', '22', '23', '26', 'stamm'
+
+        const GROUPS = [
+            { id: '21', name: '21', color: '#ef4444' },
+            { id: '22', name: '22', color: '#eab308' },
+            { id: '23', name: '23', color: '#22c55e' },
+            { id: '26', name: '26', color: '#3b82f6' },
+            { id: 'hr', name: 'Stamm', color: '#475569' }
+        ];
+
+        // Mannschaft Datenbank (Mitarbeiter) - saubere Ausgangsdaten
+        let mannschaft = [
+            { id: 1, gruppe: "21", name: "Sittlich", vorname: "Peter", verweildauer: "3 Jahre" },
+            { id: 2, gruppe: "22", name: "Schmidt", vorname: "Anna", verweildauer: "5 Jahre" },
+            { id: 3, gruppe: "23", name: "Müller", vorname: "Lisa", verweildauer: "2 Jahre" },
+            { id: 4, gruppe: "26", name: "Berger", vorname: "Tom", verweildauer: "4 Jahre" }
+        ];
+
+        function saveMannschaft() {
+            try {
+                localStorage.setItem('mannschaft', JSON.stringify(mannschaft));
+            } catch(e) {}
+            // Auch in Firebase speichern (empfohlene Lösung)
+            saveMannschaftToFirebase();
+        }
+
+        async function loadMannschaft() {
+            // 1. Versuche zuerst aus Firebase zu laden (beste Lösung)
+            if (typeof database !== 'undefined') {
+                try {
+                    const snapshot = await database.ref('databases/mannschaft').once('value');
+                    const firebaseData = snapshot.val();
+                    if (firebaseData && Array.isArray(firebaseData) && firebaseData.length > 0) {
+                        mannschaft = firebaseData;
+                        // Auch lokal speichern für Offline-Fähigkeit
+                        localStorage.setItem('mannschaft', JSON.stringify(mannschaft));
+                        return;
+                    }
+                } catch (e) {
+                    console.warn('Firebase-Load für Mannschaft fehlgeschlagen, Fallback auf localStorage');
+                }
+            }
+
+            // 2. Fallback: localStorage
+            try {
+                const saved = localStorage.getItem('mannschaft');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        mannschaft = parsed;
+                    }
+                }
+            } catch(e) {
+                console.warn('Konnte Mannschaft-Datenbank nicht laden.');
+            }
+        }
+
+        function saveMannschaftToFirebase() {
+            if (typeof database === 'undefined') return;
+            database.ref('databases/mannschaft').set(mannschaft).catch(err => {
+                console.warn('Fehler beim Speichern der Mannschaft in Firebase:', err);
+            });
+        }
+
+        // Gruppenführer Datenbank
+        let gruppenfuehrer = [
+            { id: 1, gruppe: "21", name: "Müller", vorname: "Michael" },
+            { id: 2, gruppe: "22", name: "Bauer", vorname: "Julia" },
+            { id: 3, gruppe: "23", name: "Klein", vorname: "Markus" },
+            { id: 4, gruppe: "26", name: "Fischer", vorname: "Sabine" },
+            { id: 5, gruppe: "Stamm", name: "Weber", vorname: "Lukas" }
+        ];
+
+        function saveGruppenfuehrer() {
+            try {
+                localStorage.setItem('gruppenfuehrer', JSON.stringify(gruppenfuehrer));
+            } catch(e) {}
+            saveGruppenfuehrerToFirebase();
+        }
+
+        async function loadGruppenfuehrer() {
+            if (typeof database !== 'undefined') {
+                try {
+                    const snapshot = await database.ref('databases/gruppenfuehrer').once('value');
+                    const firebaseData = snapshot.val();
+                    if (firebaseData && Array.isArray(firebaseData) && firebaseData.length > 0) {
+                        gruppenfuehrer = firebaseData;
+                        localStorage.setItem('gruppenfuehrer', JSON.stringify(gruppenfuehrer));
+                        return;
+                    }
+                } catch (e) {
+                    console.warn('Firebase-Load für Gruppenführer fehlgeschlagen');
+                }
+            }
+
+            try {
+                const saved = localStorage.getItem('gruppenfuehrer');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        gruppenfuehrer = parsed;
+                    }
+                }
+            } catch(e) {
+                console.warn('Konnte Gruppenführer-Datenbank nicht laden.');
+            }
+        }
+
+        function saveGruppenfuehrerToFirebase() {
+            if (typeof database === 'undefined') return;
+            database.ref('databases/gruppenfuehrer').set(gruppenfuehrer).catch(err => {
+                console.warn('Fehler beim Speichern der Gruppenführer in Firebase:', err);
+            });
+        }
+
+        // Zugführer Datenbank
+        let zugfuehrer = [
+            { id: 1, name: "Schneider", vorname: "Klaus" },
+            { id: 2, name: "Meier", vorname: "Petra" },
+            { id: 3, name: "Schulz", vorname: "Hans" },
+            { id: 4, name: "Becker", vorname: "Maria" },
+            { id: 5, name: "Hoffmann", vorname: "Stefan" }
+        ];
+
+        function saveZugfuehrer() {
+            try {
+                localStorage.setItem('zugfuehrer', JSON.stringify(zugfuehrer));
+            } catch(e) {}
+            saveZugfuehrerToFirebase();
+        }
+
+        async function loadZugfuehrer() {
+            if (typeof database !== 'undefined') {
+                try {
+                    const snapshot = await database.ref('databases/zugfuehrer').once('value');
+                    const firebaseData = snapshot.val();
+                    if (firebaseData && Array.isArray(firebaseData) && firebaseData.length > 0) {
+                        zugfuehrer = firebaseData;
+                        localStorage.setItem('zugfuehrer', JSON.stringify(zugfuehrer));
+                        return;
+                    }
+                } catch (e) {
+                    console.warn('Firebase-Load für Zugführer fehlgeschlagen');
+                }
+            }
+
+            try {
+                const saved = localStorage.getItem('zugfuehrer');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        zugfuehrer = parsed;
+                    }
+                }
+            } catch(e) {
+                console.warn('Konnte Zugführer-Datenbank nicht laden.');
+            }
+        }
+
+        function saveZugfuehrerToFirebase() {
+            if (typeof database === 'undefined') return;
+            database.ref('databases/zugfuehrer').set(zugfuehrer).catch(err => {
+                console.warn('Fehler beim Speichern der Zugführer in Firebase:', err);
+            });
+        }
+
+        // Safe storage (handles sandboxed environments)
+        let useLocalStorage = true;
+        function safeSave() {
+            if (!useLocalStorage) return;
+            try {
+                localStorage.setItem('urlaubsplaner_events', JSON.stringify(events));
+            } catch(e) {
+                console.warn('localStorage nicht verfügbar (Sandbox-Modus). Daten bleiben nur im Speicher.');
+                useLocalStorage = false;
+            }
+        }
+
+        function safeLoad() {
+            try {
+                const saved = localStorage.getItem('urlaubsplaner_events');
+                if (saved) {
+                    events = JSON.parse(saved);
+                    return true;
+                }
+            } catch(e) {
+                console.warn('localStorage nicht verfügbar.');
+                useLocalStorage = false;
+            }
+            return false;
+        }
+
+        // Sample initial data
+        function loadInitialData() {
+            if (!safeLoad()) {
+                // Demo data – Kalender leer (alle Einträge entfernt)
+                const demoEvents = [];
+                events = demoEvents;
+                saveToLocalStorage();
+            }
+        }
+
+        function saveToLocalStorage() {
+            safeSave();
+            updateStats();
+        }
+
+        function updateStats() {
+            const now = new Date();
+            const weekStart = new Date(now);
+            weekStart.setDate(now.getDate() - now.getDay() + 1);
+            const weekEnd = new Date(weekStart);
+            weekEnd.setDate(weekStart.getDate() + 6);
+
+            let weekCount = 0;
+            let pendingCount = 0;
+            let approvedMonth = 0;
+            let upcoming = 0;
+
+            const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+            const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+            events.forEach(ev => {
+                const start = new Date(ev.start);
+                const end = new Date(ev.end || ev.start);
+
+                // This week
+                if (start <= weekEnd && end >= weekStart) weekCount++;
+
+                // Pending
+                if (ev.status === 'pending') pendingCount++;
+
+                // Approved this month
+                if (ev.status === 'approved' && start >= monthStart && start <= monthEnd) approvedMonth++;
+
+                // Next 30 days
+                const thirtyDays = new Date(now);
+                thirtyDays.setDate(now.getDate() + 30);
+                if (start >= now && start <= thirtyDays) upcoming++;
+            });
+
+            // Defensive update (elements may not exist in all layouts)
+            const elWeek = document.getElementById('stat-week');
+            const elPending = document.getElementById('stat-pending');
+            const elApproved = document.getElementById('stat-approved');
+            const elUpcoming = document.getElementById('stat-upcoming');
+
+            if (elWeek) elWeek.textContent = weekCount;
+            if (elPending) elPending.textContent = pendingCount;
+            if (elApproved) elApproved.textContent = approvedMonth;
+            if (elUpcoming) elUpcoming.textContent = upcoming;
+        }
+
+        // Render groups in sidebar
+        function renderGroups() {
+            const container = document.getElementById('groups-list');
+            container.innerHTML = '';
+
+            GROUPS.forEach(group => {
+                const count = events.filter(e => e.groupId === group.id && e.status !== 'rejected').length;
+                
+                const div = document.createElement('div');
+                div.className = `flex items-center justify-between px-3 py-2.5 rounded-2xl hover:bg-slate-50 cursor-pointer group`;
+                div.innerHTML = `
+                    <div class="flex items-center gap-x-3">
+                        <div class="w-3 h-3 rounded-full" style="background-color: ${group.color}"></div>
+                        <span class="font-medium text-sm">${group.name}</span>
+                    </div>
+                    <div class="flex items-center gap-x-2">
+                        <span class="text-xs px-2.5 py-0.5 bg-slate-100 text-slate-600 rounded-2xl font-mono">${count}</span>
+                    </div>
+                `;
+                div.onclick = () => {
+                    renderGroupMembers(group.id);
+                };
+                container.appendChild(div);
+            });
+        }
+
+        function renderGroupMembers(groupId) {
+            const section = document.getElementById('group-members-section');
+            const listContainer = document.getElementById('group-members-list');
+            listContainer.innerHTML = '';
+
+            const group = GROUPS.find(g => g.id === groupId);
+            if (!group) return;
+
+            let members = [];
+
+            if (groupId === 'hr' || groupId === 'Stamm') {
+                // Für Stamm: Mannschaft (Stamm) + alle Gruppenführer + alle Zugführer
+                members = [
+                    ...mannschaft.filter(m => m.gruppe === 'Stamm' || m.gruppe === 'hr'),
+                    ...gruppenfuehrer,
+                    ...zugfuehrer
+                ];
+            } else {
+                members = mannschaft.filter(m => m.gruppe === groupId);
+            }
+
+            if (members.length === 0) {
+                listContainer.innerHTML = `<div class="text-xs text-slate-400 px-2 py-1">Keine Mitglieder in dieser Gruppe.</div>`;
+            } else {
+                members.forEach(member => {
+                    const div = document.createElement('div');
+                    div.className = `flex items-center justify-between px-2 py-1.5 rounded-xl hover:bg-slate-50 border border-slate-100`;
+                    
+                    let actionButton = '';
+                    if (canCreateBookings()) {
+                        actionButton = `
+                            <button onclick="quickAddForMember('${member.vorname} ${member.name}', '${groupId}', '${group.color}'); event.stopImmediatePropagation();" 
+                                    class="w-5 h-5 rounded flex-shrink-0 flex items-center justify-center text-white text-[10px] font-bold shadow-sm"
+                                    style="background-color: ${group.color}">
+                                +
+                            </button>
+                        `;
+                    }
+                    
+                    div.innerHTML = `
+                        <div class="flex items-center gap-x-2 min-w-0">
+                            ${actionButton}
+                            <span class="text-sm font-medium truncate block w-full">${member.vorname} ${member.name}</span>
+                        </div>
+                    `;
+                    listContainer.appendChild(div);
+                });
+            }
+
+            section.classList.remove('hidden');
+            section.classList.add('block');
+            updateStats();
+        }
+
+        function hideGroupMembers() {
+            const section = document.getElementById('group-members-section');
+            section.classList.remove('block');
+            section.classList.add('hidden');
+        }
+
+        function quickAddForMember(fullName, groupId, groupColor) {
+            // Öffne Modal mit vorausgefülltem Namen und Gruppe
+            showAddModal();
+            
+            // Name vorabfüllen
+            setTimeout(() => {
+                const nameInput = document.getElementById('modal-name');
+                if (nameInput) nameInput.value = fullName;
+
+                // Gruppe vorabfüllen und Dropdown ausblenden
+                const groupSelect = document.getElementById('modal-group');
+                if (groupSelect) {
+                    groupSelect.value = groupId;
+                    groupSelect.style.display = 'none';
+                    
+                    // Optional: Label ausblenden oder Hinweis
+                    const groupLabel = groupSelect.parentElement.querySelector('label');
+                    if (groupLabel) groupLabel.style.display = 'none';
+                }
+            }, 100);
+        }
+
+        function filterCalendarByGroup(groupId) {
+            filterCalendar(groupId === 'hr' ? 'stamm' : groupId);
+        }
+
+        function filterCalendar(filterValue) {
+            currentCalendarFilter = filterValue || null;
+            renderMonthlyView();
+            updateFilterUI();
+        }
+
+        function updateFilterUI() {
+            const select = document.getElementById('group-filter-select');
+            if (select) {
+                select.value = currentCalendarFilter || '';
+            }
+        }
+
+        function setDefaultDateForTagesrecherche() {
+            const dateInput = document.getElementById('day-search-input');
+            if (dateInput) {
+                const d = new Date();
+                const day = String(d.getDate()).padStart(2, '0');
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const year = d.getFullYear();
+                dateInput.value = `${day}.${month}.${year}`;
+                searchDayStats();
+            }
+        }
+
+        function updateCurrentMonthDisplay() {
+            const display = document.getElementById('current-month-display');
+            if (!display) return;
+            const date = new Date(currentCalendarYear, currentCalendarMonth);
+            display.textContent = date.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
+
+            // Heutiges Datum im Schnellzugriff anzeigen
+            const todayDisplay = document.getElementById('today-date-display');
+            if (todayDisplay) {
+                const today = new Date();
+                todayDisplay.textContent = today.toLocaleDateString('de-DE');
+            }
+        }
+
+        // Render upcoming list
+        function renderUpcoming() {
+            // Card wurde entfernt - Funktion deaktiviert
+            return;
+        }
+
+        // ==================== TAGE STATISTIK ====================
+        function searchDayStats() {
+            const dateInput = document.getElementById('day-search-input').value;
+            const statsDiv = document.getElementById('day-stats');
+            const urlaubEl = document.getElementById('day-stats-urlaub');
+            const azaEl = document.getElementById('day-stats-aza');
+
+            if (!dateInput) {
+                statsDiv.classList.add('hidden');
+                return;
+            }
+
+            let urlaubCount = 0;
+            let azaCount = 0;
+
+            events.forEach(ev => {
+                if (ev.start === dateInput && ev.status !== 'rejected') {
+                    if (ev.type === 'Urlaub') urlaubCount++;
+                    if (ev.type === 'AZA') azaCount++;
+                }
+            });
+
+            urlaubEl.textContent = urlaubCount;
+            azaEl.textContent = azaCount;
+            statsDiv.classList.remove('hidden');
+        }
+
+        // ==================== NÄCHSTE 7 TAGE ====================
+        function renderNext7DaysAbsences() {
+            const container = document.getElementById('next7days-list');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const today = new Date();
+            const in7Days = new Date(today);
+            in7Days.setDate(today.getDate() + 7);
+
+            const upcoming = events
+                .filter(ev => {
+                    const start = new Date(ev.start);
+                    return start >= today && start <= in7Days && ev.status !== 'rejected';
+                })
+                .sort((a, b) => new Date(a.start) - new Date(b.start));
+
+            if (upcoming.length === 0) {
+                container.innerHTML = `<div class="text-sm text-slate-400 px-2 py-3">Keine Abwesenheiten in den nächsten 7 Tagen</div>`;
+                return;
+            }
+
+            upcoming.forEach(ev => {
+                const group = GROUPS.find(g => g.id === ev.groupId) || { color: '#64748b', name: ev.groupId };
+                const startDate = new Date(ev.start);
+
+                const div = document.createElement('div');
+                div.className = `flex items-center gap-3 px-3 py-2 rounded-xl border border-slate-100 hover:bg-slate-50 cursor-pointer`;
+                div.innerHTML = `
+                    <div class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: ${group.color}"></div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between">
+                            <span class="font-medium text-sm">${ev.title}</span>
+                            <span class="text-[10px] text-slate-500 font-mono">${startDate.toLocaleDateString('de-DE', {day:'2-digit', month:'2-digit'})}</span>
+                        </div>
+                        <div class="text-xs text-slate-500">${ev.type} • ${group.name}</div>
+                    </div>
+                `;
+                div.onclick = () => editEvent(ev.id);
+                container.appendChild(div);
+            });
+        }
+
+        // ==================== MANN SCHAFT KALENDER (aus mannschaft DB) ====================
+        function renderMonthlyView() {
+            const container = document.getElementById('monthly-view-unified');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const year = currentCalendarYear;
+            const month = currentCalendarMonth;
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const holidaysThisYear = getHolidaysForYear(year);
+
+            // === Filter + Stamm Integration ===
+            let memberList = [];
+
+            const filter = currentCalendarFilter;
+
+            // Stamm anzeigen?
+            const showStamm = (filter === null || filter === 'stamm');
+
+            if (showStamm) {
+                // Zugführer zuerst
+                const zf = zugfuehrer.map(m => ({
+                    name: `${m.vorname} ${m.name}`,
+                    nachname: m.name,
+                    groupId: 'ZF',
+                    isStamm: true,
+                    isZugfuehrer: true
+                }));
+                // Dann Gruppenführer
+                const gf = gruppenfuehrer.map(m => ({
+                    name: `${m.vorname} ${m.name}`,
+                    nachname: m.name,
+                    groupId: 'GF',
+                    isStamm: true,
+                    isZugfuehrer: false
+                }));
+                memberList.push(...zf, ...gf);
+            }
+
+            // Mannschaft anzeigen?
+            const showMannschaft = (filter === null || ['21','22','23','26'].includes(filter));
+
+            if (showMannschaft) {
+                let mannList = mannschaft
+                    .filter(m => {
+                        if (filter === null) return ['21','22','23','26'].includes(m.gruppe);
+                        return m.gruppe === filter;
+                    })
+                    .map(m => ({
+                        name: `${m.vorname} ${m.name}`,
+                        nachname: m.name,
+                        groupId: m.gruppe,
+                        isStamm: false
+                    }));
+
+                // Sortierung
+                const groupOrder = { '21': 1, '22': 2, '23': 3, '26': 4 };
+                mannList.sort((a, b) => {
+                    const gA = groupOrder[a.groupId] || 99;
+                    const gB = groupOrder[b.groupId] || 99;
+                    if (gA !== gB) return gA - gB;
+                    return a.nachname.localeCompare(b.nachname);
+                });
+
+                // Trennlinie nur bei "Alle Gruppen"
+                if (filter === null && memberList.length > 0 && mannList.length > 0) {
+                    memberList.push({ isSeparator: true });
+                }
+
+                memberList.push(...mannList);
+            }
+
+            if (memberList.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-slate-400">
+                        <i class="fa-solid fa-users text-4xl mb-3 opacity-50"></i>
+                        <p>Keine Mitglieder für diesen Filter gefunden.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Monatsname für die Anzeige
+            const monthDate = new Date(year, month);
+            const monthName = monthDate.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
+
+            // Matrix-Tabelle mit Navigation + kompakter Monatssuche
+            const tableHTML = `
+                <div class="mb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3 px-1">
+                    <!-- Navigation Buttons + Monatsname -->
+                    <div class="flex items-center gap-x-2">
+                        <button onclick="goToPreviousMonth()" 
+                                class="flex items-center justify-center w-9 h-9 rounded-2xl border border-slate-300 hover:bg-slate-100 active:bg-slate-200 transition-colors text-lg font-light">
+                            ←
+                        </button>
+                        <div id="calendar-month-title" 
+                             class="font-semibold text-xl min-w-[170px] text-center px-4 py-1 bg-white border border-slate-200 rounded-3xl shadow-sm">
+                            ${monthName}
+                        </div>
+                        <button onclick="goToNextMonth()" 
+                                class="flex items-center justify-center w-9 h-9 rounded-2xl border border-slate-300 hover:bg-slate-100 active:bg-slate-200 transition-colors text-lg font-light">
+                            →
+                        </button>
+                    </div>
+
+                    <!-- Kompakte Monatssuche (bis 2050) -->
+                    <div class="flex items-center gap-x-3 text-sm">
+                        <span id="current-month-display" class="font-semibold text-slate-700"></span>
+                        <span id="today-date-display" class="px-3 py-1 text-xs font-medium text-slate-600"></span>
+                        <input type="month" id="month-picker" 
+                               class="border border-slate-300 rounded-2xl px-3 py-2 text-sm focus:outline-none focus:border-blue-400 w-full md:w-auto"
+                               min="2020-01" max="2050-12"
+                               onchange="jumpToSelectedMonth()">
+                        <button onclick="resetToCurrentMonth()" 
+                                class="px-3 py-2 text-xs rounded-2xl border border-slate-300 hover:bg-slate-100 active:bg-slate-200">
+                            Heute
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-auto max-h-[480px] border border-slate-200 rounded-3xl shadow-sm"> <!-- ~10 Personen vor Scroll -->
+                    <table class="w-full border-collapse text-sm">
+                        <thead class="sticky top-0 z-[60] bg-white">
+                            <tr>
+                                <th class="sticky left-0 z-[70] bg-white border p-2 text-left font-medium min-w-[160px] shadow-sm">Mannschaft</th>
+                                ${Array.from({length: daysInMonth}, (_, i) => {
+                                    const d = i + 1;
+                                    const date = new Date(year, month, d);
+                                    const weekdayNum = date.getDay(); // 0=Sonntag, 6=Samstag
+                                    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                                    const isHoliday = holidaysThisYear.has(dateStr);
+                                    const isSunday = weekdayNum === 0;
+                                    const isSaturday = weekdayNum === 6;
+
+                                    let headerClass = "border p-1 text-center min-w-[50px] text-xs";
+                                    let contentClass = "";
+
+                                    if (isHoliday) {
+                                        headerClass += " bg-black text-white font-semibold";
+                                    } else if (isSunday) {
+                                        headerClass += " bg-gray-400 text-black";
+                                    } else if (isSaturday) {
+                                        headerClass += " bg-gray-200";
+                                    } else {
+                                        headerClass += " bg-slate-50";
+                                    }
+
+                                    const weekday = date.toLocaleDateString('de-DE', {weekday: 'short'});
+                                    return `<th class="${headerClass}">${d}<br><span class="opacity-70">${weekday}</span></th>`;
+                                }).join('')}
+                            </tr>
+                            <!-- Belegt row (fixiert) -->
+                            <tr class="bg-slate-200">
+                                <th class="sticky left-0 z-[70] bg-slate-200 border p-1 text-left text-xs font-semibold shadow-sm">Belegt</th>
+                                ${Array.from({length: daysInMonth}, (_, i) => {
+                                    const day = i + 1;
+                                    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                                    const date = new Date(year, month, day);
+                                    const weekdayNum = date.getDay();
+                                    const isHoliday = holidaysThisYear.has(dateStr);
+                                    const isSunday = weekdayNum === 0;
+                                    const isSaturday = weekdayNum === 6;
+
+                                    let thClass = "border p-1 text-center text-xs font-mono";
+                                    if (isHoliday) {
+                                        thClass += " bg-black text-white";
+                                    } else if (isSunday) {
+                                        thClass += " bg-gray-400 text-black";
+                                    } else if (isSaturday) {
+                                        thClass += " bg-gray-200";
+                                    }
+
+                                    let urlaub = 0;
+                                    let aza = 0;
+                                    
+                                    events.forEach(ev => {
+                                        if (ev.status !== 'pending' && ev.status !== 'approved') return;
+                                        const start = new Date(ev.start);
+                                        const end = new Date(ev.end || ev.start);
+                                        const current = new Date(dateStr);
+                                        if (current >= start && current <= end) {
+                                            if (ev.type === 'Urlaub') urlaub++;
+                                            if (ev.type === 'AZA') aza++;
+                                        }
+                                    });
+                                    
+                                    let color = '#166534';
+                                    if (urlaub >= 7 || aza >= 4) color = '#b91c1c';
+                                    else if (urlaub >= 6 || aza >= 3) color = '#854d0e';
+                                    
+                                    return `<th class="${thClass}" style="color: ${color}">${urlaub}/${aza}</th>`;
+                                }).join('')}
+                            </tr>
+
+                            <!-- Bemerkungszeile (analog zu Belegt) -->
+                            <tr class="bg-white">
+                                <th class="sticky left-0 z-[70] bg-white border p-1 text-left text-xs font-semibold shadow-sm">Bemerkung</th>
+                                ${Array.from({length: daysInMonth}, (_, i) => {
+                                    const day = i + 1;
+                                    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                                    const remark = dailyRemarks[dateStr] || '';
+                                    const shortRemark = remark ? (remark.length > 10 ? remark.substring(0,10) + '…' : remark) : '—';
+                                    return `<th class="border p-1 text-center text-[10px] cursor-pointer hover:bg-amber-50 transition-colors" 
+                                                onclick="editRemark('${dateStr}', this)" 
+                                                title="${remark || 'Klicken zum Hinzufügen/Bearbeiten'}">
+                                        <span class="text-slate-600">${shortRemark}</span>
+                                    </th>`;
+                                }).join('')}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${memberList.map(member => {
+                                if (member.isSeparator) {
+                                    return `<tr><td colspan="${daysInMonth + 1}" class="border-t-4 border-black bg-slate-100 h-3 p-0"></td></tr>`;
+                                }
+                                const group = GROUPS.find(g => g.id === member.groupId) || { name: member.groupId, color: '#64748b' };
+                                let cells = '';
+                                for (let day = 1; day <= daysInMonth; day++) {
+                                    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                                    const dayDate = new Date(dateStr);
+                                    const dayEvents = events.filter(ev => {
+                                        if (ev.title !== member.name) return false;
+                                        const start = new Date(ev.start);
+                                        const end = new Date(ev.end || ev.start);
+                                        return dayDate >= start && dayDate <= end && ev.status !== 'rejected';
+                                    });
+                                    if (dayEvents.length > 0) {
+                                        const ev = dayEvents[0];
+                                        let bgColor = '#e5e7eb'; // default gray
+                                        let textColor = '#111827';
+                                        let titleExtra = '';
+
+                                        const type = (ev.type || '').toLowerCase();
+                                        const status = ev.status || 'pending';
+
+                                        if (type.includes('os')) {
+                                            bgColor = '#22c55e'; // grün
+                                            textColor = '#fff';
+                                        } else if (type.includes('lehrgang')) {
+                                            bgColor = '#eab308'; // gelb
+                                            textColor = '#111827';
+                                        } else if (type.includes('krank')) {
+                                            bgColor = '#111827'; // schwarz
+                                            textColor = '#fff';
+                                        } else if (type.includes('urlaub')) {
+                                            if (status === 'approved') {
+                                                bgColor = '#b91c1c'; // dunkelrot
+                                                textColor = '#fff';
+                                            } else {
+                                                bgColor = '#fda4af'; // hellrot / rose
+                                                textColor = '#111827';
+                                            }
+                                        } else if (type.includes('aza')) {
+                                            if (status === 'approved') {
+                                                bgColor = '#1e40af'; // dunkelblau
+                                                textColor = '#fff';
+                                            } else {
+                                                bgColor = '#7dd3fc'; // hellblau
+                                                textColor = '#111827';
+                                            }
+                                        } else if (type.includes('gv')) {
+                                            bgColor = '#7c3aed'; // lila / purple
+                                            textColor = '#fff';
+                                        }
+
+                                        cells += `<td class="border p-1 text-center" title="${ev.type} (${status}) - ${ev.note || ''}">
+                                            <div class="w-5 h-5 mx-auto rounded-full flex items-center justify-center text-[9px] font-bold" 
+                                                 style="background-color: ${bgColor}; color: ${textColor};">
+                                            </div>
+                                        </td>`;
+                                    } else {
+                                        cells += `<td class="border p-1 text-center text-slate-300 text-xs">—</td>`;
+                                    }
+                                }
+                                return `
+                                    <tr class="hover:bg-slate-50">
+                                        <td class="sticky left-0 bg-white border p-3 font-medium whitespace-nowrap">
+                                            <div class="flex items-center gap-x-2">
+                                                <div class="w-3 h-3 rounded-full flex-shrink-0" style="background-color: ${group.color}"></div>
+                                                ${member.name}
+                                            </div>
+                                        </td>
+                                        ${cells}
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            container.innerHTML = tableHTML;
+            updateCurrentMonthDisplay();
+            // Kein setTimeout(updateCalendarMonthTitle) mehr nötig – Titel wird direkt im Template gerendert
+        }
+
+        // Bemerkung für einen Tag bearbeiten/hinzufügen
+        function editRemark(dateStr, thElement) {
+            const current = dailyRemarks[dateStr] || '';
+            const newRemark = prompt('Bemerkung für ' + dateStr + ' eingeben (leer = löschen):', current);
+            if (newRemark === null) return; // Abbruch
+
+            if (newRemark.trim() === '') {
+                delete dailyRemarks[dateStr];
+            } else {
+                dailyRemarks[dateStr] = newRemark.trim();
+            }
+
+            // Speichern
+            try {
+                localStorage.setItem('dailyRemarks', JSON.stringify(dailyRemarks));
+            } catch(e) {}
+
+            // UI aktualisieren
+            const short = newRemark.trim() ? (newRemark.trim().length > 10 ? newRemark.trim().substring(0,10) + '…' : newRemark.trim()) : '—';
+            thElement.innerHTML = `<span class="text-slate-600">${short}</span>`;
+            thElement.title = newRemark.trim() || 'Klicken zum Bearbeiten';
+        }
+
+        // Schnell-Button: Bemerkung für einen Tag hinzufügen
+        function addRemarkForDay() {
+            const dateStr = prompt('Datum eingeben (YYYY-MM-DD), z.B. 2026-07-15:');
+            if (!dateStr) return;
+
+            // Einfache Validierung
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+                alert('Ungültiges Datumsformat. Bitte YYYY-MM-DD verwenden.');
+                return;
+            }
+
+            const current = dailyRemarks[dateStr] || '';
+            const newRemark = prompt('Bemerkung für ' + dateStr + ':', current);
+            if (newRemark === null) return;
+
+            if (newRemark.trim() === '') {
+                delete dailyRemarks[dateStr];
+            } else {
+                dailyRemarks[dateStr] = newRemark.trim();
+            }
+
+            try {
+                localStorage.setItem('dailyRemarks', JSON.stringify(dailyRemarks));
+            } catch(e) {}
+
+            // Kalender neu rendern damit die Zeile aktualisiert wird
+            renderMonthlyView(); // unified calendar
+            showToast('Bemerkung gespeichert.');
+        }
+
+        // ==================== STAMM KALENDER (nur Gruppenführer + Zugführer) ====================
+        function renderStammCalendar() {
+            const container = document.getElementById('monthly-view-stamm');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const year = currentCalendarYear;
+            const month = currentCalendarMonth;
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const holidaysThisYear = getHolidaysForYear(year);
+
+            // Nur aus gruppenfuehrer + zugfuehrer (explizit keine mannschaft!)
+            let memberList = [
+                ...gruppenfuehrer.map(m => ({
+                    name: `${m.vorname} ${m.name}`,
+                    nachname: m.name,
+                    groupId: 'GF'
+                })),
+                ...zugfuehrer.map(m => ({
+                    name: `${m.vorname} ${m.name}`,
+                    nachname: m.name,
+                    groupId: 'ZF'
+                }))
+            ];
+
+            const groupOrder = { 'GF': 1, 'ZF': 2 };
+            memberList.sort((a, b) => {
+                const gA = groupOrder[a.groupId] || 99;
+                const gB = groupOrder[b.groupId] || 99;
+                if (gA !== gB) return gA - gB;
+                return a.nachname.localeCompare(b.nachname);
+            });
+
+            if (memberList.length === 0) {
+                container.innerHTML = `<div class="text-center py-6 text-slate-400 text-sm">Keine Gruppenführer oder Zugführer gefunden.</div>`;
+                return;
+            }
+
+            const monthName = new Date(year, month).toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
+
+            // Kompakter Tabellenbau für Stamm (ähnlich, aber eigenständig)
+            const tableHTML = `
+                <div class="mb-3 flex items-center justify-between px-1">
+                    <div class="font-semibold text-lg">${monthName} <span class="text-xs text-emerald-600">(Stamm)</span></div>
+                </div>
+                <div class="overflow-auto max-h-[420px] border border-slate-200 rounded-2xl">
+                    <table class="w-full border-collapse text-sm">
+                        <thead class="sticky top-0 z-[60] bg-white">
+                            <tr>
+                                <th class="sticky left-0 z-[70] bg-white border p-2 text-left font-medium min-w-[160px]">Stamm</th>
+                                ${Array.from({length: daysInMonth}, (_, i) => {
+                                    const d = i + 1;
+                                    const date = new Date(year, month, d);
+                                    const weekdayNum = date.getDay();
+                                    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                                    const isHoliday = holidaysThisYear.has(dateStr);
+                                    const isSunday = weekdayNum === 0;
+                                    const isSaturday = weekdayNum === 6;
+                                    let headerClass = "border p-1 text-center min-w-[50px] text-xs";
+                                    if (isHoliday) headerClass += " bg-black text-white font-semibold";
+                                    else if (isSunday) headerClass += " bg-gray-400 text-black";
+                                    else if (isSaturday) headerClass += " bg-gray-200";
+                                    else headerClass += " bg-slate-50";
+                                    const weekday = date.toLocaleDateString('de-DE', {weekday: 'short'});
+                                    return `<th class="${headerClass}">${d}<br><span class="opacity-70">${weekday}</span></th>`;
+                                }).join('')}
+                            </tr>
+                            <tr class="bg-slate-200">
+                                <th class="sticky left-0 z-[70] bg-slate-200 border p-1 text-left text-xs font-semibold">Belegt</th>
+                                ${Array.from({length: daysInMonth}, (_, i) => {
+                                    const day = i + 1;
+                                    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                                    let urlaub = 0, aza = 0;
+                                    events.forEach(ev => {
+                                        if ((ev.status !== 'pending' && ev.status !== 'approved') || !ev.title) return;
+                                        const start = new Date(ev.start);
+                                        const end = new Date(ev.end || ev.start);
+                                        const current = new Date(dateStr);
+                                        if (current >= start && current <= end) {
+                                            if (ev.type === 'Urlaub') urlaub++;
+                                            if (ev.type === 'AZA') aza++;
+                                        }
+                                    });
+                                    let color = '#166534';
+                                    if (urlaub >= 7 || aza >= 4) color = '#b91c1c';
+                                    else if (urlaub >= 6 || aza >= 3) color = '#854d0e';
+                                    return `<th class="border p-1 text-center text-xs font-mono" style="color:${color}">${urlaub}/${aza}</th>`;
+                                }).join('')}
+                            </tr>
+                            <tr class="bg-white">
+                                <th class="sticky left-0 z-[70] bg-white border p-1 text-left text-xs font-semibold">Bemerkung</th>
+                                ${Array.from({length: daysInMonth}, (_, i) => {
+                                    const day = i + 1;
+                                    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                                    const remark = dailyRemarks[dateStr] || '';
+                                    const short = remark ? (remark.length > 10 ? remark.substring(0,10)+'…' : remark) : '—';
+                                    return `<th class="border p-1 text-center text-[10px] cursor-pointer hover:bg-amber-50" onclick="editRemark('${dateStr}', this)">${short}</th>`;
+                                }).join('')}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${memberList.map(member => {
+                                let cells = '';
+                                for (let day = 1; day <= daysInMonth; day++) {
+                                    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                                    const dayDate = new Date(dateStr);
+                                    const dayEvents = events.filter(ev => ev.title === member.name && new Date(ev.start) <= dayDate && new Date(ev.end || ev.start) >= dayDate && ev.status !== 'rejected');
+                                    if (dayEvents.length > 0) {
+                                        const ev = dayEvents[0];
+                                        let bg = '#e5e7eb', tc = '#111827';
+                                        const t = (ev.type || '').toLowerCase();
+                                        const s = ev.status || 'pending';
+                                        if (t.includes('os')) { bg = '#22c55e'; tc = '#fff'; }
+                                        else if (t.includes('lehrgang')) { bg = '#eab308'; tc = '#111827'; }
+                                        else if (t.includes('krank')) { bg = '#111827'; tc = '#fff'; }
+                                        else if (t.includes('urlaub')) { bg = s === 'approved' ? '#b91c1c' : '#fda4af'; tc = s === 'approved' ? '#fff' : '#111827'; }
+                                        else if (t.includes('aza')) { bg = s === 'approved' ? '#1e40af' : '#7dd3fc'; tc = s === 'approved' ? '#fff' : '#111827'; }
+                                        else if (t.includes('gv')) { bg = '#7c3aed'; tc = '#fff'; }
+                                        cells += `<td class="border p-1 text-center"><div class="w-5 h-5 mx-auto rounded-full" style="background:${bg};color:${tc}"></div></td>`;
+                                    } else {
+                                        cells += `<td class="border p-1 text-center text-slate-300 text-xs">—</td>`;
+                                    }
+                                }
+                                let badgeColor = '#64748b';
+                                if (member.isStamm) {
+                                    badgeColor = '#475569'; // Stamm-Farbe (gleich wie im Buchungscontainer)
+                                } else {
+                                    const g = GROUPS.find(gr => gr.id === member.groupId);
+                                    badgeColor = g ? g.color : '#64748b';
+                                }
+                                return `<tr class="hover:bg-slate-50"><td class="sticky left-0 bg-white border p-3 font-medium"><div class="flex items-center gap-x-2"><div class="w-3 h-3 rounded-full" style="background:${badgeColor}"></div>${member.name}</div></td>${cells}</tr>`;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            container.innerHTML = tableHTML;
+            updateCurrentMonthDisplay();
+        }
+
+        function resetToCurrentMonth() {
+            const today = new Date();
+            currentCalendarYear = today.getFullYear();
+            currentCalendarMonth = today.getMonth();
+            renderMonthlyView(); // unified calendar
+            updateCurrentMonthDisplay();
+        }
+
+        // Deutsches Datumsformat TT.MM.JJJJ
+        function formatDateDE(dateStr) {
+            if (!dateStr) return '';
+            const d = new Date(dateStr);
+            if (isNaN(d.getTime())) return dateStr;
+            const day = String(d.getDate()).padStart(2, '0');
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const year = d.getFullYear();
+            return `${day}.${month}.${year}`;
+        }
+
+        // Warnt bei Wochenende oder Feiertag in der Buchung
+        function checkDateForWeekendHoliday(dateStr, field) {
+            if (!dateStr) return;
+
+            const date = new Date(dateStr);
+            const year = date.getFullYear();
+            const holidays = getHolidaysForYear(year);
+            const dateKey = dateStr;
+            const isHol = holidays.has(dateKey);
+            const day = date.getDay();
+            const isWeekend = day === 0 || day === 6;
+
+            const startWarning = document.getElementById('date-warning-start');
+            const endWarning = document.getElementById('date-warning-end');
+
+            let warningEl = field === 'start' ? startWarning : endWarning;
+            if (!warningEl) return;
+
+            if (isHol) {
+                warningEl.innerHTML = `<span class="text-red-600 text-xs">⚠️ Feiertag – bitte prüfen</span>`;
+                warningEl.style.display = 'block';
+            } else if (isWeekend) {
+                warningEl.innerHTML = `<span class="text-amber-600 text-xs">⚠️ Wochenende</span>`;
+                warningEl.style.display = 'block';
+            } else {
+                warningEl.style.display = 'none';
+            }
+        }
+
+        // ==================== FEIERTAGE & WOCHENENDE HELPER (bis 2050) ====================
+        function getEasterDate(year) {
+            // Anonymer gregorianischer Oster-Algorithmus (Meeus/Jones/Butcher)
+            const a = year % 19;
+            const b = Math.floor(year / 100);
+            const c = year % 100;
+            const d = Math.floor(b / 4);
+            const e = b % 4;
+            const f = Math.floor((b + 8) / 25);
+            const g = Math.floor((b - f + 1) / 3);
+            const h = (19 * a + b - d - g + 15) % 30;
+            const i = Math.floor(c / 4);
+            const k = c % 4;
+            const l = (32 + 2 * e + 2 * i - h - k) % 7;
+            const m = Math.floor((a + 11 * h + 22 * l) / 451);
+            const easterMonth = Math.floor((h + l - 7 * m + 114) / 31) - 1; // 0-basiert
+            const easterDay = ((h + l - 7 * m + 114) % 31) + 1;
+            return new Date(year, easterMonth, easterDay);
+        }
+
+        function getHolidaysForYear(year) {
+            const holidays = new Set();
+            const add = (m, d) => holidays.add(`${year}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`);
+
+            // Feste Feiertage (bundesweit + Bayern)
+            add(1, 1);   // Neujahr
+            add(1, 6);   // Heilige Drei Könige (BY)
+            add(5, 1);   // Tag der Arbeit
+            add(8, 15);  // Mariä Himmelfahrt (BY)
+            add(10, 3);  // Tag der Deutschen Einheit
+            add(11, 1);  // Allerheiligen (BY)
+            add(12, 25); // 1. Weihnachtstag
+            add(12, 26); // 2. Weihnachtstag
+
+            // Bewegliche Feiertage (Ostern-basiert)
+            const easter = getEasterDate(year);
+            const easterMs = easter.getTime();
+
+            const karfreitag     = new Date(easterMs - 2 * 86400000);
+            const ostermontag    = new Date(easterMs + 1 * 86400000);
+            const himmelfahrt    = new Date(easterMs + 39 * 86400000);
+            const pfingstmontag  = new Date(easterMs + 50 * 86400000);
+            const fronleichnam   = new Date(easterMs + 60 * 86400000);
+
+            add(karfreitag.getMonth() + 1, karfreitag.getDate());
+            add(ostermontag.getMonth() + 1, ostermontag.getDate());
+            add(himmelfahrt.getMonth() + 1, himmelfahrt.getDate());
+            add(pfingstmontag.getMonth() + 1, pfingstmontag.getDate());
+            add(fronleichnam.getMonth() + 1, fronleichnam.getDate());
+
+            return holidays;
+        }
+
+        // ==================== KALENDER NAVIGATION ====================
+        function goToPreviousMonth() {
+            currentCalendarMonth--;
+            if (currentCalendarMonth < 0) {
+                currentCalendarMonth = 11;
+                currentCalendarYear--;
+            }
+            // Begrenzung auf vernünftigen Zeitraum (bis 2050 erlaubt)
+            if (currentCalendarYear < 2020) currentCalendarYear = 2020;
+            renderMonthlyView(); // unified calendar
+        }
+
+        function goToNextMonth() {
+            currentCalendarMonth++;
+            if (currentCalendarMonth > 11) {
+                currentCalendarMonth = 0;
+                currentCalendarYear++;
+            }
+            if (currentCalendarYear > 2050) currentCalendarYear = 2050;
+            renderMonthlyView(); // unified calendar
+        }
+
+        function jumpToSelectedMonth() {
+            const picker = document.getElementById('month-picker');
+            if (!picker || !picker.value) return;
+
+            // Format: "2026-07"
+            const [yearStr, monthStr] = picker.value.split('-');
+            const newYear = parseInt(yearStr, 10);
+            const newMonth = parseInt(monthStr, 10) - 1; // 0-basiert
+
+            if (newYear >= 2020 && newYear <= 2050 && newMonth >= 0 && newMonth <= 11) {
+                currentCalendarYear = newYear;
+                currentCalendarMonth = newMonth;
+                renderMonthlyView(); // unified calendar
+                updateCurrentMonthDisplay();
+            }
+        }
+
+        function updateCalendarMonthTitle() {
+            // Wird nach dem Rendern aufgerufen, um den Picker-Wert zu setzen
+            const titleEl = document.getElementById('calendar-month-title');
+            if (titleEl) {
+                const date = new Date(currentCalendarYear, currentCalendarMonth);
+                titleEl.textContent = date.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
+            }
+            const picker = document.getElementById('month-picker');
+            if (picker) {
+                picker.value = `${currentCalendarYear}-${String(currentCalendarMonth + 1).padStart(2, '0')}`;
+            }
+        }
+
+        // FullCalendar entfernt (nicht verwendet; custom renderMonthlyView() ist der aktive Kalender)
+
+        function refreshCalendar() {
+            renderGroups();
+            renderNext7DaysAbsences();
+            updateStats();
+            renderMonthlyView();           // Mannschaft
+            renderStammCalendar();         // Stamm (nur GF + ZF)
+        }
+
+        // ==================== BERECHTIGUNGEN ====================
+        function canCreateBookings() {
+            return currentRole === 'manager' || currentRole === 'admin';
+        }
+
+        function canApproveBookings() {
+            return currentRole === 'admin';
+        }
+
+        function canViewCalendar() {
+            return true;
+        }
+
+        function switchToGruppenfuehrer() {
+            switchRole('manager');
+        }
+
+        function switchToZugfuehrer() {
+            switchRole('admin');
+        }
+
+        function openDatabaseWithPassword(openFunction) {
+            const password = prompt("Passwort für Datenbankzugriff eingeben:");
+            if (password === "Michael2") {
+                openFunction();
+            } else if (password !== null) {
+                alert("Falsches Passwort!");
+            }
+        }
+
+        function updateHeaderButtons() {
+            const btnOffene = document.getElementById('btn-offene-antraege');
+            const btnGenehmigt = document.getElementById('btn-genehmigte-antraege');
+            const resetLink = document.getElementById('reset-offene-link');
+
+            if (btnOffene) btnOffene.style.display = (currentRole === 'admin') ? 'flex' : 'none';
+            if (btnGenehmigt) btnGenehmigt.style.display = (currentRole === 'admin') ? 'flex' : 'none';
+            if (resetLink) resetLink.style.display = (currentRole === 'admin') ? 'inline' : 'none';
+        }
+
+        // Role switching
+        function switchRole(role) {
+            currentRole = role;
+            updateHeaderButtons();
+            
+            // Update UI buttons
+            document.querySelectorAll('[id^="role-"]').forEach(btn => {
+                btn.classList.remove('bg-white', 'shadow-sm', 'active-role');
+                btn.classList.add('text-slate-600');
+            });
+            
+            const activeBtn = document.getElementById(`role-${role}`);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-white', 'shadow-sm');
+                activeBtn.classList.remove('text-slate-600');
+            }
+
+            // Update current user display
+            const userEl = document.getElementById('current-user');
+            const groupEl = document.getElementById('current-group');
+            
+            if (role === 'mitarbeiter') {
+                userEl.textContent = 'Peter Sittlich';
+                groupEl.textContent = '21';
+            } else if (role === 'manager') {
+                userEl.textContent = 'Michael Berger';
+                groupEl.textContent = 'Vertrieb (Leiter)';
+            } else {
+                userEl.textContent = 'Zugführer';
+                groupEl.textContent = 'Alle Gruppen';
+            }
+
+            // Status-Buttons wurden entfernt – keine Sichtbarkeit mehr nötig
+        }
+
+        // Show add modal
+        let modalCurrentGroup = null;
+
+        function showAddModal(preselectedDate = null) {
+            const modal = document.getElementById('add-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            // Reset form
+            document.getElementById('modal-title').textContent = 'Neuen Eintrag hinzufügen';
+            document.getElementById('save-btn-text').textContent = 'Speichern';
+            document.getElementById('delete-btn').classList.add('hidden');
+            editingEventId = null;
+
+            // Populate groups
+            const groupSelect = document.getElementById('modal-group');
+            groupSelect.innerHTML = '';
+            
+            GROUPS.forEach(group => {
+                const opt = document.createElement('option');
+                opt.value = group.id;
+                opt.textContent = group.name;
+                groupSelect.appendChild(opt);
+            });
+
+            // Reset visibility (für Quick-Add aus Gruppenmitglieder)
+            groupSelect.style.display = 'block';
+            const groupLabel = groupSelect.parentElement.querySelector('label');
+            if (groupLabel) groupLabel.style.display = 'block';
+
+            // Preselect based on role
+            if (currentRole === 'mitarbeiter') {
+                groupSelect.value = '21'; // Default now Peter Sittlich in Gruppe 21
+                groupSelect.disabled = true;
+            } else {
+                groupSelect.disabled = false;
+            }
+
+            // Preselect date
+            const startInput = document.getElementById('modal-start');
+            const endInput = document.getElementById('modal-end');
+            
+            if (preselectedDate) {
+                startInput.value = preselectedDate;
+                endInput.value = preselectedDate;
+            } else {
+                const today = new Date().toISOString().split('T')[0];
+                startInput.value = today;
+                endInput.value = today;
+            }
+
+            // Auto-set "Bis" = "Von" when user changes "Von"
+            startInput.onchange = function() {
+                endInput.value = startInput.value;
+                checkDateForWeekendHoliday(startInput.value, 'start');
+            };
+
+            endInput.onchange = function() {
+                checkDateForWeekendHoliday(endInput.value, 'end');
+            };
+
+            // Prüfe bereits vorausgewähltes Datum
+            if (startInput.value) {
+                setTimeout(() => checkDateForWeekendHoliday(startInput.value, 'start'), 50);
+            }
+
+            if (currentRole === 'mitarbeiter') {
+                document.getElementById('modal-name').value = (groupSelect.value === '21') ? 'Peter Sittlich' : 'Anna Schmidt';
+            } else {
+                document.getElementById('modal-name').value = '';
+            }
+
+            // Dynamic name suggestion when changing group (for managers/admins)
+            groupSelect.onchange = function() {
+                const nameInput = document.getElementById('modal-name');
+                if (currentRole !== 'mitarbeiter') {
+                    if (groupSelect.value === '21') {
+                        nameInput.value = 'Peter Sittlich';
+                    } else if (groupSelect.value === '22') {
+                        nameInput.value = 'Anna Schmidt';
+                    } else {
+                        nameInput.value = '';
+                    }
+                }
+            };
+
+            document.getElementById('modal-note').value = '';
+            document.getElementById('modal-type').value = 'Urlaub';
+
+            // Status-Buttons wurden entfernt. Status wird jetzt automatisch gesetzt:
+            // Admin/Manager → approved, Mannschaft → pending
+            window.currentModalStatus = null;
+        }
+
+        function hideAddModal() {
+            const modal = document.getElementById('add-modal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `fixed bottom-6 right-6 px-6 py-3 rounded-2xl shadow-lg text-white text-sm flex items-center gap-x-3 z-[200] ${type === 'success' ? 'bg-emerald-600' : 'bg-amber-500'}`;
+            toast.innerHTML = `
+                <i class="fa-solid ${type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i>
+                <span>${message}</span>
+            `;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.transition = 'all 0.3s ease';
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 2500);
+        }
+
+        function saveEvent() {
+            const groupId = document.getElementById('modal-group').value;
+            const type = document.getElementById('modal-type').value;
+            const start = document.getElementById('modal-start').value;
+            const end = document.getElementById('modal-end').value;
+            const name = document.getElementById('modal-name').value.trim() || 'Unbekannt';
+            const note = document.getElementById('modal-note').value.trim();
+
+            if (!start || !name) {
+                alert('Bitte Datum und Namen ausfüllen.');
+                return;
+            }
+
+            let status = 'pending';
+            if (currentRole === 'admin') {
+                status = 'approved';   // Nur Zugführer erstellt direkt genehmigt
+            }
+            // Gruppenführer und Mannschaft → pending (erscheint bei "Offene Anträge")
+
+            let savedEvent = null;
+
+            if (editingEventId) {
+                const index = events.findIndex(e => e.id === editingEventId);
+                if (index !== -1) {
+                    events[index].groupId = groupId;
+                    events[index].type = type;
+                    events[index].start = start;
+                    events[index].end = end;
+                    events[index].title = name;
+                    events[index].note = note;
+                    events[index].status = status;
+                    savedEvent = events[index];
+                }
+            } else {
+                savedEvent = {
+                    id: 'e' + Date.now(),
+                    title: name,
+                    start: start,
+                    end: end || start,
+                    groupId: groupId,
+                    type: type,
+                    note: note,
+                    status: status,
+                    createdBy: name,
+                    createdAt: new Date().toISOString()
+                };
+                events.push(savedEvent);
+            }
+
+            saveToLocalStorage();
+
+            if (savedEvent) {
+                saveEventToFirebase(savedEvent);
+            }
+
+            refreshCalendar();
+            updateStats();
+            renderGroups();
+            renderNext7DaysAbsences();
+
+            hideAddModal();
+            showToast('Buchung wurde erfolgreich gespeichert.');
+        }
+
+        function editEvent(eventId) {
+            const ev = events.find(e => e.id === eventId);
+            if (!ev) return;
+
+            editingEventId = eventId;
+            
+            const modal = document.getElementById('add-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            document.getElementById('modal-title').textContent = 'Eintrag bearbeiten';
+            document.getElementById('save-btn-text').textContent = 'Aktualisieren';
+            document.getElementById('delete-btn').classList.remove('hidden');
+
+            // Fill form
+            document.getElementById('modal-group').value = ev.groupId;
+            document.getElementById('modal-type').value = ev.type;
+            document.getElementById('modal-start').value = ev.start;
+            document.getElementById('modal-end').value = ev.end || ev.start;
+            document.getElementById('modal-name').value = ev.title;
+            document.getElementById('modal-note').value = ev.note || '';
+
+            // Status-Buttons entfernt – Status wird nicht mehr manuell im Modal geändert
+            window.currentModalStatus = null;
+
+            // Disable group for normal employees
+            document.getElementById('modal-group').disabled = (currentRole === 'mitarbeiter');
+        }
+
+        function deleteCurrentEvent() {
+            if (!editingEventId || !confirm('Eintrag wirklich löschen?')) return;
+            
+            events = events.filter(e => e.id !== editingEventId);
+            saveToLocalStorage();
+            refreshCalendar();
+            hideAddModal();
+        }
+
+        // setModalStatus wurde entfernt (Status-Buttons nicht mehr vorhanden)
+
+        // Export data
+        function exportData() {
+            const dataStr = JSON.stringify(events, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = `urlaubsplaner-export-${new Date().toISOString().slice(0,10)}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        }
+
+        function resetData() {
+            if (confirm('Alle Daten zurücksetzen und Demo-Daten laden?')) {
+                localStorage.removeItem('urlaubsplaner_events');
+                location.reload();
+            }
+        }
+
+        function resetOffeneAntraege() {
+            if (!confirm('Wirklich alle offenen Anträge zurücksetzen?')) return;
+
+            let changed = false;
+            events.forEach(ev => {
+                if (ev.status === 'pending') {
+                    ev.status = 'rejected';
+                    changed = true;
+                }
+            });
+
+            if (changed) {
+                saveToLocalStorage();
+                // Also push to Firebase for other devices
+                events.forEach(ev => {
+                    if (ev.status === 'rejected') {
+                        saveEventToFirebase(ev);
+                    }
+                });
+                location.reload();
+            }
+        }
+
+        function showLegend() {
+            alert(`Legende der Farben:
+
+🟢 Grün = Genehmigt (sichtbar für alle)
+🟡 Gelb = Ausstehender Antrag (muss genehmigt werden)
+🔴 Rot = Abgelehnt
+
+Jede Arbeitsgruppe hat eine eigene Farbe im Kalender.
+
+Mitarbeiter: Können nur Anträge für ihre Gruppe stellen (werden als "pending" gespeichert).
+Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
+        }
+
+        // Initialize everything
+        function showMannschaftModal(groupFilter = null) {
+            loadMannschaft();
+            currentMannschaftFilter = groupFilter;
+            const modal = document.getElementById('mannschaft-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            renderMannschaftTable();
+        }
+
+        function hideMannschaftModal() {
+            const modal = document.getElementById('mannschaft-modal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+        }
+
+        function renderMannschaftTable() {
+            const tbody = document.getElementById('mannschaft-table-body');
+            tbody.innerHTML = '';
+            let list = [...mannschaft];
+
+            // Hilfsfunktion (falls nicht global definiert)
+            function getMonths(verweildauer) {
+                if (!verweildauer) return 0;
+                let m = 0;
+                const parts = verweildauer.toLowerCase().split(' ');
+                for (let i = 0; i < parts.length; i++) {
+                    if (parts[i].includes('jahr')) m += (parseInt(parts[i-1]) || 0) * 12;
+                    if (parts[i].includes('monat')) m += (parseInt(parts[i-1]) || 0);
+                }
+                return m;
+            }
+
+            // Sortierung: Gruppe aufsteigend, innerhalb Gruppe nach Verweildauer (neueste oben)
+            list.sort((a, b) => {
+                const groupOrder = { '21': 1, '22': 2, '23': 3, '26': 4, 'Stamm': 5, 'hr': 5 };
+                const gA = groupOrder[a.gruppe] || 99;
+                const gB = groupOrder[b.gruppe] || 99;
+                if (gA !== gB) return gA - gB;
+
+                return getMonths(a.verweildauer) - getMonths(b.verweildauer);
+            });
+
+            if (currentMannschaftFilter) {
+                list = list.filter(m => m.gruppe === currentMannschaftFilter);
+            }
+            list.forEach((member) => {
+                const originalIndex = mannschaft.findIndex(m => m.id === member.id);
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50';
+                tr.innerHTML = `
+                    <td class="border p-3">${member.gruppe}</td>
+                    <td class="border p-3">${member.name}</td>
+                    <td class="border p-3">${member.vorname}</td>
+                    <td class="border p-3">${member.verweildauer || '-'}</td>
+                    <td class="border p-3 text-center">
+                        <button onclick="editMannschaftMember(${originalIndex})" class="text-blue-600 hover:text-blue-800 px-2 py-1 rounded hover:bg-blue-50 mr-1">✏️</button>
+                        <button onclick="deleteMannschaftMember(${originalIndex})" class="text-red-600 hover:text-red-800 px-2 py-1 rounded hover:bg-red-50">🗑️</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function addNewMannschaftMember() {
+            const gruppe = prompt("Gruppe (z.B. 21, 22, 23, 26, Stamm):");
+            if (!gruppe) return;
+            const vorname = prompt("Vorname:");
+            if (!vorname) return;
+            const name = prompt("Name:");
+            if (!name) return;
+            const verweildauer = prompt("Verweildauer (z.B. 3 Jahre):", "1 Jahr");
+
+            mannschaft.push({
+                id: Date.now(),
+                gruppe: gruppe,
+                name: name,
+                vorname: vorname,
+                verweildauer: verweildauer || "1 Jahr"
+            });
+            saveMannschaft();
+            renderMannschaftTable();
+        }
+
+        function editMannschaftMember(index) {
+            const member = mannschaft[index];
+            if (!member) return;
+
+            const newGruppe = prompt("Neue Gruppe:", member.gruppe);
+            if (!newGruppe) return;
+            const newVerweildauer = prompt("Verweildauer:", member.verweildauer || "");
+
+            member.gruppe = newGruppe;
+            member.verweildauer = newVerweildauer || member.verweildauer;
+
+            saveMannschaft();
+            renderMannschaftTable();
+        }
+
+        function deleteMannschaftMember(index) {
+            if (confirm("Mitglied wirklich löschen?")) {
+                mannschaft.splice(index, 1);
+                saveMannschaft();
+                renderMannschaftTable();
+            }
+        }
+
+        function showGruppenfuehrerModal() {
+            loadGruppenfuehrer();
+            const modal = document.getElementById('gruppenfuehrer-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            renderGruppenfuehrerTable();
+        }
+
+        function hideGruppenfuehrerModal() {
+            const modal = document.getElementById('gruppenfuehrer-modal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+        }
+
+        function renderGruppenfuehrerTable() {
+            const tbody = document.getElementById('gruppenfuehrer-table-body');
+            tbody.innerHTML = '';
+            gruppenfuehrer.forEach((member, index) => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50';
+                tr.innerHTML = `
+                    <td class="border p-3">${member.gruppe}</td>
+                    <td class="border p-3">${member.vorname}</td>
+                    <td class="border p-3">${member.name}</td>
+                    <td class="border p-3 text-center">
+                        <button onclick="editGruppenfuehrerMember(${index})" class="text-blue-600 hover:text-blue-800 px-2 py-1 rounded hover:bg-blue-50 mr-1">✏️</button>
+                        <button onclick="deleteGruppenfuehrerMember(${index})" class="text-red-600 hover:text-red-800 px-2 py-1 rounded hover:bg-red-50">🗑️</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function addNewGruppenfuehrerMember() {
+            const gruppe = prompt("Gruppe (z.B. 21, 22, 23, 26, Stamm):");
+            if (!gruppe) return;
+            const vorname = prompt("Vorname:");
+            if (!vorname) return;
+            const name = prompt("Name:");
+            if (!name) return;
+
+            gruppenfuehrer.push({
+                id: Date.now(),
+                gruppe: gruppe,
+                name: name,
+                vorname: vorname
+            });
+            saveGruppenfuehrer();
+            renderGruppenfuehrerTable();
+        }
+
+        function editGruppenfuehrerMember(index) {
+            const member = gruppenfuehrer[index];
+            if (!member) return;
+
+            const newGruppe = prompt("Neue Gruppe:", member.gruppe);
+            if (!newGruppe) return;
+
+            member.gruppe = newGruppe;
+            saveGruppenfuehrer();
+            renderGruppenfuehrerTable();
+        }
+
+        function deleteGruppenfuehrerMember(index) {
+            if (confirm("Gruppenführer wirklich löschen?")) {
+                gruppenfuehrer.splice(index, 1);
+                saveGruppenfuehrer();
+                renderGruppenfuehrerTable();
+            }
+        }
+
+        function showZugfuehrerModal() {
+            loadZugfuehrer();
+            const modal = document.getElementById('zugfuehrer-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            renderZugfuehrerTable();
+        }
+
+        function hideZugfuehrerModal() {
+            const modal = document.getElementById('zugfuehrer-modal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+        }
+
+        // ==================== DARK MODE ====================
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const iconTop = document.getElementById('darkmode-icon');
+            const iconFooter = document.getElementById('darkmode-icon-footer');
+
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.setItem('darkMode', 'false');
+                if (iconTop) iconTop.classList.replace('fa-moon', 'fa-sun');
+                if (iconFooter) iconFooter.classList.replace('fa-moon', 'fa-sun');
+            } else {
+                html.classList.add('dark');
+                localStorage.setItem('darkMode', 'true');
+                if (iconTop) iconTop.classList.replace('fa-sun', 'fa-moon');
+                if (iconFooter) iconFooter.classList.replace('fa-sun', 'fa-moon');
+            }
+        }
+
+        // Dark Mode beim Start laden
+        function initDarkMode() {
+            const savedMode = localStorage.getItem('darkMode');
+            const html = document.documentElement;
+            const icon = document.getElementById('darkmode-icon');
+
+            if (savedMode === 'true' || (!savedMode && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                html.classList.add('dark');
+                if (icon) icon.classList.add('fa-moon');
+            } else {
+                html.classList.remove('dark');
+                if (icon) icon.classList.add('fa-sun');
+            }
+        }
+
+        function renderZugfuehrerTable() {
+            const tbody = document.getElementById('zugfuehrer-table-body');
+            tbody.innerHTML = '';
+            zugfuehrer.forEach((member, index) => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50';
+                tr.innerHTML = `
+                    <td class="border p-3">${member.vorname}</td>
+                    <td class="border p-3">${member.name}</td>
+                    <td class="border p-3 text-center">
+                        <button onclick="deleteZugfuehrerMember(${index})" class="text-red-600 hover:text-red-800 px-2 py-1 rounded hover:bg-red-50">🗑️ Löschen</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function addNewZugfuehrerMember() {
+            const vorname = prompt("Vorname:");
+            if (!vorname) return;
+            const name = prompt("Name:");
+            if (!name) return;
+
+            zugfuehrer.push({
+                id: Date.now(),
+                name: name,
+                vorname: vorname
+            });
+            saveZugfuehrer();
+            renderZugfuehrerTable();
+        }
+
+        function deleteZugfuehrerMember(index) {
+            if (confirm("Zugführer wirklich löschen?")) {
+                zugfuehrer.splice(index, 1);
+                saveZugfuehrer();
+                renderZugfuehrerTable();
+            }
+        }
+
+        // ==================== OFFENE ANTRÄGE ====================
+        function showOffeneAntraegeModal() {
+            const modal = document.getElementById('offene-antraege-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            renderOffeneAntraegeTable();
+        }
+
+        function hideOffeneAntraegeModal() {
+            const modal = document.getElementById('offene-antraege-modal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+        }
+
+        function renderOffeneAntraegeTable() {
+            const tbody = document.getElementById('offene-antraege-table-body');
+            tbody.innerHTML = '';
+
+            // Filter pending + sort by start date
+            const offene = events
+                .filter(ev => ev.status === 'pending')
+                .sort((a, b) => new Date(a.start) - new Date(b.start));
+
+            if (offene.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-slate-400">Keine offenen Anträge vorhanden.</td></tr>`;
+                return;
+            }
+
+            offene.forEach(ev => {
+                const group = GROUPS.find(g => g.id === ev.groupId) || { name: ev.groupId, color: '#64748b' };
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50';
+                tr.innerHTML = `
+                    <td class="border p-3 text-sm">${formatDateDE(ev.start)}</td>
+                    <td class="border p-3 font-medium">${ev.title}</td>
+                    <td class="border p-3">
+                        <span class="inline-block w-2 h-2 rounded-full mr-1.5" style="background-color: ${group.color}"></span>
+                        ${group.name}
+                    </td>
+                    <td class="border p-3">${ev.type}</td>
+                    <td class="border p-3 text-sm">${formatDateDE(ev.start)} ${ev.end && ev.end !== ev.start ? '– ' + formatDateDE(ev.end) : ''}</td>
+                    <td class="border p-3 text-sm text-slate-500">${ev.note || '-'}</td>
+                    <td class="border p-3 text-xs text-slate-500">
+                        ${ev.createdAt ? new Date(ev.createdAt).toLocaleDateString('de-DE', {day:'2-digit', month:'2-digit', year:'2-digit'}) : '-'}
+                    </td>
+                    <td class="border p-3 text-center">
+                        ${canApproveBookings() ? `
+                            <div class="flex justify-center gap-x-2">
+                                <button onclick="approveAntrag('${ev.id}', this)" 
+                                        class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl transition-colors">
+                                    Genehmigen
+                                </button>
+                                <button onclick="rejectAntrag('${ev.id}', this)" 
+                                        class="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-xl transition-colors">
+                                    Ablehnen
+                                </button>
+                            </div>
+                        ` : '<span class="text-xs text-slate-400">Keine Berechtigung</span>'}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Hilfsfunktion für Firebase-Update (Status ändern oder löschen)
+        function updateOrDeleteInFirebase(ev, doDelete = false) {
+            if (typeof database === 'undefined' || !ev) return;
+
+            const eventsRef = database.ref('events');
+            eventsRef.once('value').then(snapshot => {
+                const data = snapshot.val();
+                if (!data) return;
+
+                let foundKey = null;
+                Object.keys(data).forEach(key => {
+                    const fbEv = data[key];
+                    if (fbEv.id === ev.id || (fbEv.title === ev.title && fbEv.start === ev.start)) {
+                        foundKey = key;
+                    }
+                });
+
+                if (foundKey) {
+                    if (doDelete) {
+                        eventsRef.child(foundKey).remove();
+                    } else {
+                        // Update Status (und ggf. Note)
+                        eventsRef.child(foundKey).update({ status: ev.status, note: ev.note || '' });
+                    }
+                } else if (!doDelete) {
+                    // Falls nicht gefunden (z.B. neuer lokaler Eintrag), neu pushen
+                    const clean = { ...ev };
+                    delete clean.id;
+                    eventsRef.push(clean);
+                }
+            }).catch(err => console.warn('Firebase Update Fehler:', err));
+        }
+
+     function approveAntrag(eventId, buttonElement = null) {
+        const index = events.findIndex(e => e.id === eventId);
+        if (index === -1) return;
+
+        const ev = events[index];
+        ev.status = 'approved';  // FIX: Status auf genehmigt setzen statt löschen → erscheint jetzt im Kalender (grün) und in Genehmigte-Liste
+        saveToLocalStorage();
+
+        // Firebase aktualisieren (Status-Änderung pushen)
+        updateOrDeleteInFirebase(ev, false);
+
+        showToast('Antrag wurde genehmigt und ist jetzt sichtbar.');
+        renderOffeneAntraegeTable();
+        updateStats();
+        refreshCalendar();
+    }
+
+        function rejectAntrag(eventId, buttonElement = null) {
+        const index = events.findIndex(e => e.id === eventId);
+        if (index === -1) return;
+
+        const ev = events[index];
+
+        if (!confirm('Antrag wirklich ablehnen?')) return;
+
+        ev.status = 'rejected';  // FIX: Als rejected markieren (wird in Kalender/Matrix ausgeblendet)
+        saveToLocalStorage();
+
+        updateOrDeleteInFirebase(ev, false);  // Status-Update in Firebase
+
+        showToast('Antrag wurde abgelehnt.');
+        renderOffeneAntraegeTable();
+        updateStats();
+        refreshCalendar();
+    }
+
+        // ==================== GENEHMIGTE ANTRÄGE ====================
+        function showGenehmigteAntraegeModal() {
+            const modal = document.getElementById('genehmigte-antraege-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            renderGenehmigteAntraegeTable();
+        }
+
+        function hideGenehmigteAntraegeModal() {
+            const modal = document.getElementById('genehmigte-antraege-modal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+        }
+
+        function renderGenehmigteAntraegeTable() {
+            const tbody = document.getElementById('genehmigte-antraege-table-body');
+            tbody.innerHTML = '';
+
+            const genehmigt = events
+                .filter(ev => ev.status === 'approved')
+                .sort((a, b) => new Date(a.start) - new Date(b.start));
+
+            if (genehmigt.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-slate-400">Keine genehmigten Anträge vorhanden.</td></tr>`;
+                return;
+            }
+
+            genehmigt.forEach(ev => {
+                const group = GROUPS.find(g => g.id === ev.groupId) || { name: ev.groupId, color: '#64748b' };
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50';
+                tr.innerHTML = `
+                    <td class="border p-3 text-sm">${formatDateDE(ev.start)}</td>
+                    <td class="border p-3 font-medium">${ev.title}</td>
+                    <td class="border p-3">
+                        <span class="inline-block w-2 h-2 rounded-full mr-1.5" style="background-color: ${group.color}"></span>
+                        ${group.name}
+                    </td>
+                    <td class="border p-3">${ev.type}</td>
+                    <td class="border p-3 text-sm">${formatDateDE(ev.start)} ${ev.end && ev.end !== ev.start ? '– ' + formatDateDE(ev.end) : ''}</td>
+                    <td class="border p-3 text-sm text-slate-500">${ev.note || '-'}</td>
+                    <td class="border p-3 text-xs text-slate-500">
+                        ${ev.createdAt ? new Date(ev.createdAt).toLocaleDateString('de-DE', {day:'2-digit', month:'2-digit', year:'2-digit'}) : '-'}
+                    </td>
+                    <td class="border p-3 text-center">
+                        <button onclick="stornoAntrag('${ev.id}')" 
+                                class="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-xl transition-colors">
+                            Storno
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function stornoAntrag(eventId) {
+        const index = events.findIndex(e => e.id === eventId);
+        if (index === -1) return;
+
+        if (!confirm('Genehmigten Antrag wirklich stornieren/löschen?')) return;
+
+        const ev = events[index];
+        events.splice(index, 1);
+        saveToLocalStorage();
+
+        // Aus Firebase entfernen
+        if (typeof database !== 'undefined') {
+            const eventsRef = database.ref('events');
+            eventsRef.once('value').then(snapshot => {
+                const data = snapshot.val();
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        const fbEv = data[key];
+                        if (fbEv.id === eventId || (fbEv.title === ev.title && fbEv.start === ev.start)) {
+                            eventsRef.child(key).remove();
+                        }
+                    });
+                }
+            });
+        }
+
+        renderGenehmigteAntraegeTable();
+        updateStats();
+        refreshCalendar();
+    }
+
+        function initializeApp() {
+            initializeTailwind();
+            loadMannschaft();
+            loadGruppenfuehrer();
+            loadZugfuehrer();
+
+            // Bemerkungen laden
+            try {
+                const savedRemarks = localStorage.getItem('dailyRemarks');
+                if (savedRemarks) {
+                    dailyRemarks = JSON.parse(savedRemarks);
+                }
+            } catch(e) {}
+
+            // Load from Firebase first, fallback to localStorage
+            if (typeof database !== 'undefined') {
+                const eventsRef = database.ref('events');
+                eventsRef.once('value').then((snapshot) => {
+                    const firebaseData = snapshot.val();
+                    if (firebaseData) {
+                        events = Object.keys(firebaseData).map(key => ({
+                            id: key,
+                            ...firebaseData[key]
+                        }));
+                    } else {
+                        loadInitialData(); // fallback
+                    }
+                    
+                    // Start live listener
+                    setupFirebaseListener();
+
+                    // Initial UI
+                    switchRole('mitarbeiter');
+                    updateHeaderButtons();
+                    renderGroups();
+                    updateStats();
+                    renderMonthlyView();      // Mannschaft
+                    renderStammCalendar();  // Stamm (nur aus gruppenfuehrer + zugfuehrer)
+
+                    setDefaultDateForTagesrecherche();
+                    
+                }).catch(() => {
+                    loadInitialData();
+                    switchRole('mitarbeiter');
+                    updateHeaderButtons();
+                    renderGroups();
+                    updateStats();
+                    renderMonthlyView();      // Mannschaft
+                    renderStammCalendar();  // Stamm (nur aus gruppenfuehrer + zugfuehrer)
+                    setDefaultDateForTagesrecherche();
+                });
+            } else {
+                // No Firebase - normal local mode
+                loadInitialData();
+                switchRole('mitarbeiter');
+                updateHeaderButtons();
+                renderGroups();
+                updateStats();
+                renderMonthlyView(['21','22','23','26'], 'Mannschaft', 'monthly-view-mannschaft');
+                renderMonthlyView(['hr'], 'Stamm', 'monthly-view-stamm');
+                setDefaultDateForTagesrecherche();
+            }
+
+            // Keyboard support
+            document.addEventListener('keydown', function(e) {
+                if (e.key === "Escape") {
+                    const modal = document.getElementById('add-modal');
+                    if (!modal.classList.contains('hidden')) {
+                        hideAddModal();
+                    }
+                }
+                if (e.key === "/" && document.activeElement.tagName === "BODY") {
+                    e.preventDefault();
+                    showAddModal();
+                }
+            });
+
+            console.log('%c[Urlaubsplaner] App ready with Firebase sync.', 'color:#64748b');
+        }
+
+        // ==================== FIREBASE SYNC ====================
+        let firebaseListenerActive = false;
+
+        function setupFirebaseListener() {
+            if (typeof database === 'undefined' || firebaseListenerActive) return;
+
+            const eventsRef = database.ref('events');
+
+            eventsRef.on('value', (snapshot) => {
+                const firebaseData = snapshot.val();
+
+                if (firebaseData) {
+                    const firebaseEvents = Object.keys(firebaseData).map(key => ({
+                        id: key,
+                        ...firebaseData[key]
+                    }));
+
+                    // Leichtere Prüfung statt vollem JSON.stringify (Performance bei vielen Events)
+                    const hasChanged = events.length !== firebaseEvents.length || 
+                        JSON.stringify(events.map(e => e.id + e.status)) !== JSON.stringify(firebaseEvents.map(e => e.id + e.status));
+
+                    if (hasChanged) {
+                        events = firebaseEvents;
+                        console.log('%c[Firebase] Live-Update erhalten', 'color:#3b82f6');
+
+                        refreshCalendar();
+                        renderGroups();
+                        updateStats();
+
+                        const offeneModal = document.getElementById('offene-antraege-modal');
+                        if (offeneModal && !offeneModal.classList.contains('hidden')) {
+                            renderOffeneAntraegeTable();
+                        }
+                    }
+                }
+            });
+
+            firebaseListenerActive = true;
+            console.log('%c[Firebase] Live-Synchronisation aktiviert', 'color:#475569');
+        }
+
+        function saveEventToFirebase(eventData) {
+            if (typeof database === 'undefined' || !eventData) return;
+
+            const eventsRef = database.ref('events');
+
+            // Always use push for new events or set for updates
+            if (eventData.id && !eventData.id.startsWith('e')) {
+                // Existing Firebase key
+                eventsRef.child(eventData.id).set(eventData);
+            } else {
+                // New event - let Firebase generate the key
+                const newRef = eventsRef.push();
+                // Remove the temporary 'e' id and use Firebase key
+                const cleanEvent = { ...eventData };
+                delete cleanEvent.id;
+                newRef.set(cleanEvent).then(() => {
+                    // Update local event with real Firebase ID
+                    eventData.id = newRef.key;
+                });
+            }
+        }
+
+        function testFirebaseConnection() {
+            if (typeof database === 'undefined') {
+                alert('Firebase ist noch nicht initialisiert. Bitte lade die Seite neu.');
+                return;
+            }
+
+            const testRef = database.ref('test/connection');
+            
+            testRef.set({
+                timestamp: new Date().toISOString(),
+                message: 'Test erfolgreich'
+            })
+            .then(() => {
+                return testRef.once('value');
+            })
+            .then((snapshot) => {
+                const data = snapshot.val();
+                showToast('Firebase Verbindung erfolgreich!');
+                console.log('%c[Firebase Test] Erfolgreich:', 'color: #475569', data);
+            })
+            .catch((error) => {
+                console.error('%c[Firebase Test] Fehler:', 'color: #ef4444', error);
+                alert('Firebase Fehler: ' + error.message);
+            });
+        }
+
+        // Boot app
+        window.onload = initializeApp;
+    </script>
+</body>
+</html>
