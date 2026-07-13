@@ -290,6 +290,19 @@
 
             /* Eingaben >= 16px, sonst zoomt iOS beim Fokussieren rein */
             input, select, textarea { font-size: 16px !important; }
+
+            /* Datumsfeld der Tagesrecherche exakt so breit wie die Einträge in
+               "Nächste 7 Tage" (deren Liste hat pr-1 = 4px Innenabstand rechts).
+               min-width/box-sizing verhindern zusätzlich, dass das native
+               Datums-Steuerelement bei 16px Schrift über den Container hinausläuft. */
+            #day-search-input {
+                width: calc(100% - 4px) !important;
+                max-width: calc(100% - 4px) !important;
+                min-width: 0 !important;
+                box-sizing: border-box !important;
+                padding-left: 0.75rem !important;
+                padding-right: 0.75rem !important;
+            }
         }
 
         /* ==================== TABLET / SCHMALER LAPTOP (768px - 1229px) ====================
