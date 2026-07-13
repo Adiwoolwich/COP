@@ -24,12 +24,21 @@
         appId: "1:926698565631:web:252239f5ef0aa28ce301ca"
       };
 
-      firebase.initializeApp(firebaseConfig);
-      const database = firebase.database();
-      // Anonyme Anmeldung: notwendig, damit Schreibzugriffe gemäß den Firebase-Regeln
-      // (".write": "auth != null") erlaubt sind. Läuft automatisch im Hintergrund,
-      // Nutzer bemerken davon nichts und müssen sich nicht einloggen.
-      firebase.auth().signInAnonymously().catch(err => console.error('Firebase-Auth-Fehler:', err));
+      // "let" statt "const" + try/catch: Falls das Firebase-CDN blockiert ist
+      // (Firewall, Adblocker, VPN-Filter), bleibt "database" schlicht undefined.
+      // Die vorhandenen Guards (typeof database === 'undefined') greifen dann sauber
+      // und die App läuft lokal weiter, statt mit einem ReferenceError abzustürzen.
+      let database;
+      try {
+          firebase.initializeApp(firebaseConfig);
+          database = firebase.database();
+          // Anonyme Anmeldung: notwendig, damit Schreibzugriffe gemäß den Firebase-Regeln
+          // (".write": "auth != null") erlaubt sind. Läuft automatisch im Hintergrund,
+          // Nutzer bemerken davon nichts und müssen sich nicht einloggen.
+          firebase.auth().signInAnonymously().catch(err => console.error('Firebase-Auth-Fehler:', err));
+      } catch (e) {
+          console.error('Firebase nicht verfügbar – App läuft im lokalen Modus:', e);
+      }
     </script>
 
     <style>
@@ -223,10 +232,21 @@
             }
             .cal-tools { flex-wrap: wrap; gap: 0.5rem !important; }
             .cal-tools #today-date-display { display: none !important; }
-            .cal-tools #calendar-date-search,
             .cal-tools #group-filter-select {
-                flex: 1 1 45%;
+                flex: 1 1 auto;
                 min-height: 40px;
+            }
+            .cal-tools #month-picker-btn {
+                flex: 0 0 auto;
+                width: 44px;
+                height: 44px;
+            }
+            /* Auf dem iPhone sitzt der Button links -> Popover linksbündig öffnen,
+               sonst ragt es (rechtsbündig verankert) über den linken Rand hinaus. */
+            .month-pop {
+                left: 0;
+                right: auto;
+                width: min(280px, calc(100vw - 40px));
             }
 
             /* Tabelle bleibt horizontal scrollbar (31 Tage passen nie), aber kompakter */
@@ -289,6 +309,328 @@
             }
             .tab-wrap { margin-right: 0.5rem !important; }
         }
+
+
+        /* =====================================================================
+           REDESIGN-EBENE - Wappen-Farbwelt (Schwarz / Gold / Rot)
+           Re-themed ueber die vorhandenen Utility-Klassen. Kein JS wird
+           angefasst -> die Logik bleibt exakt wie zuvor.
+           !important ist noetig, weil das Tailwind-CDN sein CSS zur Laufzeit
+           NACH diesem Block injiziert.
+           ===================================================================== */
+        :root {
+            --w-black:    #1d1d1d;   /* Schild-Schwarz */
+            --w-surface:  #262626;   /* Card */
+            --w-surface2: #2f2f2f;   /* eingebettete Flaechen */
+            --w-surface3: #383838;   /* Hover / Pills */
+            --w-gold:     #F6DA4A;   /* Wappen-Gold */
+            --w-gold-dim: rgba(246, 218, 74, 0.30);
+            --w-gold-soft:rgba(246, 218, 74, 0.10);
+            --w-red:      #E2483C;   /* Wappen-Rot */
+            --w-text:     #F3EFE3;
+            --w-text-dim: #A9A399;
+            --w-line:     rgba(246, 218, 74, 0.16);
+            --w-radius:   18px;
+        }
+
+        body { background: var(--w-black) !important; color: var(--w-text); }
+
+        /* ---------- Flaechen ---------- */
+        .bg-white      { background-color: var(--w-surface)  !important; }
+        .bg-slate-50   { background-color: var(--w-surface2) !important; }
+        .bg-slate-100  { background-color: var(--w-surface2) !important; }
+        .bg-slate-200  { background-color: var(--w-surface3) !important; }
+
+        /* ---------- Text ---------- */
+        .text-slate-900, .text-slate-800, .text-black { color: var(--w-text) !important; }
+        .text-slate-700, .text-slate-600 { color: #D6D0C4 !important; }
+        .text-slate-500, .text-slate-400 { color: var(--w-text-dim) !important; }
+        h1, h2, h3, h4 { color: var(--w-text); }
+
+        /* ---------- Linien ---------- */
+        .border, .border-b, .border-t,
+        .border-slate-100, .border-slate-200, .border-slate-300 {
+            border-color: var(--w-line) !important;
+        }
+
+        /* ---------- Cards ---------- */
+        .modern-card {
+            background: linear-gradient(180deg, var(--w-surface) 0%, #212121 100%) !important;
+            border: 1px solid var(--w-line) !important;
+            border-radius: var(--w-radius) !important;
+            box-shadow: 0 2px 10px rgba(0,0,0,.35) !important;
+            transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease;
+        }
+        .modern-card:hover {
+            border-color: var(--w-gold-dim) !important;
+            box-shadow: 0 8px 22px rgba(0,0,0,.45) !important;
+            transform: none !important;   /* kein Verrutschen mehr beim Hover */
+        }
+        /* Card-Ueberschriften mit Gold-Akzent */
+        .modern-card > .flex > div > h3,
+        .modern-card > .flex > h3 {
+            position: relative;
+            padding-left: 12px;
+            letter-spacing: .2px;
+        }
+        .modern-card > .flex > div > h3::before,
+        .modern-card > .flex > h3::before {
+            content: "";
+            position: absolute; left: 0; top: 50%;
+            transform: translateY(-50%);
+            width: 3px; height: 1.05em;
+            border-radius: 2px;
+            background: var(--w-gold);
+        }
+
+        /* ---------- Navigation ---------- */
+        nav {
+            background: rgba(29,29,29,.92) !important;
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--w-gold-dim) !important;
+        }
+        .nav-brand img {
+            border-radius: 10px;
+            box-shadow: 0 0 0 1px var(--w-gold-dim);
+        }
+        .nav-brand h1 { color: var(--w-gold) !important; letter-spacing: 2px; }
+        .nav-brand p  { color: var(--w-text-dim) !important; }
+
+        .tab-wrap, .role-switcher {
+            background: var(--w-surface2) !important;
+            border: 1px solid var(--w-line);
+            border-radius: 999px !important;
+        }
+        .tab-wrap button, .role-switcher button {
+            color: var(--w-text-dim) !important;
+            border-radius: 999px !important;
+            transition: background .15s ease, color .15s ease;
+        }
+        .tab-wrap button:hover, .role-switcher button:hover {
+            background: var(--w-surface3) !important;
+            color: var(--w-text) !important;
+        }
+        /* aktive Rolle / aktiver Tab */
+        .role-switcher button.active, #tab-kalender.active {
+            background: var(--w-gold) !important;
+            color: #1d1d1d !important;
+            font-weight: 600;
+        }
+        .role-switcher button.active i { color: #1d1d1d !important; }
+        /* Punkte (Gruppenführer ●● / Zugführer ●●●) wieder in Weiß */
+        .role-switcher .bg-black { background-color: #FFFFFF !important; }
+        /* Ausnahme: auf der aktiven, goldenen Pille wären weiße Punkte unsichtbar
+           -> dort dunkel, damit sie sichtbar bleiben */
+        .role-switcher button.active .bg-black { background-color: #1d1d1d !important; }
+
+        /* ---------- Buttons ---------- */
+        .header-actions button, .db-links button, footer button {
+            background: var(--w-surface2) !important;
+            color: var(--w-text) !important;
+            border: 1px solid var(--w-line) !important;
+            border-radius: 999px !important;
+            transition: background .15s ease, border-color .15s ease;
+        }
+        .header-actions button:hover, .db-links button:hover, footer button:hover {
+            background: var(--w-surface3) !important;
+            border-color: var(--w-gold-dim) !important;
+        }
+        /* Primaeraktionen in Modals in Gold */
+        .modal button[onclick^="saveEvent"],
+        .modal button[onclick^="addMannschaft"],
+        .modal button[onclick^="addGruppenfuehrer"],
+        .modal button[onclick^="addZugfuehrer"] {
+            background: var(--w-gold) !important;
+            color: #1d1d1d !important;
+            font-weight: 600;
+            border: none !important;
+        }
+
+        /* ---------- Eingaben ---------- */
+        input, select, textarea {
+            background: var(--w-surface2) !important;
+            color: var(--w-text) !important;
+            border: 1px solid var(--w-line) !important;
+            border-radius: 12px !important;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none !important;
+            border-color: var(--w-gold) !important;
+            box-shadow: 0 0 0 3px var(--w-gold-soft) !important;
+        }
+        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacity(.7); }
+        select option { background: var(--w-surface2); color: var(--w-text); }
+
+        /* ---------- Gruppenliste (Buchung-Card) ---------- */
+        #groups-list > div {
+            background: var(--w-surface2);
+            border: 1px solid transparent;
+            border-radius: 12px;
+            padding: 8px 10px;
+            transition: border-color .15s ease, background .15s ease;
+        }
+        #groups-list > div:hover {
+            background: var(--w-surface3);
+            border-color: var(--w-gold-dim);
+        }
+        #group-members-list > div {
+            background: var(--w-surface2);
+            border: 1px solid var(--w-line);
+            border-radius: 10px;
+            padding: 6px 10px;
+        }
+
+        /* ---------- Kalender ---------- */
+        .cal-scroll {
+            border: 1px solid var(--w-line) !important;
+            border-radius: var(--w-radius) !important;
+            background: var(--w-surface) !important;
+        }
+        .cal-scroll th, .cal-scroll td { border-color: rgba(255,255,255,.07) !important; }
+        .cal-scroll thead th { background: var(--w-surface2) !important; }
+        .cal-scroll tbody td:first-child,
+        .cal-scroll thead th:first-child { background: var(--w-surface) !important; }
+
+        /* Hover-Zeile: deckender heller Gold-Ton + schwarze Schrift, damit der Name
+           lesbar bleibt. Muss NACH der first-child-Regel stehen, sonst überschreibt
+           diese (gleiche Spezifität, später im Code) den Hover-Hintergrund wieder. */
+        .cal-scroll tbody tr:hover td,
+        .cal-scroll tbody tr:hover td:first-child {
+            background: #EFE3B0 !important;
+            color: #1d1d1d !important;
+        }
+        .cal-scroll tbody tr:hover td * { color: #1d1d1d !important; }
+        .cal-scroll thead tr:nth-child(3) th { background: var(--w-surface3) !important; }   /* Belegt-Zeile */
+        .cal-scroll thead tr:nth-child(3) th:first-child { background: var(--w-surface3) !important; }
+        /* Wochenende / Feiertag im Dark-Theme unterscheidbar halten */
+        .cal-scroll .bg-gray-200 { background-color: #333 !important; }
+        .cal-scroll .bg-gray-400 { background-color: #45413a !important; color: var(--w-text) !important; }
+        .cal-scroll .bg-black    { background-color: var(--w-gold) !important; color: #1d1d1d !important; }
+        .cal-scroll .bg-slate-100 { background-color: #1a1a1a !important; }   /* Trennstrich-Zeile */
+        .cal-scroll .border-black { border-color: var(--w-gold) !important; }
+        .cal-scroll .text-slate-600 { color: var(--w-text-dim) !important; }
+        /* Monatsnavigation */
+        .cal-monthnav button {
+            background: var(--w-surface2) !important;
+            border: 1px solid var(--w-line) !important;
+            color: var(--w-text) !important;
+            border-radius: 999px !important;
+        }
+        .cal-monthnav button:hover { border-color: var(--w-gold) !important; color: var(--w-gold) !important; }
+        #calendar-month-title {
+            background: var(--w-surface2) !important;
+            border: 1px solid var(--w-line) !important;
+            color: var(--w-text) !important;
+            border-radius: 999px !important;
+        }
+
+        /* ---------- Monats-Picker ---------- */
+        .month-picker-wrap { position: relative; display: inline-flex; }
+
+        #month-picker-btn {
+            width: 40px; height: 40px;
+            display: inline-flex; align-items: center; justify-content: center;
+            background: var(--w-surface2) !important;
+            border: 1px solid var(--w-line) !important;
+            color: var(--w-text) !important;
+            border-radius: 999px !important;
+            cursor: pointer;
+            transition: border-color .15s ease, color .15s ease, background .15s ease;
+        }
+        #month-picker-btn:hover,
+        #month-picker-btn[aria-expanded="true"] {
+            border-color: var(--w-gold) !important;
+            color: var(--w-gold) !important;
+            background: var(--w-surface3) !important;
+        }
+
+        .month-pop {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            z-index: 90;
+            width: 260px;
+            padding: 12px;
+            background: var(--w-surface) !important;
+            border: 1px solid var(--w-gold-dim) !important;
+            border-radius: 14px !important;
+            box-shadow: 0 16px 40px rgba(0,0,0,.55);
+        }
+        .month-pop.hidden { display: none !important; }
+
+        .month-pop-head {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .month-pop-head span {
+            font-weight: 600; font-size: .95rem; color: var(--w-text);
+        }
+        .month-pop-head button {
+            width: 30px; height: 30px;
+            display: inline-flex; align-items: center; justify-content: center;
+            background: var(--w-surface2) !important;
+            border: 1px solid var(--w-line) !important;
+            color: var(--w-text) !important;
+            border-radius: 999px !important;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .month-pop-head button:hover {
+            border-color: var(--w-gold) !important;
+            color: var(--w-gold) !important;
+        }
+
+        .month-pop-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+        }
+        .month-cell {
+            padding: 9px 0;
+            font-size: .85rem;
+            background: var(--w-surface2) !important;
+            border: 1px solid transparent !important;
+            color: var(--w-text) !important;
+            border-radius: 10px !important;
+            cursor: pointer;
+            transition: background .12s ease, border-color .12s ease, color .12s ease;
+        }
+        .month-cell:hover {
+            background: var(--w-surface3) !important;
+            border-color: var(--w-gold-dim) !important;
+        }
+        .month-cell.is-active {
+            background: var(--w-gold) !important;
+            color: #1d1d1d !important;
+            font-weight: 600;
+        }
+
+        /* ---------- Modals ---------- */
+        .modal {
+            background: var(--w-surface) !important;
+            border: 1px solid var(--w-gold-dim) !important;
+            border-radius: var(--w-radius) !important;
+            box-shadow: 0 24px 60px rgba(0,0,0,.6) !important;
+        }
+        .bg-black\/40 { background-color: rgba(0,0,0,.65) !important; backdrop-filter: blur(2px); }
+
+        /* ---------- Abwesenheits-Karten (Naechste 7 Tage) ---------- */
+        #next7days-list > div {
+            background: var(--w-surface2) !important;
+            border: 1px solid var(--w-line) !important;
+            border-radius: 12px !important;
+        }
+
+        /* ---------- Scrollbars ---------- */
+        .cal-scroll::-webkit-scrollbar,
+        #group-members-list::-webkit-scrollbar,
+        #next7days-list::-webkit-scrollbar { width: 10px; height: 10px; }
+        .cal-scroll::-webkit-scrollbar-thumb,
+        #group-members-list::-webkit-scrollbar-thumb,
+        #next7days-list::-webkit-scrollbar-thumb {
+            background: #4a4a4a; border-radius: 999px;
+        }
+        .cal-scroll::-webkit-scrollbar-thumb:hover { background: var(--w-gold-dim); }
 
     </style>
 </head>
@@ -764,15 +1106,6 @@
         </button>
     </div>
 
-    <footer class="text-center py-4 text-xs text-slate-400">
-        <!-- Dark Mode Toggle -->
-        <button onclick="toggleDarkMode()" 
-                class="px-3 py-1 text-xs flex items-center gap-x-2 rounded-2xl hover:bg-slate-700 text-slate-300 hover:text-white transition-colors"
-                title="Dark Mode umschalten">
-            <i class="fa-solid fa-moon" id="darkmode-icon-footer"></i>
-            <span>Dark Mode</span>
-        </button>
-    </footer>
 
     <script>
         // Tailwind script
@@ -1385,9 +1718,21 @@
                     <div class="cal-tools flex items-center gap-x-2">
                         <span id="today-date-display" class="px-2 py-1 text-xs font-medium text-slate-500"></span>
                         
-                        <input type="date" id="calendar-date-search"
-                               class="border border-slate-300 rounded-2xl px-3 py-1.5 text-sm focus:outline-none focus:border-blue-400"
-                               onchange="jumpCalendarToDate(this.value)">
+                        <div class="month-picker-wrap">
+                            <button type="button" id="month-picker-btn"
+                                    onclick="toggleMonthPicker(event)"
+                                    title="Monat wählen" aria-haspopup="dialog" aria-expanded="false">
+                                <i class="fa-solid fa-calendar-days"></i>
+                            </button>
+                            <div id="month-picker-pop" class="month-pop hidden" role="dialog" aria-label="Monat wählen">
+                                <div class="month-pop-head">
+                                    <button type="button" onclick="monthPickerYear(-1)" aria-label="Vorheriges Jahr">←</button>
+                                    <span id="month-pop-year"></span>
+                                    <button type="button" onclick="monthPickerYear(1)" aria-label="Nächstes Jahr">→</button>
+                                </div>
+                                <div class="month-pop-grid" id="month-pop-grid"></div>
+                            </div>
+                        </div>
 
                         <select id="group-filter-select" onchange="filterCalendar(this.value || null)"
                                 class="px-4 py-2 text-sm font-medium border border-slate-300 rounded-2xl bg-white focus:outline-none focus:border-blue-400">
@@ -1893,6 +2238,79 @@
                 updateCurrentMonthDisplay();
             }
         }
+
+        // ==================== MONATS-PICKER ====================
+        // Jahr, das im Popover gerade angezeigt wird (unabhängig vom Kalender,
+        // damit man blättern kann, ohne sofort zu springen).
+        let monthPickerYearShown = null;
+
+        const MONTH_NAMES_SHORT = ['Jan','Feb','Mär','Apr','Mai','Jun',
+                                   'Jul','Aug','Sep','Okt','Nov','Dez'];
+
+        function renderMonthPicker() {
+            const grid = document.getElementById('month-pop-grid');
+            const yearEl = document.getElementById('month-pop-year');
+            if (!grid || !yearEl) return;
+
+            if (monthPickerYearShown === null) monthPickerYearShown = currentCalendarYear;
+            yearEl.textContent = monthPickerYearShown;
+
+            grid.innerHTML = MONTH_NAMES_SHORT.map((name, i) => {
+                const isCurrent = (i === currentCalendarMonth &&
+                                   monthPickerYearShown === currentCalendarYear);
+                return '<button type="button" class="month-cell' + (isCurrent ? ' is-active' : '') +
+                       '" onclick="selectMonth(' + i + ')">' + name + '</button>';
+            }).join('');
+        }
+
+        function toggleMonthPicker(evt) {
+            if (evt) evt.stopPropagation();
+            const pop = document.getElementById('month-picker-pop');
+            const btn = document.getElementById('month-picker-btn');
+            if (!pop) return;
+
+            const willOpen = pop.classList.contains('hidden');
+            if (willOpen) {
+                monthPickerYearShown = currentCalendarYear;   // immer beim aktuellen Jahr starten
+                renderMonthPicker();
+            }
+            pop.classList.toggle('hidden', !willOpen);
+            if (btn) btn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+        }
+
+        function closeMonthPicker() {
+            const pop = document.getElementById('month-picker-pop');
+            const btn = document.getElementById('month-picker-btn');
+            if (pop) pop.classList.add('hidden');
+            if (btn) btn.setAttribute('aria-expanded', 'false');
+        }
+
+        function monthPickerYear(delta) {
+            // Klick im Popover darf es nicht schließen -> kein Event-Bubbling nötig,
+            // da der Outside-Click-Handler auf den Popover-Container prüft.
+            const next = (monthPickerYearShown === null ? currentCalendarYear : monthPickerYearShown) + delta;
+            if (next < 2020 || next > 2050) return;   // gleiche Grenzen wie die Monatsnavigation
+            monthPickerYearShown = next;
+            renderMonthPicker();
+        }
+
+        function selectMonth(monthIndex) {
+            currentCalendarYear = (monthPickerYearShown === null)
+                ? currentCalendarYear : monthPickerYearShown;
+            currentCalendarMonth = monthIndex;
+            closeMonthPicker();
+            renderMonthlyView();          // baut die Toolbar neu auf -> Popover ist ohnehin weg
+            updateCurrentMonthDisplay();
+        }
+
+        // Schließen bei Klick außerhalb bzw. Escape
+        document.addEventListener('click', (e) => {
+            const wrap = document.querySelector('.month-picker-wrap');
+            if (wrap && !wrap.contains(e.target)) closeMonthPicker();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeMonthPicker();
+        });
 
         function jumpCalendarToDate(dateStr) {
             if (!dateStr) return;
