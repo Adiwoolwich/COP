@@ -12,6 +12,8 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <!-- SheetJS: echter Excel-Export. Fehlt es (CDN blockiert), greift automatisch der CSV-Fallback. -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 
     <script>
       const firebaseConfig = {
@@ -219,7 +221,8 @@
             .members-col { width: 100% !important; }     /* schlaegt w-[210px] / w-[280px] */
             #groups-list > div { min-height: 44px; }
             #group-members-list { max-height: 40vh !important; }
-            #group-members-section button { min-height: 36px; min-width: 36px; }
+            #group-members-section button,
+            #group-members-header button { min-height: 36px; min-width: 36px; }
             #group-members-list button { width: 36px !important; height: 36px !important; }
 
             /* --- Kalender-Card --- */
@@ -288,21 +291,47 @@
             .modal .overflow-auto,
             .modal .overflow-x-auto { -webkit-overflow-scrolling: touch; }
 
+            /* Einsatzwunsch-Panel hat bereits seinen eigenen internen Scrollbereich
+               (.ew-table-wrap) - die generische .modal-Regel darüber würde sonst
+               einen zweiten, äußeren Scrollbalken erzeugen. */
+            #einsatzwunsch-modal .modal { overflow-y: hidden; max-height: 88vh; }
+            .ew-panel { max-height: 88vh; }
+
+
+            /* Einsatzwunsch: Eingabefelder untereinander, Nav-Buttons dürfen umbrechen */
+            .ew-form { grid-template-columns: 1fr !important; }
+            .nav-actions { flex-wrap: wrap !important; }
+            /* Nav-Buttons dürfen umbrechen; Zeile 2: Rollen-Umschalter. */
+            .tab-wrap { flex: 1 1 auto; justify-content: space-between; margin-right: 0 !important; }
+            .tab-wrap button, .tab-wrap a { flex: 1 1 0; padding-left: 0.5rem !important; padding-right: 0.5rem !important; }
+            .role-switcher { flex: 1 1 100% !important; }   /* erzwingt eigene Zeile */
+            #einsatzwunsch-modal table { min-width: 620px; }
+
             /* Eingaben >= 16px, sonst zoomt iOS beim Fokussieren rein */
             input, select, textarea { font-size: 16px !important; }
 
+            /* VON/BIS-Datumsfelder im Buchungs-Modal (grid-cols-2): Grid-Zellen haben
+               standardmäßig min-width:auto, wodurch ein natives Datumsfeld nicht unter
+               seine intrinsische Inhaltsbreite ("tt.mm.jjjj") schrumpfen kann und über
+               die Nachbarzelle hinausläuft. min-width:0 erzwingt das Schrumpfen. */
+            #add-modal .grid-cols-2 { min-width: 0; }
+            #add-modal .grid-cols-2 > div { min-width: 0; }
+            #add-modal input[type="date"] { min-width: 0 !important; width: 100% !important; }
+
             /* Datumsfeld der Tagesrecherche exakt so breit wie die Einträge in
-               "Nächste 7 Tage" (deren Liste hat pr-1 = 4px Innenabstand rechts).
-               min-width/box-sizing verhindern zusätzlich, dass das native
+               "Nächste 7 Tage": beide Boxen bekommen 0 Innenabstand rechts an
+               ihrem Elternelement, damit die Breite definitorisch identisch ist
+               (kein calc()-Schätzwert, der bei abweichender Rendering-Engine
+               wieder auseinanderlaufen kann).
+               min-width:0/box-sizing verhindern zusätzlich, dass das native
                Datums-Steuerelement bei 16px Schrift über den Container hinausläuft. */
             #day-search-input {
-                width: calc(100% - 4px) !important;
-                max-width: calc(100% - 4px) !important;
+                width: 100% !important;
+                max-width: 100% !important;
                 min-width: 0 !important;
                 box-sizing: border-box !important;
-                padding-left: 0.75rem !important;
-                padding-right: 0.75rem !important;
             }
+            #next7days-list { padding-right: 0 !important; }
         }
 
         /* ==================== TABLET / SCHMALER LAPTOP (768px - 1229px) ====================
@@ -414,14 +443,29 @@
             border: 1px solid var(--w-line);
             border-radius: 999px !important;
         }
-        .tab-wrap button, .role-switcher button {
+        .tab-wrap button, .tab-wrap a, .role-switcher button {
             color: var(--w-text-dim) !important;
             border-radius: 999px !important;
             transition: background .15s ease, color .15s ease;
         }
-        .tab-wrap button:hover, .role-switcher button:hover {
+        .tab-wrap button:hover, .tab-wrap a:hover, .role-switcher button:hover {
             background: var(--w-surface3) !important;
             color: var(--w-text) !important;
+        }
+        /* Der Merch-Link ist ein <a>, muss sich aber exakt wie die Tab-Buttons verhalten.
+           Ohne explizite Zeilenhöhe/Padding wäre er 4px niedriger als die <button>-Tabs,
+           weil Browser für <a> und <button> unterschiedliche Standard-Boxmodelle nutzen. */
+        .tab-wrap a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: inherit;
+            line-height: 1.25rem;      /* = text-sm, wie bei den Tab-Buttons */
+            padding-top: 0.375rem;     /* = py-1.5 */
+            padding-bottom: 0.375rem;
+            box-sizing: border-box;
         }
         /* aktive Rolle / aktiver Tab */
         .role-switcher button.active, #tab-kalender.active {
@@ -515,13 +559,48 @@
         .cal-scroll tbody tr:hover td * { color: #1d1d1d !important; }
         .cal-scroll thead tr:nth-child(3) th { background: var(--w-surface3) !important; }   /* Belegt-Zeile */
         .cal-scroll thead tr:nth-child(3) th:first-child { background: var(--w-surface3) !important; }
-        /* Wochenende / Feiertag im Dark-Theme unterscheidbar halten */
+
+        /* ---------- Alle weißen Modal-Tabellen: gleicher Hover-Fix wie im Kalender ---------- */
+        /* Betrifft Offene/Genehmigte Anträge sowie die drei Datenbanken (Mannschaft,
+           Gruppenführer, Zugführer). Ohne diese Regel erbt der Zeilentext die helle
+           App-weite Schriftfarbe (var(--w-text)); Tailwinds "hover:bg-slate-50" macht
+           die Zeile dann fast weiß, wodurch der Text praktisch verschwindet.
+           Grundzustand + Hover werden hier auf dunkle Schrift fixiert. */
+        #offene-antraege-modal tbody td,
+        #genehmigte-antraege-modal tbody td,
+        #mannschaft-modal tbody td,
+        #gruppenfuehrer-modal tbody td,
+        #zugfuehrer-modal tbody td { color: #1d1d1d; }
+        #offene-antraege-modal tbody tr:hover td,
+        #genehmigte-antraege-modal tbody tr:hover td,
+        #mannschaft-modal tbody tr:hover td,
+        #gruppenfuehrer-modal tbody tr:hover td,
+        #zugfuehrer-modal tbody tr:hover td {
+            background: #EFE3B0 !important;
+            color: #1d1d1d !important;
+        }
+        #offene-antraege-modal tbody tr:hover td *,
+        #genehmigte-antraege-modal tbody tr:hover td *,
+        #mannschaft-modal tbody tr:hover td *,
+        #gruppenfuehrer-modal tbody tr:hover td *,
+        #zugfuehrer-modal tbody tr:hover td * { color: #1d1d1d !important; }
+        /* Wochenende / Feiertag im Dark-Theme unterscheidbar halten.
+           Feiertage: WEISS statt Gold (auf Wunsch). */
         .cal-scroll .bg-gray-200 { background-color: #333 !important; }
         .cal-scroll .bg-gray-400 { background-color: #45413a !important; color: var(--w-text) !important; }
-        .cal-scroll .bg-black    { background-color: var(--w-gold) !important; color: #1d1d1d !important; }
+        .cal-scroll .bg-black    { background-color: #FFFFFF !important; color: #1d1d1d !important; }
         .cal-scroll .bg-slate-100 { background-color: #1a1a1a !important; }   /* Trennstrich-Zeile */
         .cal-scroll .border-black { border-color: var(--w-gold) !important; }
         .cal-scroll .text-slate-600 { color: var(--w-text-dim) !important; }
+
+        /* Belegt-Zeile: Ampelfarbe (grün/gelb/rot) gilt IMMER, auch an Sonntagen und
+           Feiertagen - nicht nur werktags. Die Farbe kommt aus der inline gesetzten
+           CSS-Variable --bc; diese Regel ist spezifischer als .cal-scroll .bg-gray-400 /
+           .cal-scroll .bg-black (zwei Klassen) durch die zusätzliche .belegt-cell-Klasse
+           und gewinnt dadurch unabhängig von der Reihenfolge im Stylesheet. */
+        .cal-scroll thead tr th.belegt-cell {
+            color: var(--bc) !important;
+        }
         /* Monatsnavigation */
         .cal-monthnav button {
             background: var(--w-surface2) !important;
@@ -536,6 +615,175 @@
             color: var(--w-text) !important;
             border-radius: 999px !important;
         }
+
+
+        /* ---------- Einsatzwunsch ---------- */
+        /* Panel-Layout: Kopfzeile + Wunscheingabe bleiben fixiert, nur die
+           Einträge-Tabelle scrollt. Ohne Höhenbegrenzung + Flex-Column konnte
+           das Modal bei vielen Einträgen höher als der Bildschirm werden, ohne
+           dass irgendwo ein Scrollbalken erschien - der Rand war dann einfach
+           unerreichbar abgeschnitten. */
+        .ew-panel {
+            display: flex;
+            flex-direction: column;
+            max-height: 85vh;
+            overflow: hidden;   /* verhindert doppelte Scrollbalken; nur .ew-panel-scroll scrollt */
+        }
+        .ew-panel-fixed { flex: 0 0 auto; }   /* Kopfzeile + Wunscheingabe: feste Höhe, kein Schrumpfen */
+        .ew-panel-scroll {
+            flex: 1 1 auto;
+            min-height: 0;      /* Flex-Kinder schrumpfen sonst nicht unter ihre Inhaltsgröße */
+            overflow: hidden;   /* der eigentliche Scroll passiert im inneren .ew-table-wrap */
+            display: flex;
+            padding-top: 1rem;
+        }
+        .ew-table-wrap {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow: auto;     /* <- der sichtbare Scrollbalken für die Einsatzwünsche */
+            -webkit-overflow-scrolling: touch;
+        }
+        .ew-table-wrap::-webkit-scrollbar { width: 10px; height: 10px; }
+        .ew-table-wrap::-webkit-scrollbar-thumb { background: #4a4a4a; border-radius: 999px; }
+        .ew-table-wrap::-webkit-scrollbar-thumb:hover { background: var(--w-gold-dim); }
+
+        #tab-einsatzwunsch { position: relative; }
+        .ew-badge {
+            display: inline-block;
+            width: 8px; height: 8px;
+            margin-left: 7px;
+            border-radius: 999px;
+            background: var(--w-gold);
+            box-shadow: 0 0 0 2px var(--w-gold-dim);
+            vertical-align: middle;
+        }
+        .ew-badge.hidden { display: none !important; }
+        /* dezenter Hinweis am Button selbst, solange ungelesen */
+        #tab-einsatzwunsch.has-new { color: var(--w-text) !important; }
+
+        #ew-export-btn {
+            background: var(--w-surface2) !important;
+            border: 1px solid var(--w-line) !important;
+            color: var(--w-text) !important;
+            border-radius: 999px !important;
+        }
+        #ew-export-btn:hover {
+            border-color: var(--w-gold) !important;
+            color: var(--w-gold) !important;
+        }
+        #ew-add-btn {
+            background: var(--w-gold) !important;
+            color: #1d1d1d !important;
+            border: none !important;
+        }
+        #ew-add-btn:hover { filter: brightness(1.05); }
+        /* Aktion-Spalte: nur für den Zugführer sichtbar (Klasse is-zf am Modal) */
+        #einsatzwunsch-modal .ew-col-aktion { display: none; }
+        #einsatzwunsch-modal.is-zf .ew-col-aktion { display: table-cell; }
+        #einsatzwunsch-modal .ew-c-aktion { visibility: collapse; }
+        #einsatzwunsch-modal.is-zf .ew-c-aktion { visibility: visible; }
+
+        /* Spaltenbreiten.
+           WICHTIG: bei table-layout:fixed wird "width:1%" wörtlich genommen (1% der
+           Tabellenbreite) - der bekannte "schrumpf auf Inhalt"-Trick funktioniert nur bei
+           table-layout:auto. Deshalb hier feste px-Breiten für die schmalen Spalten;
+           Anlass bekommt keine Breite und nimmt den gesamten Rest ein. */
+        #ew-table { table-layout: fixed; }
+        .ew-c-datum  { width: 108px; }   /* genau so breit wie "18.08.2026" braucht */
+        .ew-c-ort    { width: 22%;  }
+        .ew-c-von    { width: 15%;  }
+        .ew-c-status { width: 108px; }
+        .ew-c-aktion { width: 68px; }    /* zwei Icon-Buttons untereinander */
+        /* .ew-c-anlass ohne Breite -> erhält den kompletten Rest (breiteste Spalte) */
+
+        #ew-table th, #ew-table td { vertical-align: middle; }
+        #ew-table .ew-col-datum { white-space: nowrap; }
+        #ew-table td { word-break: break-word; }
+
+        /* Status-Anzeige (für ALLE Rollen sichtbar) */
+        .ew-status {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: .75rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .ew-status-offen {
+            background: var(--w-surface3);
+            color: var(--w-text-dim);
+            border: 1px solid var(--w-line);
+        }
+        .ew-status-angenommen {
+            background: rgba(34, 197, 94, .15);
+            color: #4ADE80;
+            border: 1px solid rgba(34, 197, 94, .4);
+        }
+        .ew-status-abgelehnt {
+            background: rgba(226, 72, 60, .15);
+            color: #F1836F;
+            border: 1px solid rgba(226, 72, 60, .4);
+        }
+
+        /* Status-Icons (reine Anzeige, gleiche Optik wie die Aktion-Buttons daneben) */
+        .ew-status-icon {
+            display: inline-flex;
+            align-items: center; justify-content: center;
+            width: 30px; height: 30px;
+            border-radius: 999px;
+            font-size: .85rem;
+        }
+        .ew-status-icon-ja {
+            background: rgba(34, 197, 94, .18);
+            color: #4ADE80;
+            border: 1px solid rgba(34, 197, 94, .55);
+        }
+        .ew-status-icon-nein {
+            background: rgba(226, 72, 60, .18);
+            color: #F1836F;
+            border: 1px solid rgba(226, 72, 60, .55);
+        }
+
+        /* Aktion-Buttons (nur Zugführer): Haken/X untereinander, platzsparend */
+        .ew-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+        .ew-act {
+            width: 34px; height: 34px;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: .9rem;
+            border-radius: 999px !important;
+            background: var(--w-surface2) !important;
+            border: 1px solid var(--w-line) !important;
+            color: var(--w-text-dim) !important;
+            cursor: pointer;
+            transition: background .12s ease, border-color .12s ease, color .12s ease;
+        }
+        .ew-act-ja:hover, .ew-act-ja.is-on {
+            background: rgba(34, 197, 94, .18) !important;
+            border-color: rgba(34, 197, 94, .6) !important;
+            color: #4ADE80 !important;
+        }
+        .ew-act-nein:hover, .ew-act-nein.is-on {
+            background: rgba(226, 72, 60, .18) !important;
+            border-color: rgba(226, 72, 60, .6) !important;
+            color: #F1836F !important;
+        }
+        .ew-act.is-on { box-shadow: inset 0 0 0 1px currentColor; }
+
+        /* Eingabezeile: 4 Felder + Button nebeneinander (Desktop) */
+        .ew-form { grid-template-columns: 150px 1fr 1fr 1fr auto; align-items: end; }
+        .ew-form-action { align-self: end; }
+
+        #einsatzwunsch-modal thead th {
+            background: var(--w-surface3) !important;
+            color: var(--w-text) !important;
+        }
+        #einsatzwunsch-modal tbody td { color: var(--w-text); }
+        #einsatzwunsch-modal tbody tr:hover td { background: var(--w-gold-soft) !important; }
 
         /* ---------- Monats-Picker ---------- */
         .month-picker-wrap { position: relative; display: inline-flex; }
@@ -668,6 +916,9 @@
                 <div class="nav-actions flex items-center gap-x-3">
                     <!-- Tabs -->
                     <div class="tab-wrap flex bg-slate-100 rounded-3xl p-1 text-sm mr-4">
+                        <button onclick="showEinsatzwunschModal()" id="tab-einsatzwunsch" class="px-5 py-1.5 rounded-3xl font-medium transition-all">
+                            <span class="ew-label">Einsatzwunsch</span><span id="einsatzwunsch-badge" class="ew-badge hidden" title="Neue Einträge"></span>
+                        </button>
                         <button onclick="document.getElementById('monthly-view-unified').scrollIntoView({ behavior: 'smooth' })" id="tab-kalender" class="px-5 py-1.5 rounded-3xl font-medium transition-all active">Kalender</button>
                     </div>
 
@@ -729,6 +980,14 @@
                     <div class="modern-card bg-slate-50 rounded-3xl p-6 shadow-sm border border-slate-100 hover:border-yellow-200 transition-all">
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="font-semibold text-lg">Buchung</h3>
+                            <!-- Auf Höhe der Buchung-Zeile: erscheint erst, wenn eine Gruppe ausgewählt ist -->
+                            <div id="group-members-header" class="hidden items-center gap-x-2">
+                                <h4 class="font-medium text-sm">Gruppenmitglieder</h4>
+                                <button onclick="hideGroupMembers()" 
+                                        class="text-xs text-slate-400 hover:text-slate-600 px-1.5 py-0.5 rounded hover:bg-slate-100">
+                                    ✕
+                                </button>
+                            </div>
                         </div>
                         
                         <div class="buchung-split flex gap-8">
@@ -741,13 +1000,6 @@
 
                             <!-- Right: Group Members -->
                             <div id="group-members-section" class="members-col w-[280px] flex-shrink-0 hidden">
-                                <div class="flex items-center gap-x-2 mb-2">
-                                    <h4 class="font-medium text-sm">Gruppenmitglieder</h4>
-                                    <button onclick="hideGroupMembers()" 
-                                            class="text-xs text-slate-400 hover:text-slate-600 px-1.5 py-0.5 rounded hover:bg-slate-100">
-                                        ✕
-                                    </button>
-                                </div>
                                 <div id="group-members-list" class="space-y-1 text-sm max-h-[220px] overflow-auto pr-1">
                                     <!-- Wird per JS gefüllt -->
                                 </div>
@@ -814,6 +1066,83 @@
     </div>
 
     <!-- Add/Edit Modal -->
+    <!-- Einsatzwunsch-Modal -->
+    <div id="einsatzwunsch-modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-[100]">
+        <div class="bg-white w-full max-w-5xl mx-4 rounded-3xl shadow-xl modal ew-panel">
+            <!-- Fixierter Bereich: Kopfzeile + Wunscheingabe scrollen NICHT mit -->
+            <div class="ew-panel-fixed">
+                <div class="px-6 pt-6 pb-4 border-b flex items-center justify-between">
+                    <h3 class="font-semibold text-xl">Einsatzwünsche</h3>
+                    <div class="flex items-center gap-x-2">
+                        <button onclick="exportEinsatzwuensche()" id="ew-export-btn"
+                                class="px-4 py-2 text-sm rounded-2xl font-medium">
+                            <i class="fa-solid fa-file-excel mr-2"></i>Export
+                        </button>
+                        <button onclick="hideEinsatzwunschModal()" class="text-slate-400 hover:text-slate-600 w-9 h-9 flex items-center justify-center">
+                            <i class="fa-solid fa-times text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="px-6 pt-6">
+                    <!-- Neuer Eintrag (Wunscheingabe) -->
+                    <div class="ew-form grid gap-3 mb-5">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1.5">DATUM</label>
+                            <input type="date" id="ew-datum" class="w-full border border-slate-200 rounded-2xl px-4 py-2.5 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1.5">ANLASS</label>
+                            <input type="text" id="ew-anlass" class="w-full border border-slate-200 rounded-2xl px-4 py-2.5 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1.5">ORT</label>
+                            <input type="text" id="ew-ort" class="w-full border border-slate-200 rounded-2xl px-4 py-2.5 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1.5">GEWÜNSCHT VON</label>
+                            <input type="text" id="ew-von" class="w-full border border-slate-200 rounded-2xl px-4 py-2.5 text-sm">
+                        </div>
+                        <div class="ew-form-action">
+                            <button onclick="addEinsatzwunsch()" id="ew-add-btn" class="w-full px-4 py-2.5 text-sm rounded-2xl font-semibold">
+                                <i class="fa-solid fa-plus mr-2"></i>Hinzufügen
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="ew-error" class="hidden text-sm mb-3" style="color: var(--w-red);"></div>
+                </div>
+            </div>
+
+            <!-- Einziger scrollbarer Bereich: die Einträge -->
+            <div class="ew-panel-scroll px-6 pb-6">
+                <div class="ew-table-wrap border rounded-2xl" id="ew-table-wrap">
+                    <table class="w-full border-collapse text-sm" id="ew-table">
+                        <colgroup>
+                            <col class="ew-c-datum">
+                            <col class="ew-c-anlass">
+                            <col class="ew-c-ort">
+                            <col class="ew-c-von">
+                            <col class="ew-c-status">
+                            <col class="ew-c-aktion">
+                        </colgroup>
+                        <thead class="sticky top-0">
+                            <tr>
+                                <th class="border p-3 text-left ew-col-datum">Datum</th>
+                                <th class="border p-3 text-left">Anlass</th>
+                                <th class="border p-3 text-left">Ort</th>
+                                <th class="border p-3 text-left">Gewünscht von</th>
+                                <th class="border p-3 text-left">Status</th>
+                                <th class="border p-3 text-left ew-col-aktion">Aktion</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ew-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="add-modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-[100]">
         <div class="bg-white w-full max-w-lg mx-4 rounded-3xl shadow-xl modal">
             <div class="px-6 pt-6 pb-4 border-b flex items-center justify-between">
@@ -913,12 +1242,16 @@
             
             <!-- Scrollbarer Inhalt -->
             <div class="flex-1 overflow-auto p-6">
-                <div class="flex justify-between items-center mb-4">
+                <div class="flex justify-between items-center mb-1">
                     <h4 class="font-medium">Mitarbeiterliste</h4>
                     <button onclick="addNewMannschaftMember()" class="flex items-center gap-x-2 bg-yellow-400 hover:bg-yellow-500 text-black px-4 py-2 rounded-2xl text-sm font-semibold">
                         <i class="fa-solid fa-plus mr-2"></i> Neues Mitglied
                     </button>
                 </div>
+                <p class="text-xs text-slate-400 mb-4">
+                    Kontingentbeginn (Basis der Verweildauer-Berechnung): <span id="kontingent-beginn-display" class="font-medium text-slate-600"></span>
+                    <button onclick="setKontingentBeginn()" class="text-blue-600 hover:text-blue-800 underline ml-1">ändern</button>
+                </p>
                 
                 <table class="w-full border-collapse text-sm">
                     <thead class="sticky top-0 z-[50] bg-white shadow-sm">
@@ -945,40 +1278,42 @@
 
     <!-- Gruppenführer Datenbank Modal -->
     <div id="gruppenfuehrer-modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-[100]">
-        <div class="bg-white w-full max-w-4xl mx-4 rounded-3xl shadow-xl modal">
-            <div class="px-6 pt-6 pb-4 border-b flex items-center justify-between">
+        <div class="bg-white w-full max-w-4xl mx-4 rounded-3xl shadow-xl modal flex flex-col" style="max-height: 85vh;">
+
+            <!-- Header fixiert -->
+            <div class="px-6 py-4 border-b flex items-center justify-between flex-shrink-0">
                 <h3 class="font-semibold text-xl">Gruppenführer (Datenbank)</h3>
                 <button onclick="hideGruppenfuehrerModal()" class="text-slate-400 hover:text-slate-600 w-9 h-9 flex items-center justify-center">
                     <i class="fa-solid fa-times text-xl"></i>
                 </button>
             </div>
-            
-            <div class="p-6">
+
+            <!-- Scrollbarer Inhalt -->
+            <div class="flex-1 overflow-auto p-6">
                 <div class="flex justify-between items-center mb-4">
                     <h4 class="font-medium">Gruppenführer-Liste</h4>
                     <button onclick="addNewGruppenfuehrerMember()" class="flex items-center gap-x-2 bg-yellow-400 hover:bg-yellow-500 text-black px-4 py-2 rounded-2xl text-sm font-semibold">
                         <i class="fa-solid fa-plus mr-2"></i> Neuer Gruppenführer
                     </button>
                 </div>
-                
-                <div class="overflow-x-auto">
-                    <table class="w-full border-collapse text-sm">
-                        <thead>
-                            <tr class="bg-slate-100">
-                                <th class="border p-3 text-left">Gruppe</th>
-                                <th class="border p-3 text-left">Vorname</th>
-                                <th class="border p-3 text-left">Name</th>
-                                <th class="border p-3 text-center">Aktionen</th>
-                            </tr>
-                        </thead>
-                        <tbody id="gruppenfuehrer-table-body">
-                            <!-- Wird per JS gefüllt -->
-                        </tbody>
-                    </table>
-                </div>
+
+                <table class="w-full border-collapse text-sm">
+                    <thead class="sticky top-0 z-[50] bg-white shadow-sm">
+                        <tr class="bg-slate-100">
+                            <th class="border p-3 text-left font-semibold">Gruppe</th>
+                            <th class="border p-3 text-left font-semibold">Vorname</th>
+                            <th class="border p-3 text-left font-semibold">Name</th>
+                            <th class="border p-3 text-center font-semibold">Aktionen</th>
+                        </tr>
+                    </thead>
+                    <tbody id="gruppenfuehrer-table-body">
+                        <!-- Wird per JS gefüllt -->
+                    </tbody>
+                </table>
             </div>
-            
-            <div class="px-6 py-5 bg-slate-50 rounded-b-3xl flex justify-end">
+
+            <!-- Footer fixiert -->
+            <div class="px-6 py-5 bg-slate-50 rounded-b-3xl flex justify-end border-t flex-shrink-0">
                 <button onclick="hideGruppenfuehrerModal()" class="px-5 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-800 transition-colors">Schließen</button>
             </div>
         </div>
@@ -986,39 +1321,41 @@
 
     <!-- Zugführer Datenbank Modal -->
     <div id="zugfuehrer-modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-[100]">
-        <div class="bg-white w-full max-w-4xl mx-4 rounded-3xl shadow-xl modal">
-            <div class="px-6 pt-6 pb-4 border-b flex items-center justify-between">
+        <div class="bg-white w-full max-w-4xl mx-4 rounded-3xl shadow-xl modal flex flex-col" style="max-height: 85vh;">
+
+            <!-- Header fixiert -->
+            <div class="px-6 py-4 border-b flex items-center justify-between flex-shrink-0">
                 <h3 class="font-semibold text-xl">Zugführer (Datenbank)</h3>
                 <button onclick="hideZugfuehrerModal()" class="text-slate-400 hover:text-slate-600 w-9 h-9 flex items-center justify-center">
                     <i class="fa-solid fa-times text-xl"></i>
                 </button>
             </div>
-            
-            <div class="p-6">
+
+            <!-- Scrollbarer Inhalt -->
+            <div class="flex-1 overflow-auto p-6">
                 <div class="flex justify-between items-center mb-4">
                     <h4 class="font-medium">Zugführerliste</h4>
                     <button onclick="addNewZugfuehrerMember()" class="flex items-center gap-x-2 bg-yellow-400 hover:bg-yellow-500 text-black px-4 py-2 rounded-2xl text-sm font-semibold">
                         <i class="fa-solid fa-plus mr-2"></i> Neues Mitglied
                     </button>
                 </div>
-                
-                <div class="overflow-x-auto">
-                    <table class="w-full border-collapse text-sm">
-                        <thead>
-                            <tr class="bg-slate-100">
-                                <th class="border p-3 text-left">Vorname</th>
-                                <th class="border p-3 text-left">Name</th>
-                                <th class="border p-3 text-center">Aktionen</th>
-                            </tr>
-                        </thead>
-                        <tbody id="zugfuehrer-table-body">
-                            <!-- Wird per JS gefüllt -->
-                        </tbody>
-                    </table>
-                </div>
+
+                <table class="w-full border-collapse text-sm">
+                    <thead class="sticky top-0 z-[50] bg-white shadow-sm">
+                        <tr class="bg-slate-100">
+                            <th class="border p-3 text-left font-semibold">Vorname</th>
+                            <th class="border p-3 text-left font-semibold">Name</th>
+                            <th class="border p-3 text-center font-semibold">Aktionen</th>
+                        </tr>
+                    </thead>
+                    <tbody id="zugfuehrer-table-body">
+                        <!-- Wird per JS gefüllt -->
+                    </tbody>
+                </table>
             </div>
-            
-            <div class="px-6 py-5 bg-slate-50 rounded-b-3xl flex justify-end">
+
+            <!-- Footer fixiert -->
+            <div class="px-6 py-5 bg-slate-50 rounded-b-3xl flex justify-end border-t flex-shrink-0">
                 <button onclick="hideZugfuehrerModal()" class="px-5 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-800 transition-colors">Schließen</button>
             </div>
         </div>
@@ -1462,6 +1799,8 @@
 
             section.classList.remove('hidden');
             section.classList.add('block');
+            const header = document.getElementById('group-members-header');
+            if (header) { header.classList.remove('hidden'); header.classList.add('flex'); }
             updateStats();
         }
 
@@ -1469,6 +1808,8 @@
             const section = document.getElementById('group-members-section');
             section.classList.remove('block');
             section.classList.add('hidden');
+            const header = document.getElementById('group-members-header');
+            if (header) { header.classList.remove('flex'); header.classList.add('hidden'); }
         }
 
         function quickAddForMember(fullName, groupId, groupColor) {
@@ -1842,10 +2183,10 @@
                                     });
 
                                     let color = '#166534';
-                                    if (urlaub >= 7 || aza >= 4) color = '#b91c1c';
+                                    if (urlaub >= 6 && aza >= 3) color = '#b91c1c';
                                     else if (urlaub >= 6 || aza >= 3) color = '#854d0e';
 
-                                    return `<th class="${thClass}" style="color: ${color}">${urlaub}/${aza}</th>`;
+                                    return `<th class="${thClass} belegt-cell" style="--bc: ${color}">${urlaub}/${aza}</th>`;
                                 }).join('')}
                             </tr>
                         </thead>
@@ -1916,7 +2257,7 @@
                                 }
                                 return `
                                     <tr class="hover:bg-slate-50">
-                                        <td class="sticky left-0 bg-white border p-1.5 font-medium whitespace-nowrap">
+                                        <td class="sticky left-0 z-[20] bg-white border p-1.5 font-medium whitespace-nowrap">
                                             <div class="flex items-center gap-x-2">
                                                 <div class="w-3 h-3 rounded-full flex-shrink-0" style="background-color: ${group.color}"></div>
                                                 ${member.name}
@@ -2063,9 +2404,9 @@
                                         }
                                     });
                                     let color = '#166534';
-                                    if (urlaub >= 7 || aza >= 4) color = '#b91c1c';
+                                    if (urlaub >= 6 && aza >= 3) color = '#b91c1c';
                                     else if (urlaub >= 6 || aza >= 3) color = '#854d0e';
-                                    return `<th class="border p-1 text-center text-xs font-mono" style="color:${color}">${urlaub}/${aza}</th>`;
+                                    return `<th class="border p-1 text-center text-xs font-mono belegt-cell" style="--bc:${color}">${urlaub}/${aza}</th>`;
                                 }).join('')}
                             </tr>
                             <tr class="bg-white">
@@ -2109,7 +2450,7 @@
                                     const g = GROUPS.find(gr => gr.id === member.groupId);
                                     badgeColor = g ? g.color : '#64748b';
                                 }
-                                return `<tr class="hover:bg-slate-50"><td class="sticky left-0 bg-white border p-1.5 font-medium"><div class="flex items-center gap-x-2"><div class="w-3 h-3 rounded-full" style="background:${badgeColor}"></div>${member.name}</div></td>${cells}</tr>`;
+                                return `<tr class="hover:bg-slate-50"><td class="sticky left-0 z-[20] bg-white border p-1.5 font-medium"><div class="flex items-center gap-x-2"><div class="w-3 h-3 rounded-full" style="background:${badgeColor}"></div>${member.name}</div></td>${cells}</tr>`;
                             }).join('')}
                         </tbody>
                     </table>
@@ -2135,6 +2476,69 @@
             const month = String(d.getMonth() + 1).padStart(2, '0');
             const year = d.getFullYear();
             return `${day}.${month}.${year}`;
+        }
+
+        // ---------- Verweildauer-Prüfung bei Buchungen ----------
+        // Wandelt einen Verweildauer-Text (z.B. "3 Jahre", "6 Monate") in eine Anzahl Monate um.
+        function parseVerweildauerMonths(verweildauer) {
+            if (!verweildauer) return 0;
+            let m = 0;
+            const parts = verweildauer.toLowerCase().split(' ');
+            for (let i = 0; i < parts.length; i++) {
+                if (parts[i].includes('jahr')) m += (parseInt(parts[i - 1]) || 0) * 12;
+                if (parts[i].includes('monat')) m += (parseInt(parts[i - 1]) || 0);
+            }
+            return m;
+        }
+
+        // Referenzdatum, ab dem die Verweildauer der Mannschaft läuft (Kontingentbeginn).
+        // Wird lokal gespeichert und kann über setKontingentBeginn() angepasst werden.
+        function getKontingentBeginn() {
+            try {
+                return localStorage.getItem('kontingentBeginn') || '2026-01-01';
+            } catch (e) {
+                return '2026-01-01';
+            }
+        }
+
+        function setKontingentBeginn() {
+            const current = getKontingentBeginn();
+            const input = prompt('Kontingentbeginn (Referenzdatum für die Verweildauer-Berechnung), Format JJJJ-MM-TT:', current);
+            if (!input) return;
+            if (isNaN(new Date(input).getTime())) {
+                alert('Ungültiges Datum. Bitte im Format JJJJ-MM-TT eingeben.');
+                return;
+            }
+            try {
+                localStorage.setItem('kontingentBeginn', input);
+            } catch (e) {
+                console.warn('Konnte Kontingentbeginn nicht dauerhaft speichern.');
+            }
+            renderKontingentBeginnDisplay();
+            showToast('Kontingentbeginn aktualisiert.');
+        }
+
+        function renderKontingentBeginnDisplay() {
+            const el = document.getElementById('kontingent-beginn-display');
+            if (el) el.textContent = formatDateDE(getKontingentBeginn());
+        }
+
+        // Ermittelt das Ende der Verweildauer eines Mannschafts-Mitglieds
+        // (Kontingentbeginn + hinterlegte Verweildauer). Gibt null zurück, wenn die
+        // Person nicht in der Mannschaft-Datenbank geführt wird oder keine Verweildauer
+        // hinterlegt ist (z.B. Gruppenführer/Zugführer/Stamm ohne dieses Feld).
+        function getVerweildauerEnde(fullName) {
+            if (!fullName || typeof mannschaft === 'undefined') return null;
+            const trimmed = fullName.trim();
+            const member = mannschaft.find(m => `${m.vorname} ${m.name}`.trim() === trimmed);
+            if (!member || !member.verweildauer) return null;
+            const months = parseVerweildauerMonths(member.verweildauer);
+            if (!months) return null;
+            const start = new Date(getKontingentBeginn());
+            if (isNaN(start.getTime())) return null;
+            const ende = new Date(start);
+            ende.setMonth(ende.getMonth() + months);
+            return ende;
         }
 
         function checkDateForWeekendHoliday(dateStr, field) {
@@ -2250,6 +2654,313 @@
                 renderMonthlyView();
                 updateCurrentMonthDisplay();
             }
+        }
+
+        // ==================== EINSATZWÜNSCHE ====================
+        let einsatzwuensche = [];
+        let ewLastReadAt = 0;   // Zeitpunkt, zu dem ein Zugführer die Tabelle zuletzt geöffnet hat
+
+        // Datum direkt aus dem ISO-String formatieren (TT.MM.JJJJ).
+        // Bewusst NICHT über new Date(iso).toLocaleDateString(): das interpretiert
+        // "2026-09-04" als UTC-Mitternacht und kann in westlichen Zeitzonen einen Tag
+        // zurückspringen; außerdem liefert de-DE dort "4.9.2026" ohne führende Nullen.
+        function formatEwDatum(iso) {
+            if (!iso) return '—';
+            const parts = String(iso).split('-');
+            if (parts.length !== 3) return iso;
+            return `${parts[2]}.${parts[1]}.${parts[0]}`;
+        }
+
+        function escapeHtml(s) {
+            return String(s == null ? '' : s)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        // Ein Einsatzwunsch wird EXAKT drei Wochen (21 Tage) vor seinem Termin
+        // automatisch entfernt. Bewusst mit lokalen Datumsteilen gerechnet
+        // (kein new Date(iso) -> UTC-Falle) und auf Tagesgrenzen normalisiert.
+        function ewLoeschDatum(iso) {
+            if (!iso) return null;
+            const parts = String(iso).split('-');
+            if (parts.length !== 3) return null;
+            const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+            if (isNaN(d.getTime())) return null;
+            d.setDate(d.getDate() - 21);
+            d.setHours(0, 0, 0, 0);
+            return d;
+        }
+
+        function ewIstFaellig(e) {
+            const grenze = ewLoeschDatum(e.datum);
+            if (!grenze) return false;
+            const heute = new Date();
+            heute.setHours(0, 0, 0, 0);
+            return heute >= grenze;   // ab drei Wochen vorher: Zeile fällt weg
+        }
+
+        // Seite bleibt oft tagelang offen -> regelmäßig prüfen, ob Einträge fällig sind.
+        setInterval(() => {
+            if (typeof einsatzwuensche === 'undefined') return;
+            if (pruneEinsatzwuensche() > 0) {
+                renderEinsatzwuensche();
+                updateEinsatzwunschBadge();
+            }
+        }, 60 * 60 * 1000);
+
+        function pruneEinsatzwuensche() {
+            const vorher = einsatzwuensche.length;
+            einsatzwuensche = einsatzwuensche.filter(e => !ewIstFaellig(e));
+            const entfernt = vorher - einsatzwuensche.length;
+            if (entfernt > 0) saveEinsatzwuensche();
+            return entfernt;
+        }
+
+        function setEinsatzwunschStatus(id, status) {
+            if (currentRole !== 'admin') return;              // nur Zugführer
+            const e = einsatzwuensche.find(x => x.id === id);
+            if (!e) return;
+            e.status = (e.status === status) ? 'offen' : status;   // erneuter Klick = zurücksetzen
+            e.statusAt = Date.now();
+            saveEinsatzwuensche();
+            renderEinsatzwuensche();
+        }
+
+        async function loadEinsatzwuensche() {
+            // Firebase ist führend; localStorage dient nur als Fallback ohne Netz.
+            if (typeof database !== 'undefined') {
+                try {
+                    const snap = await database.ref('einsatzwuensche/eintraege').once('value');
+                    const val = snap.val();
+                    einsatzwuensche = Array.isArray(val) ? val : (val ? Object.values(val) : []);
+
+                    const metaSnap = await database.ref('einsatzwuensche/lastReadAt').once('value');
+                    ewLastReadAt = metaSnap.val() || 0;
+
+                    try {
+                        localStorage.setItem('einsatzwuensche', JSON.stringify(einsatzwuensche));
+                        localStorage.setItem('ewLastReadAt', String(ewLastReadAt));
+                    } catch (e) {}
+                    pruneEinsatzwuensche();
+                    updateEinsatzwunschBadge();
+                    return;
+                } catch (e) {
+                    console.warn('Einsatzwünsche konnten nicht aus Firebase geladen werden:', e);
+                }
+            }
+            try {
+                einsatzwuensche = JSON.parse(localStorage.getItem('einsatzwuensche') || '[]');
+                ewLastReadAt = parseInt(localStorage.getItem('ewLastReadAt') || '0', 10) || 0;
+            } catch (e) {
+                einsatzwuensche = [];
+                ewLastReadAt = 0;
+            }
+            pruneEinsatzwuensche();
+            updateEinsatzwunschBadge();
+        }
+
+        function saveEinsatzwuensche() {
+            try { localStorage.setItem('einsatzwuensche', JSON.stringify(einsatzwuensche)); } catch (e) {}
+            if (typeof database !== 'undefined') {
+                database.ref('einsatzwuensche/eintraege').set(einsatzwuensche)
+                    .catch(err => console.warn('Fehler beim Speichern der Einsatzwünsche:', err));
+            }
+        }
+
+        function saveEwLastRead() {
+            try { localStorage.setItem('ewLastReadAt', String(ewLastReadAt)); } catch (e) {}
+            if (typeof database !== 'undefined') {
+                database.ref('einsatzwuensche/lastReadAt').set(ewLastReadAt)
+                    .catch(err => console.warn('Fehler beim Speichern des Lesestatus:', err));
+            }
+        }
+
+        // Badge zeigt an, ob es Einträge gibt, die neuer sind als das letzte Öffnen
+        // durch einen Zugführer.
+        function hasUngeleseneEinsatzwuensche() {
+            return einsatzwuensche.some(e => (e.createdAt || 0) > ewLastReadAt);
+        }
+
+        function updateEinsatzwunschBadge() {
+            const badge = document.getElementById('einsatzwunsch-badge');
+            if (!badge) return;
+            const neu = hasUngeleseneEinsatzwuensche();
+            badge.classList.toggle('hidden', !neu);
+            const btn = document.getElementById('tab-einsatzwunsch');
+            if (btn) btn.classList.toggle('has-new', neu);
+        }
+
+        function renderEinsatzwuensche() {
+            const tbody = document.getElementById('ew-tbody');
+            if (!tbody) return;
+
+            pruneEinsatzwuensche();   // beim Öffnen/Neuzeichnen fällige Einträge entfernen
+
+            const istZf = (currentRole === 'admin');
+            const modal = document.getElementById('einsatzwunsch-modal');
+            if (modal) modal.classList.toggle('is-zf', istZf);   // blendet Aktion-Spalte ein/aus
+
+            if (einsatzwuensche.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="border p-4 text-center text-slate-400">Keine Einsatzwünsche vorhanden</td></tr>';
+                return;
+            }
+
+            const sorted = [...einsatzwuensche].sort((a, b) => String(a.datum).localeCompare(String(b.datum)));
+
+            tbody.innerHTML = sorted.map(e => {
+                const st = e.status || 'offen';
+                // Status sieht JEDER (auch die Mannschaft) - die Buttons nur der Zugführer.
+                // "Angenommen"/"Abgelehnt" als Haken/X (gleiches Icon wie in der Aktion-Spalte),
+                // zentriert; "Offen" bleibt als Text-Pille, da es dafür kein sinnvolles Icon gibt.
+                const statusCell = st === 'angenommen'
+                    ? `<span class="ew-status-icon ew-status-icon-ja" title="Angenommen" aria-label="Angenommen"><i class="fa-solid fa-check"></i></span>`
+                    : st === 'abgelehnt'
+                    ? `<span class="ew-status-icon ew-status-icon-nein" title="Abgelehnt" aria-label="Abgelehnt"><i class="fa-solid fa-xmark"></i></span>`
+                    : `<span class="ew-status ew-status-offen">Offen</span>`;
+
+                // Für Nicht-Zugführer werden die Buttons gar nicht erst erzeugt
+                // (nicht nur per CSS versteckt) - sie stehen sonst im DOM.
+                // Nur für Zugführer erzeugen (nicht bloß per CSS verstecken).
+                // Grüner Haken = angenommen, rotes X = abgelehnt, untereinander.
+                const aktion = !istZf ? '' : `
+                    <div class="ew-actions">
+                        <button onclick="setEinsatzwunschStatus('${e.id}','angenommen')"
+                                class="ew-act ew-act-ja${st === 'angenommen' ? ' is-on' : ''}"
+                                title="Angenommen" aria-label="Angenommen">
+                            <i class="fa-solid fa-check"></i>
+                        </button>
+                        <button onclick="setEinsatzwunschStatus('${e.id}','abgelehnt')"
+                                class="ew-act ew-act-nein${st === 'abgelehnt' ? ' is-on' : ''}"
+                                title="Abgelehnt" aria-label="Abgelehnt">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>`;
+
+                return `<tr>
+                    <td class="border p-3 whitespace-nowrap ew-col-datum">${formatEwDatum(e.datum)}</td>
+                    <td class="border p-3">${escapeHtml(e.anlass)}</td>
+                    <td class="border p-3">${escapeHtml(e.ort)}</td>
+                    <td class="border p-3">${escapeHtml(e.gewuenschtVon)}</td>
+                    <td class="border p-3 text-center">${statusCell}</td>
+                    <td class="border p-3 ew-col-aktion">${aktion}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        function addEinsatzwunsch() {
+            const datum = document.getElementById('ew-datum').value;
+            const anlass = document.getElementById('ew-anlass').value.trim();
+            const ort = document.getElementById('ew-ort').value.trim();
+            const von = document.getElementById('ew-von').value.trim();
+            const err = document.getElementById('ew-error');
+
+            if (!datum || !anlass || !ort || !von) {
+                if (err) {
+                    err.textContent = 'Bitte alle Felder ausfüllen (Datum, Anlass, Ort, Gewünscht von).';
+                    err.classList.remove('hidden');
+                }
+                return;
+            }
+            // Ein Eintrag, dessen Termin weniger als 3 Wochen entfernt ist, würde von der
+            // Auto-Löschung sofort wieder entfernt -> hier abfangen statt kommentarlos verlieren.
+            if (ewIstFaellig({ datum })) {
+                if (err) {
+                    err.textContent = 'Das Datum muss mehr als drei Wochen in der Zukunft liegen – '
+                        + 'Einsatzwünsche werden drei Wochen vor dem Termin automatisch entfernt.';
+                    err.classList.remove('hidden');
+                }
+                return;
+            }
+            if (err) err.classList.add('hidden');
+
+            einsatzwuensche.push({
+                id: 'ew_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+                datum, anlass, ort, gewuenschtVon: von,
+                status: 'offen',
+                createdAt: Date.now()
+            });
+            saveEinsatzwuensche();
+
+            document.getElementById('ew-datum').value = '';
+            document.getElementById('ew-anlass').value = '';
+            document.getElementById('ew-ort').value = '';
+            document.getElementById('ew-von').value = '';
+
+            renderEinsatzwuensche();
+            updateEinsatzwunschBadge();
+        }
+
+        function deleteEinsatzwunsch(id) {
+            if (currentRole !== 'admin') return;            // nur Zugführer darf löschen
+            if (!confirm('Einsatzwunsch wirklich löschen?')) return;
+            einsatzwuensche = einsatzwuensche.filter(e => e.id !== id);
+            saveEinsatzwuensche();
+            renderEinsatzwuensche();
+            updateEinsatzwunschBadge();
+        }
+
+        function showEinsatzwunschModal() {
+            const m = document.getElementById('einsatzwunsch-modal');
+            if (!m) return;
+            m.classList.remove('hidden');
+            renderEinsatzwuensche();
+
+            // Als gelesen gilt es NUR, wenn ein Zugführer die Tabelle öffnet.
+            if (currentRole === 'admin') {
+                ewLastReadAt = Date.now();
+                saveEwLastRead();
+                updateEinsatzwunschBadge();
+            }
+        }
+
+        function hideEinsatzwunschModal() {
+            const m = document.getElementById('einsatzwunsch-modal');
+            if (m) m.classList.add('hidden');
+        }
+
+        function exportEinsatzwuensche() {
+            if (einsatzwuensche.length === 0) {
+                alert('Es gibt keine Einsatzwünsche zum Exportieren.');
+                return;
+            }
+            const sorted = [...einsatzwuensche].sort((a, b) => String(a.datum).localeCompare(String(b.datum)));
+            const stLabel = s => s === 'angenommen' ? 'Angenommen'
+                               : s === 'abgelehnt'  ? 'Abgelehnt' : 'Offen';
+            const rows = sorted.map(e => ({
+                'Datum': e.datum ? formatEwDatum(e.datum) : '',
+                'Anlass': e.anlass || '',
+                'Ort': e.ort || '',
+                'Gewünscht von': e.gewuenschtVon || '',
+                'Status': stLabel(e.status)
+            }));
+            const stamp = new Date().toISOString().slice(0, 10);
+
+            // Echte .xlsx-Datei, wenn SheetJS geladen ist; sonst CSV (öffnet ebenfalls in Excel).
+            if (typeof XLSX !== 'undefined') {
+                const ws = XLSX.utils.json_to_sheet(rows);
+                ws['!cols'] = [{ wch: 12 }, { wch: 38 }, { wch: 24 }, { wch: 18 }, { wch: 14 }];
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Einsatzwünsche');
+                XLSX.writeFile(wb, `Einsatzwuensche_${stamp}.xlsx`);
+                return;
+            }
+
+            // CSV-Fallback: Semikolon + BOM, damit Excel (DE) Spalten und Umlaute korrekt liest.
+            const esc = v => '"' + String(v).replace(/"/g, '""') + '"';
+            const head = ['Datum', 'Anlass', 'Ort', 'Gewünscht von', 'Status'];
+            const csv = [head.map(esc).join(';')]
+                .concat(rows.map(r => head.map(h => esc(r[h])).join(';')))
+                .join('\r\n');
+
+            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Einsatzwuensche_${stamp}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
 
         // ==================== MONATS-PICKER ====================
@@ -2423,6 +3134,8 @@
         }
 
         function switchRole(role) {
+            // Badge-Zustand nach jedem Rollenwechsel neu bewerten
+            setTimeout(updateEinsatzwunschBadge, 0);
             currentRole = role;
             updateHeaderButtons();
             
@@ -2545,6 +3258,22 @@
             if (end && new Date(end) < new Date(start)) {
                 alert('Das "Bis"-Datum darf nicht vor dem "Von"-Datum liegen.');
                 return;
+            }
+
+            // Warnhinweis, wenn die Buchung nach dem Ende der Verweildauer des
+            // Mitglieds liegt (Mannschaft-Datenbank, Feld "Verweildauer").
+            const verweildauerEnde = getVerweildauerEnde(name);
+            if (verweildauerEnde) {
+                const bookingStart = new Date(start);
+                if (bookingStart > verweildauerEnde) {
+                    if (!confirm(
+                        'Buchung nach Verweildauer\n\n' +
+                        `Die Verweildauer von ${name} endet laut Datenbank am ${formatDateDE(verweildauerEnde.toISOString().split('T')[0])}. ` +
+                        'Die gewählte Buchung liegt danach.\n\nTrotzdem fortfahren?'
+                    )) {
+                        return;
+                    }
+                }
             }
 
             const overlapping = events.some(ev => 
@@ -2713,6 +3442,7 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
             modal.classList.remove('hidden');
             modal.classList.add('flex');
             renderMannschaftTable();
+            renderKontingentBeginnDisplay();
         }
 
         function hideMannschaftModal() {
@@ -3208,6 +3938,7 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
             // Sicherstellen, dass die Mitgliederdatenbanken geladen sind, bevor Buchungen
             // anhand ihrer Namen der richtigen Gruppe zugeordnet werden.
             await Promise.all([loadMannschaft(), loadGruppenfuehrer(), loadZugfuehrer()]);
+            await loadEinsatzwuensche();
 
             try {
                 const savedRemarks = localStorage.getItem('dailyRemarks');
