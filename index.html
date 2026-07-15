@@ -34,10 +34,8 @@
       try {
           firebase.initializeApp(firebaseConfig);
           database = firebase.database();
-          // Anonyme Anmeldung: notwendig, damit Schreibzugriffe gemäß den Firebase-Regeln
-          // (".write": "auth != null") erlaubt sind. Läuft automatisch im Hintergrund,
-          // Nutzer bemerken davon nichts und müssen sich nicht einloggen.
-          firebase.auth().signInAnonymously().catch(err => console.error('Firebase-Auth-Fehler:', err));
+          // Anonyme Anmeldung entfernt: Zugriff erfolgt jetzt ausschließlich über echte
+          // Accounts (E-Mail/Passwort mit Custom Claims), siehe Login-Modal weiter unten.
       } catch (e) {
           console.error('Firebase nicht verfügbar – App läuft im lokalen Modus:', e);
       }
@@ -388,6 +386,13 @@
         .text-slate-700, .text-slate-600 { color: #D6D0C4 !important; }
         .text-slate-500, .text-slate-400 { color: var(--w-text-dim) !important; }
         h1, h2, h3, h4 { color: var(--w-text); }
+
+        /* Goldene Buttons (Anmelden, Bestätigen, Hinzufügen ...) bleiben auf hellem
+           Gold-Grund gut lesbar: dunkler Text statt des globalen Hell-Text-Overrides. */
+        .bg-yellow-400.text-slate-900,
+        .bg-yellow-400.text-black {
+            color: #1d1d1d !important;
+        }
 
         /* ---------- Linien ---------- */
         .border, .border-b, .border-t,
@@ -882,6 +887,19 @@
             border-radius: 12px !important;
         }
 
+        .logout-btn {
+            border: 1px solid var(--w-gold-dim);
+            color: var(--w-gold);
+            background: transparent;
+            box-shadow: 0 0 0 rgba(246, 218, 74, 0);
+        }
+        .logout-btn:hover {
+            border-color: var(--w-gold);
+            background: var(--w-gold);
+            color: #1d1d1d;
+            box-shadow: 0 4px 12px -2px rgba(246, 218, 74, 0.35);
+        }
+
         /* ---------- Scrollbars ---------- */
         .cal-scroll::-webkit-scrollbar,
         #group-members-list::-webkit-scrollbar,
@@ -946,6 +964,7 @@
                             <span class="role-label">Zugführer</span><span class="role-label-short">ZF</span>
                         </button>
                     </div>
+                    <div id="logout-info" class="hidden ml-3 text-xs whitespace-nowrap"></div>
                 </div>
             </div>
         </div>
@@ -1139,6 +1158,41 @@
                         <tbody id="ew-tbody"></tbody>
                     </table>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Passwort-Modal: ersetzt window.prompt(), damit die Eingabe optisch maskiert (*) werden kann -->
+    <div id="password-modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-[110]">
+        <div class="bg-white w-full max-w-sm mx-4 rounded-2xl shadow-xl modal p-6">
+            <h3 id="password-modal-title" class="font-display font-semibold text-lg text-slate-800 mb-4">Passwort eingeben</h3>
+            <input type="text" id="password-modal-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                   class="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-lg tracking-widest focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                   placeholder="">
+            <div class="flex justify-end gap-2 mt-5">
+                <button onclick="closePasswordModal(false)" class="px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-100 text-sm font-medium">Abbrechen</button>
+                <button onclick="closePasswordModal(true)" class="px-4 py-2 rounded-lg bg-yellow-400 hover:bg-yellow-500 text-slate-900 text-sm font-semibold">Bestätigen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login-Modal: echte Firebase-Accounts (Benutzername + maskiertes Passwort) statt Rollen-Passwort -->
+    <div id="login-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-[120]">
+        <div class="bg-white w-full max-w-sm mx-4 rounded-2xl shadow-xl modal p-6">
+            <h3 class="font-display font-semibold text-lg text-slate-800 mb-1">Anmelden</h3>
+            <p id="login-modal-subtitle" class="text-sm text-slate-500 mb-4">Bitte melde dich an, um fortzufahren.</p>
+            <label class="block text-xs font-medium text-slate-500 mb-1">Benutzername</label>
+            <input type="text" id="login-modal-username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                   class="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-base focus:outline-none focus:ring-2 focus:ring-yellow-400 mb-3"
+                   placeholder="">
+            <label class="block text-xs font-medium text-slate-500 mb-1">Passwort</label>
+            <input type="text" id="login-modal-password" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                   class="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-lg tracking-widest focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                   placeholder="">
+            <p id="login-modal-error" class="hidden text-sm text-red-600 mt-2">Benutzername oder Passwort falsch.</p>
+            <div class="flex justify-end gap-2 mt-5">
+                <button id="login-modal-cancel" onclick="cancelLoginModal()" class="px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-100 text-sm font-medium">Abbrechen</button>
+                <button onclick="submitLoginModal()" class="px-4 py-2 rounded-lg bg-yellow-400 hover:bg-yellow-500 text-slate-900 text-sm font-semibold">Anmelden</button>
             </div>
         </div>
     </div>
@@ -2246,7 +2300,8 @@
 
                                         const created = ev.createdAt ? formatDateDE(ev.createdAt) : 'unbekannt';
                                         const statusDE = ev.status === 'pending' ? 'gewünscht' : (ev.status === 'approved' ? 'genehmigt' : ev.status);
-                                        cells += `<td class="border p-1 text-center" title="${ev.type} • Erstellt am ${created} • ${statusDE}${ev.note ? ' – ' + ev.note : ''}">
+                                        const lastActionInfo = ev.lastActionBy ? ` • Zuletzt gebucht von ${ev.lastActionBy}` : '';
+                                        cells += `<td class="border p-1 text-center" title="${ev.type} • Erstellt am ${created} • ${statusDE}${lastActionInfo}${ev.note ? ' – ' + ev.note : ''}">
                                             <div class="w-5 h-5 mx-auto rounded-full flex items-center justify-center text-[9px] font-bold" 
                                                  style="background-color: ${bgColor}; color: ${textColor};">
                                             </div>
@@ -3094,28 +3149,238 @@
             return true;
         }
 
-        function switchToGruppenfuehrer() {
-            const password = prompt("Passwort für die Rolle Gruppenführer eingeben:");
-            if (password === null) return; // Abbruch
-            if (password === "Michael2") {
+        // ==================== PASSWORT-MODAL (maskierte Eingabe statt window.prompt) ====================
+        let _passwordModalRealValue = '';
+        let _passwordModalResolve = null;
+
+        function promptPassword(titleText) {
+            return new Promise((resolve) => {
+                _passwordModalRealValue = '';
+                _passwordModalResolve = resolve;
+                const modal = document.getElementById('password-modal');
+                const titleEl = document.getElementById('password-modal-title');
+                const input = document.getElementById('password-modal-input');
+                titleEl.textContent = titleText;
+                input.value = '';
+                modal.classList.remove('hidden');
+                setTimeout(() => input.focus(), 50);
+            });
+        }
+
+        function closePasswordModal(confirmed) {
+            const modal = document.getElementById('password-modal');
+            modal.classList.add('hidden');
+            const result = confirmed ? _passwordModalRealValue : null;
+            _passwordModalRealValue = '';
+            if (_passwordModalResolve) {
+                const resolve = _passwordModalResolve;
+                _passwordModalResolve = null;
+                resolve(result);
+            }
+        }
+
+        // Speichert das echte Passwort im Hintergrund, zeigt im Feld aber nur "*" an
+        document.addEventListener('DOMContentLoaded', () => {
+            const input = document.getElementById('password-modal-input');
+            if (!input) return;
+
+            input.addEventListener('input', (e) => {
+                if (e.inputType === 'insertText' || e.inputType === 'insertFromPaste') {
+                    _passwordModalRealValue += (e.data || '');
+                } else if (e.inputType === 'deleteContentBackward' || e.inputType === 'deleteContentForward') {
+                    _passwordModalRealValue = _passwordModalRealValue.slice(0, -1);
+                } else {
+                    // Fallback (z.B. Autofill): Länge an die sichtbare Eingabe angleichen
+                    _passwordModalRealValue = _passwordModalRealValue.slice(0, input.value.length);
+                }
+                input.value = '*'.repeat(_passwordModalRealValue.length);
+                input.setSelectionRange(input.value.length, input.value.length);
+            });
+
+            // Cursor immer ans Ende springen lassen, damit die einfache Maskierungs-Logik
+            // (Zeichen werden am Ende angehängt/entfernt) zuverlässig funktioniert
+            const forceCursorToEnd = () => input.setSelectionRange(input.value.length, input.value.length);
+            input.addEventListener('click', forceCursorToEnd);
+            input.addEventListener('keyup', forceCursorToEnd);
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    closePasswordModal(true);
+                } else if (e.key === 'Escape') {
+                    e.preventDefault();
+                    closePasswordModal(false);
+                }
+            });
+        });
+
+        // ==================== ECHTE ACCOUNTS (Firebase Auth + Custom Claims) ====================
+        // Interne Nutzernamen werden als Pseudo-E-Mail an Firebase Auth übergeben,
+        // z.B. "schmidt" -> "schmidt@cop.local". Die Rolle (mannschaft/gf/zf) kommt
+        // als Custom Claim vom Server (per einmaligem Admin-Skript gesetzt) und wird
+        // NICHT im Client geprüft/vergeben - das ist der eigentliche Sicherheitsgewinn.
+        const COP_LOGIN_DOMAIN = 'cop.local';
+        let _loginModalResolve = null;
+        let _loginModalCancelable = true;
+
+        function usernameToEmail(username) {
+            return username.trim().toLowerCase().replace(/\s+/g, '.') + '@' + COP_LOGIN_DOMAIN;
+        }
+
+        // Öffnet das Login-Modal und liefert true, sobald der Login erfolgreich war.
+        // cancelable=false blendet den Abbrechen-Button aus (Zwangslogin beim App-Start).
+        function showLoginModal(subtitleText, cancelable) {
+            return new Promise((resolve) => {
+                _loginModalResolve = resolve;
+                _loginModalCancelable = cancelable !== false;
+                const modal = document.getElementById('login-modal');
+                const subtitle = document.getElementById('login-modal-subtitle');
+                const userInput = document.getElementById('login-modal-username');
+                const passInput = document.getElementById('login-modal-password');
+                const errorEl = document.getElementById('login-modal-error');
+                const cancelBtn = document.getElementById('login-modal-cancel');
+                subtitle.textContent = subtitleText || 'Bitte melde dich an, um fortzufahren.';
+                userInput.value = '';
+                passInput.value = '';
+                _loginPasswordReal = '';
+                errorEl.classList.add('hidden');
+                cancelBtn.style.display = _loginModalCancelable ? '' : 'none';
+                modal.classList.remove('hidden');
+                setTimeout(() => userInput.focus(), 50);
+            });
+        }
+
+        function cancelLoginModal() {
+            if (!_loginModalCancelable) return;
+            document.getElementById('login-modal').classList.add('hidden');
+            const resolve = _loginModalResolve;
+            _loginModalResolve = null;
+            if (resolve) resolve(false);
+        }
+
+        async function submitLoginModal() {
+            const username = document.getElementById('login-modal-username').value;
+            const password = _loginPasswordReal;
+            const errorEl = document.getElementById('login-modal-error');
+            if (!username || !password) {
+                errorEl.textContent = 'Bitte Benutzername und Passwort eingeben.';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+            if (typeof database === 'undefined' || typeof firebase === 'undefined') {
+                errorEl.textContent = 'Firebase ist nicht verfügbar. Bitte Seite neu laden.';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+            try {
+                await firebase.auth().signInWithEmailAndPassword(usernameToEmail(username), password);
+                document.getElementById('login-modal').classList.add('hidden');
+                const resolve = _loginModalResolve;
+                _loginModalResolve = null;
+                if (resolve) resolve(true);
+            } catch (err) {
+                console.warn('Login fehlgeschlagen:', err.code);
+                errorEl.textContent = 'Benutzername oder Passwort falsch.';
+                errorEl.classList.remove('hidden');
+            }
+        }
+
+        // Maskiert das Passwortfeld im Login-Modal genauso wie das bestehende Passwort-Modal
+        let _loginPasswordReal = '';
+        document.addEventListener('DOMContentLoaded', () => {
+            const passInput = document.getElementById('login-modal-password');
+            if (!passInput) return;
+            passInput.addEventListener('input', (e) => {
+                if (e.inputType === 'insertText' || e.inputType === 'insertFromPaste') {
+                    _loginPasswordReal += (e.data || '');
+                } else if (e.inputType === 'deleteContentBackward' || e.inputType === 'deleteContentForward') {
+                    _loginPasswordReal = _loginPasswordReal.slice(0, -1);
+                } else {
+                    _loginPasswordReal = _loginPasswordReal.slice(0, passInput.value.length);
+                }
+                passInput.value = '*'.repeat(_loginPasswordReal.length);
+                passInput.setSelectionRange(passInput.value.length, passInput.value.length);
+            });
+            const forceCursorToEnd = () => passInput.setSelectionRange(passInput.value.length, passInput.value.length);
+            passInput.addEventListener('click', forceCursorToEnd);
+            passInput.addEventListener('keyup', forceCursorToEnd);
+            passInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') { e.preventDefault(); submitLoginModal(); }
+                else if (e.key === 'Escape') { e.preventDefault(); cancelLoginModal(); }
+            });
+            const userInput = document.getElementById('login-modal-username');
+            userInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') { e.preventDefault(); document.getElementById('login-modal-password').focus(); }
+            });
+        });
+
+        // Liest die Rolle aus dem ID-Token (Custom Claim "role": "mannschaft" | "gf" | "zf")
+        // und setzt die App-Rolle entsprechend. Kein Rollen-Fallback im Client!
+        async function applyRoleFromClaims() {
+            const user = firebase.auth().currentUser;
+            if (!user) return null;
+            const tokenResult = await user.getIdTokenResult(true);
+            const role = tokenResult.claims && tokenResult.claims.role;
+            if (role === 'zf') {
+                switchRole('admin');
+            } else if (role === 'gf') {
                 switchRole('manager');
             } else {
-                alert("Falsches Passwort!");
+                switchRole('mitarbeiter');
             }
+            updateLogoutButton(user, role);
+            return role;
         }
 
-        function switchToZugfuehrer() {
-            const password = prompt("Passwort für die Rolle Zugführer eingeben:");
-            if (password === null) return; // Abbruch
-            if (password === "100102030") {
-                switchRole('admin');
+        function updateLogoutButton(user, role) {
+            const el = document.getElementById('logout-info');
+            if (!el) return;
+            if (user) {
+                el.innerHTML = '<span class="hidden sm:inline text-slate-400 mr-3 text-xs">' + user.email.split('@')[0] + '</span>' +
+                    '<button onclick="doLogout()" class="logout-btn flex items-center gap-x-1.5 transition-colors px-3 py-1.5 rounded-xl font-semibold text-xs">' +
+                    '<i class="fa-solid fa-arrow-right-from-bracket"></i><span>Abmelden</span></button>';
+                el.classList.remove('hidden');
             } else {
-                alert("Falsches Passwort!");
+                el.classList.add('hidden');
             }
         }
 
-        function openDatabaseWithPassword(openFunction) {
-            const password = prompt("Passwort für Datenbankzugriff eingeben:");
+        async function doLogout() {
+            try { await firebase.auth().signOut(); } catch (e) {}
+            location.reload();
+        }
+
+        // Erzwingt beim App-Start ein Login, bevor die App überhaupt geladen wird.
+        async function ensureLoggedIn() {
+            if (typeof firebase === 'undefined' || typeof database === 'undefined') return;
+            if (firebase.auth().currentUser) {
+                await applyRoleFromClaims();
+                return;
+            }
+            let loggedIn = false;
+            while (!loggedIn) {
+                loggedIn = await showLoginModal('Bitte melde dich an, um die COP-App zu nutzen.', false);
+            }
+            await applyRoleFromClaims();
+        }
+
+        // Wechselt den eingeloggten Account (z.B. Gruppenführer -> Zugführer), ohne dass
+        // die Rolle vom Client vorgegeben wird - sie ergibt sich aus dem Account selbst.
+        async function switchAccount() {
+            const ok = await showLoginModal('Mit anderem Konto anmelden:', true);
+            if (ok) await applyRoleFromClaims();
+        }
+
+        async function switchToGruppenfuehrer() {
+            await switchAccount();
+        }
+
+        async function switchToZugfuehrer() {
+            await switchAccount();
+        }
+
+        async function openDatabaseWithPassword(openFunction) {
+            const password = await promptPassword("Passwort für Datenbankzugriff eingeben:");
             if (password === "Michael2") {
                 openFunction();
             } else if (password !== null) {
@@ -3232,6 +3497,16 @@
         }
 
         // ==================== FIXED saveEvent() ====================
+        // Ermittelt den handelnden Account (nur für Gruppenführer/Zugführer relevant),
+        // damit Buchungen nachvollziehen lassen, wer zuletzt gebucht/bearbeitet hat.
+        function getActingAccountLabel() {
+            const user = (typeof firebase !== 'undefined' && firebase.auth) ? firebase.auth().currentUser : null;
+            if (!user) return null;
+            if (currentRole === 'admin') return 'ZF: ' + user.email.split('@')[0];
+            if (currentRole === 'manager') return 'GF: ' + user.email.split('@')[0];
+            return null;
+        }
+
         function saveEvent() {
             // Werte aus dem Modal auslesen (das war der Fehler - Variablen waren undefined)
             const type = document.getElementById('modal-type').value;
@@ -3304,6 +3579,8 @@
                     events[index].title = name;
                     events[index].note = note;
                     events[index].status = status;
+                    const actingLabel = getActingAccountLabel();
+                    if (actingLabel) events[index].lastActionBy = actingLabel;
                     savedEvent = events[index];
                 }
             } else {
@@ -3319,6 +3596,8 @@
                     createdBy: name,
                     createdAt: new Date().toISOString()
                 };
+                const actingLabel = getActingAccountLabel();
+                if (actingLabel) savedEvent.lastActionBy = actingLabel;
                 events.push(savedEvent);
             }
 
@@ -3780,7 +4059,7 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
                     if (doDelete) {
                         eventsRef.child(foundKey).remove();
                     } else {
-                        eventsRef.child(foundKey).update({ status: ev.status, note: ev.note || '' });
+                        eventsRef.child(foundKey).update({ status: ev.status, note: ev.note || '', lastActionBy: ev.lastActionBy || null });
                     }
                 } else if (!doDelete) {
                     const clean = { ...ev };
@@ -3796,6 +4075,8 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
 
             const ev = events[index];
             ev.status = 'approved';
+            const actingLabel = getActingAccountLabel();
+            if (actingLabel) ev.lastActionBy = actingLabel;
             saveToLocalStorage();
 
             updateOrDeleteInFirebase(ev, false);
@@ -3815,6 +4096,8 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
             if (!confirm('Antrag wirklich ablehnen?')) return;
 
             ev.status = 'rejected';
+            const actingLabelReject = getActingAccountLabel();
+            if (actingLabelReject) ev.lastActionBy = actingLabelReject;
             saveToLocalStorage();
 
             updateOrDeleteInFirebase(ev, false);
@@ -3963,7 +4246,7 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
                     normalizeEventGroupIds();
                     setupFirebaseListener();
 
-                    switchRole('mitarbeiter');
+                    applyRoleFromClaims();
                     updateHeaderButtons();
                     renderGroups();
                     updateStats();
@@ -3975,7 +4258,7 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
                 }).catch(() => {
                     loadInitialData();
                     normalizeEventGroupIds();
-                    switchRole('mitarbeiter');
+                    applyRoleFromClaims();
                     updateHeaderButtons();
                     renderGroups();
                     updateStats();
@@ -4112,18 +4395,14 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
         }
 
         // Boot app
-        window.onload = function() {
-            // Warten bis die anonyme Anmeldung abgeschlossen ist (oder nach 3s weitermachen,
-            // falls kein Netz/Firebase verfügbar), damit initializeApp() nicht auf einen
-            // noch nicht authentifizierten Zustand trifft und Schreibzugriffe fehlschlagen.
-            let started = false;
-            const start = () => { if (!started) { started = true; initializeApp(); } };
-            try {
-                firebase.auth().onAuthStateChanged(() => start());
-            } catch (e) {
-                start();
+        window.onload = async function() {
+            // Kein automatischer Start mehr ohne Login: Falls Firebase verfügbar ist,
+            // muss sich der Nutzer zuerst über das Login-Modal anmelden. Ist Firebase
+            // nicht verfügbar (Netz/Firewall), startet die App wie bisher lokal.
+            if (typeof firebase !== 'undefined' && typeof database !== 'undefined') {
+                await ensureLoggedIn();
             }
-            setTimeout(start, 3000);
+            initializeApp();
         };
     </script>
 </body>
