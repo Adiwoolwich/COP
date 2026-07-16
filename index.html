@@ -565,17 +565,16 @@
         .cal-scroll thead tr:nth-child(3) th { background: var(--w-surface3) !important; }   /* Belegt-Zeile */
         .cal-scroll thead tr:nth-child(3) th:first-child { background: var(--w-surface3) !important; }
 
-        /* ---------- Alle weißen Modal-Tabellen: gleicher Hover-Fix wie im Kalender ---------- */
+        /* ---------- Alle weißen Modal-Tabellen: gleicher Hover-Look wie im Kalender ---------- */
         /* Betrifft Offene/Genehmigte Anträge sowie die drei Datenbanken (Mannschaft,
-           Gruppenführer, Zugführer). Ohne diese Regel erbt der Zeilentext die helle
-           App-weite Schriftfarbe (var(--w-text)); Tailwinds "hover:bg-slate-50" macht
-           die Zeile dann fast weiß, wodurch der Text praktisch verschwindet.
-           Grundzustand + Hover werden hier auf dunkle Schrift fixiert. */
+           Gruppenführer, Zugführer). Grundzustand: helle/weiße Schrift (wie im Kalender,
+           passend zum dunklen Modal-Hintergrund). Hover: heller Gold-Ton als Hintergrund
+           + schwarze Schrift, exakt wie in .cal-scroll tbody tr:hover. */
         #offene-antraege-modal tbody td,
         #genehmigte-antraege-modal tbody td,
         #mannschaft-modal tbody td,
         #gruppenfuehrer-modal tbody td,
-        #zugfuehrer-modal tbody td { color: #1d1d1d; }
+        #zugfuehrer-modal tbody td { color: var(--w-text) !important; }
         #offene-antraege-modal tbody tr:hover td,
         #genehmigte-antraege-modal tbody tr:hover td,
         #mannschaft-modal tbody tr:hover td,
@@ -589,6 +588,16 @@
         #mannschaft-modal tbody tr:hover td *,
         #gruppenfuehrer-modal tbody tr:hover td *,
         #zugfuehrer-modal tbody tr:hover td * { color: #1d1d1d !important; }
+
+        /* Geringere Zeilenhöhe in den 5 Tabellen (kompakteres Layout) */
+        #offene-antraege-modal table th, #offene-antraege-modal table td,
+        #genehmigte-antraege-modal table th, #genehmigte-antraege-modal table td,
+        #mannschaft-modal table th, #mannschaft-modal table td,
+        #gruppenfuehrer-modal table th, #gruppenfuehrer-modal table td,
+        #zugfuehrer-modal table th, #zugfuehrer-modal table td {
+            padding-top: 5px !important;
+            padding-bottom: 5px !important;
+        }
         /* Wochenende / Feiertag im Dark-Theme unterscheidbar halten.
            Feiertage: WEISS statt Gold (auf Wunsch). */
         .cal-scroll .bg-gray-200 { background-color: #333 !important; }
