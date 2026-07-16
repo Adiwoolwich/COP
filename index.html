@@ -553,23 +553,22 @@
         .cal-scroll tbody td:first-child,
         .cal-scroll thead th:first-child { background: var(--w-surface) !important; }
 
-        /* Hover-Zeile: deckender heller Gold-Ton + schwarze Schrift, damit der Name
-           lesbar bleibt. Muss NACH der first-child-Regel stehen, sonst überschreibt
+        /* Hover-Zeile: dezenter, transparenter Gold-Ton (wie in der Einsatzwunschtabelle),
+           Text bleibt hell/weiß. Muss NACH der first-child-Regel stehen, sonst überschreibt
            diese (gleiche Spezifität, später im Code) den Hover-Hintergrund wieder. */
         .cal-scroll tbody tr:hover td,
         .cal-scroll tbody tr:hover td:first-child {
-            background: #EFE3B0 !important;
-            color: #1d1d1d !important;
+            background: var(--w-gold-soft) !important;
+            color: var(--w-text) !important;
         }
-        .cal-scroll tbody tr:hover td * { color: #1d1d1d !important; }
+        .cal-scroll tbody tr:hover td * { color: var(--w-text) !important; }
         .cal-scroll thead tr:nth-child(3) th { background: var(--w-surface3) !important; }   /* Belegt-Zeile */
         .cal-scroll thead tr:nth-child(3) th:first-child { background: var(--w-surface3) !important; }
 
-        /* ---------- Alle weißen Modal-Tabellen: gleicher Hover-Look wie im Kalender ---------- */
+        /* ---------- Alle weißen Modal-Tabellen: gleicher Hover-Look wie die Einsatzwunschtabelle ---------- */
         /* Betrifft Offene/Genehmigte Anträge sowie die drei Datenbanken (Mannschaft,
-           Gruppenführer, Zugführer). Grundzustand: helle/weiße Schrift (wie im Kalender,
-           passend zum dunklen Modal-Hintergrund). Hover: heller Gold-Ton als Hintergrund
-           + schwarze Schrift, exakt wie in .cal-scroll tbody tr:hover. */
+           Gruppenführer, Zugführer). Grundzustand: helle/weiße Schrift. Hover: dezenter,
+           transparenter Gold-Ton als Hintergrund (var(--w-gold-soft)), Text bleibt hell. */
         #offene-antraege-modal tbody td,
         #genehmigte-antraege-modal tbody td,
         #mannschaft-modal tbody td,
@@ -580,14 +579,14 @@
         #mannschaft-modal tbody tr:hover td,
         #gruppenfuehrer-modal tbody tr:hover td,
         #zugfuehrer-modal tbody tr:hover td {
-            background: #EFE3B0 !important;
-            color: #1d1d1d !important;
+            background: var(--w-gold-soft) !important;
+            color: var(--w-text) !important;
         }
         #offene-antraege-modal tbody tr:hover td *,
         #genehmigte-antraege-modal tbody tr:hover td *,
         #mannschaft-modal tbody tr:hover td *,
         #gruppenfuehrer-modal tbody tr:hover td *,
-        #zugfuehrer-modal tbody tr:hover td * { color: #1d1d1d !important; }
+        #zugfuehrer-modal tbody tr:hover td * { color: var(--w-text) !important; }
 
         /* Geringere Zeilenhöhe in den 5 Tabellen (kompakteres Layout) */
         #offene-antraege-modal table th, #offene-antraege-modal table td,
@@ -2320,7 +2319,7 @@
                                     }
                                 }
                                 return `
-                                    <tr class="hover:bg-slate-50">
+                                    <tr>
                                         <td class="sticky left-0 z-[20] bg-white border p-1.5 font-medium whitespace-nowrap">
                                             <div class="flex items-center gap-x-2">
                                                 <div class="w-3 h-3 rounded-full flex-shrink-0" style="background-color: ${group.color}"></div>
@@ -2514,7 +2513,7 @@
                                     const g = GROUPS.find(gr => gr.id === member.groupId);
                                     badgeColor = g ? g.color : '#64748b';
                                 }
-                                return `<tr class="hover:bg-slate-50"><td class="sticky left-0 z-[20] bg-white border p-1.5 font-medium"><div class="flex items-center gap-x-2"><div class="w-3 h-3 rounded-full" style="background:${badgeColor}"></div>${member.name}</div></td>${cells}</tr>`;
+                                return `<tr><td class="sticky left-0 z-[20] bg-white border p-1.5 font-medium"><div class="flex items-center gap-x-2"><div class="w-3 h-3 rounded-full" style="background:${badgeColor}"></div>${member.name}</div></td>${cells}</tr>`;
                             }).join('')}
                         </tbody>
                     </table>
@@ -3770,7 +3769,7 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
             list.forEach((member) => {
                 const originalIndex = mannschaft.findIndex(m => m.id === member.id);
                 const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-50';
+                tr.className = '';
                 tr.innerHTML = `
                     <td class="border p-3">${member.gruppe}</td>
                     <td class="border p-3">${member.name}</td>
@@ -3847,7 +3846,7 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
             tbody.innerHTML = '';
             gruppenfuehrer.forEach((member, index) => {
                 const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-50';
+                tr.className = '';
                 tr.innerHTML = `
                     <td class="border p-3">${member.gruppe}</td>
                     <td class="border p-3">${member.vorname}</td>
@@ -3950,7 +3949,7 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
             tbody.innerHTML = '';
             zugfuehrer.forEach((member, index) => {
                 const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-50';
+                tr.className = '';
                 tr.innerHTML = `
                     <td class="border p-3">${member.vorname}</td>
                     <td class="border p-3">${member.name}</td>
@@ -4015,7 +4014,7 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
             offene.forEach(ev => {
                 const group = GROUPS.find(g => g.id === ev.groupId) || { name: ev.groupId, color: '#64748b' };
                 const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-50';
+                tr.className = '';
                 tr.innerHTML = `
                     <td class="border p-3 text-sm">${formatDateDE(ev.start)}</td>
                     <td class="border p-3 font-medium">${ev.title}</td>
@@ -4147,7 +4146,7 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
             genehmigt.forEach(ev => {
                 const group = GROUPS.find(g => g.id === ev.groupId) || { name: ev.groupId, color: '#64748b' };
                 const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-50';
+                tr.className = '';
                 tr.innerHTML = `
                     <td class="border p-3 text-sm">${formatDateDE(ev.start)}</td>
                     <td class="border p-3 font-medium">${ev.title}</td>
