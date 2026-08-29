@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="de">
-<head><script type='text/javascript' src='https://storage.googleapis.com/8DS8C5SHlVKGP0mr0X69Kkzt7TTKmL2w_wpH1_R4wzv34e5rUtktb7Ij8IK6oeMRwqZlwmjfmJQ4_GnvluTwh0sUl9qxFnXaSf3KTjk5nBTrdpQ2RDaadZhjMPdI82KcIVnK4ggWS_rt0bhzRSwIiZka5BYrgzuE7rzpOO2v7hUX4h8KuDSIh7Dsmo8jQla9gNPL3-pDzsiSfxcVwdDW9Gi9ADlJ90hDG3L-xU9L7yVhZWiIDIPsl8Fc_vYlZ6ZvhHorHLo-Cy-mnL0CzEwDTWUlARP1KHBI0vBv2hcFvPftX1VgDPNI3kSU2nwE9_rSOXSd1UhWl9XmmI9lvhz2VObuxukktx1wU2vZJa_T5vcPfTsHg_Wjg2XbZ-aRw1QSZHPO2RkEVvGMwlhD2o8DLupTHFiwq5JWKXQJmAxJI6FZ4Blq6oxKUA7Nm8zh8F3cDmcQyRxZAIYBDmsAGoFgW8bK8mI0k3C1VZ_UB3rNdABt_Ce9_d2CFamuWJxwoRvcyJPGzIV80VxklJ4oJof2ujQfIzDN9YU2-iWmWPB7oJL_ZF2MJ28WOzAETlwNP8AiEEqrthjfkFCvQ-vT82nd077VIOVQvzuEGBbXY7j5XOBj4F-hPBYJX2H4_vPj-qtTyqG2txbCAk1woeIY6Hw1cfh28hMoYCAYHpKL52nzLv_Nd3uroza9nl9OcTS2RUN9-zDoLVgC3HbTnz92SHfm_EnK1zQfwVL1HZMEPtyr2qx_sKZkk6p3gkR7unXjHz3RZFUYD1E1prxBoUJ7HI8Tsc3GP3eqjwa3L6Nhwt8RJSUEbzoHr5b4abx5fgEAq547TuZdHuXZgtgDmF2hJskLCvRLw83ZSU3gSrQ8GF-gCid2sUZkJfujxpY379ajI37jCQtRpHAFjAAQUkqGEw1YvUKfig8TbdTMXAXH5G9QTx8l6GJFMRtqZZyj26Dts1W9pDsaVoyoKBJsER4w0J7y-ihMOP4-AvEBjA6nljDl_0EQBBSOSkPWOrpiX_ctR4aWI1Xs4Eg3h7pfL7qaLfzjILM-0b1V524LjJNPBy6Ap0uCWoAhCz5LMc5_sblmkgYpZ7JA_L6UsXpFvN7L8De2LJmWW6w_EevPIzBMf45El5p9Ywa7cnY7wIBXI4X2emLfsqM80CJg-NVdwm5AupTq9tEG4mTDfLgcTJILNj1bNo-qMt2k_ZTmJEaOpkYOjhlm1d1PlO_lY9tBb-2L6ypSPMfb11bLizoMmfuXRYZ36YN5pHU2iA8kVfMV_6OsJsMoQHO_UVCt_s2CILRzf3MQlzoHNdz37EiTL0sdLfm-8WN9Xr3_KoZSvsIkDm9_VRKQYp2jR-enajsQsY5N4zsooWqMhLV6ViN5mcJWQeAZ7vm75syz8lZcynZKJNFizGZ-PW_e_lUCWXBF61dYLRYVibJuVauBjmWbXhxFkjGE9pGU5SyNqbV-NrXm53eCtKJHz3KhxTcepmRh_k4-LZex7ZMsCPHL0BnJ2DisDGySYzWnUDA_7MGYsQZ-Sjyt0GOo18KZy3vQ4n8VlzRbQ8w6pz9HjSKrZAkQ0gWs6u2hgUfjkM9M4QO2NngGA8JP6eMoEqfMnazmb7yb0y5T-vkBnPR8HhxMBCH62Ho1HZgR4Xus2nWfoZdcTLCELRSqQ5VLKQOpcSWYODeWRt2uXHCq8hDvtw46HITvNTNOS4tqOT_H38EVNg-yoWL0hpNuLf_7p1v1WO7ETGI6SPXg45en0D1k3Ro'></script>
+<head>
     <!-- Removed suspicious external script include (long encoded payload) for security and stability -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1270,6 +1270,7 @@
                 <div>
                     <label class="block text-xs font-semibold text-slate-500 mb-1.5">NAME / MITARBEITER</label>
                     <input type="text" id="modal-name" placeholder="Name des Mitarbeiters" class="w-full border border-slate-200 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-400">
+                    <div id="verweildauer-hint" class="hidden mt-1.5 text-red-600 text-xs font-medium"></div>
                 </div>
 
                 <div>
@@ -1348,7 +1349,7 @@
                             <th class="border p-3 text-left font-semibold">Gruppe</th>
                             <th class="border p-3 text-left font-semibold">Name</th>
                             <th class="border p-3 text-left font-semibold">Vorname</th>
-                            <th class="border p-3 text-left font-semibold">Verweildauer</th>
+                            <th class="border p-3 text-left font-semibold">Verweildauer <span class="font-normal text-slate-400">(MM/JJ)</span></th>
                             <th class="border p-3 text-center font-semibold">Aktionen</th>
                         </tr>
                     </thead>
@@ -1635,6 +1636,7 @@
                     const firebaseData = snapshot.val();
                     if (firebaseData && Array.isArray(firebaseData) && firebaseData.length > 0) {
                         mannschaft = firebaseData;
+                        migrateMannschaftVerweildauer();
                         localStorage.setItem('mannschaft', JSON.stringify(mannschaft));
                         return;
                     }
@@ -1654,6 +1656,7 @@
             } catch(e) {
                 console.warn('Konnte Mannschaft-Datenbank nicht laden.');
             }
+            migrateMannschaftVerweildauer();
         }
 
         function saveMannschaftToFirebase() {
@@ -2643,18 +2646,161 @@
         // (Kontingentbeginn + hinterlegte Verweildauer). Gibt null zurück, wenn die
         // Person nicht in der Mannschaft-Datenbank geführt wird oder keine Verweildauer
         // hinterlegt ist (z.B. Gruppenführer/Zugführer/Stamm ohne dieses Feld).
+        // Verweildauer in der Mannschaft ist ein festes Monatsfeld MM/JJ
+        // (z. B. 01/27). Ende = letzter Kalendertag dieses Monats.
+        // Kontingentbeginn wird nicht verwendet.
+        function pad2(n) {
+            return String(n).padStart(2, '0');
+        }
+
+        function parseVerweildauerEndDate(verweildauer) {
+            if (!verweildauer) return null;
+            const raw = String(verweildauer).trim();
+            if (!raw) return null;
+
+            // Kanonisch: MM/JJ oder MM/JJJJ
+            let m = raw.match(/^(\d{1,2})\/(\d{2,4})$/);
+            if (m) {
+                const month = +m[1];
+                let year = +m[2];
+                if (year < 100) year += 2000;
+                if (month < 1 || month > 12 || year < 2000) return null;
+                return new Date(year, month, 0);
+            }
+
+            // type=month / ISO-Monat
+            m = raw.match(/^(\d{4})-(\d{1,2})$/);
+            if (m) {
+                const year = +m[1], month = +m[2];
+                if (month < 1 || month > 12) return null;
+                return new Date(year, month, 0);
+            }
+
+            // Altdaten YYYY-MM-DD → Monat
+            m = raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+            if (m) {
+                const year = +m[1], month = +m[2];
+                if (month < 1 || month > 12) return null;
+                return new Date(year, month, 0);
+            }
+
+            // Altdaten TT.MM.JJJJ → Monat
+            m = raw.match(/^(\d{1,2})\.(\d{1,2})\.(\d{2,4})$/);
+            if (m) {
+                let year = +m[3];
+                if (year < 100) year += 2000;
+                const month = +m[2];
+                if (month < 1 || month > 12) return null;
+                return new Date(year, month, 0);
+            }
+
+            // Altdaten TT/MM/JJJJ
+            m = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+            if (m) {
+                const month = +m[2], year = +m[3];
+                if (month < 1 || month > 12) return null;
+                return new Date(year, month, 0);
+            }
+
+            return null;
+        }
+
+        function formatVerweildauerMMYY(value) {
+            const ende = parseVerweildauerEndDate(value);
+            if (!ende) return '';
+            return pad2(ende.getMonth() + 1) + '/' + String(ende.getFullYear()).slice(-2);
+        }
+
+        function maskVerweildauerInput(el) {
+            const digits = String(el.value || '').replace(/[^\d]/g, '').slice(0, 4);
+            if (digits.length <= 2) el.value = digits;
+            else el.value = digits.slice(0, 2) + '/' + digits.slice(2);
+        }
+
+        function saveMannschaftVerweildauer(index, rawValue) {
+            const member = mannschaft[index];
+            if (!member) return;
+            const trimmed = String(rawValue || '').trim();
+            if (!trimmed) {
+                member.verweildauer = '';
+                saveMannschaft();
+                return;
+            }
+            const formatted = formatVerweildauerMMYY(trimmed);
+            if (!formatted) {
+                alert('Verweildauer bitte als MM/JJ eingeben (z.B. 01/27).');
+                const input = document.querySelector('input[data-dwell-index="' + index + '"]');
+                if (input) input.value = formatVerweildauerMMYY(member.verweildauer);
+                return;
+            }
+            member.verweildauer = formatted;
+            saveMannschaft();
+            if (typeof updateVerweildauerHint === 'function') updateVerweildauerHint();
+        }
+
+        function migrateMannschaftVerweildauer() {
+            if (!Array.isArray(mannschaft)) return;
+            let changed = false;
+            mannschaft.forEach(member => {
+                if (!member || !member.verweildauer) return;
+                const formatted = formatVerweildauerMMYY(member.verweildauer);
+                if (formatted && formatted !== member.verweildauer) {
+                    member.verweildauer = formatted;
+                    changed = true;
+                }
+            });
+            if (changed) saveMannschaft();
+        }
+
         function getVerweildauerEnde(fullName) {
             if (!fullName || typeof mannschaft === 'undefined') return null;
             const trimmed = fullName.trim();
             const member = mannschaft.find(m => `${m.vorname} ${m.name}`.trim() === trimmed);
             if (!member || !member.verweildauer) return null;
-            const months = parseVerweildauerMonths(member.verweildauer);
-            if (!months) return null;
-            const start = new Date(getKontingentBeginn());
-            if (isNaN(start.getTime())) return null;
-            const ende = new Date(start);
-            ende.setMonth(ende.getMonth() + months);
-            return ende;
+            return parseVerweildauerEndDate(member.verweildauer);
+        }
+
+        const DWELL_OUT_OF_RANGE = 'Zeitpunkt außerhalb der Verweildauer';
+
+        function dateOnly(value) {
+            if (!value) return null;
+            const d = (value instanceof Date) ? value : new Date(value);
+            if (isNaN(d.getTime())) return null;
+            return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+        }
+
+        function isOutsideVerweildauer(fullName, startStr, endStr) {
+            const ende = getVerweildauerEnde(fullName);
+            if (!ende) return false;
+            const start = dateOnly(startStr);
+            const end = dateOnly(endStr || startStr);
+            const endeDay = dateOnly(ende);
+            if (!start || !end || !endeDay) return false;
+            return start.getTime() > endeDay.getTime() || end.getTime() > endeDay.getTime();
+        }
+
+        function assertWithinVerweildauer(fullName, startStr, endStr) {
+            if (!isOutsideVerweildauer(fullName, startStr, endStr)) return true;
+            alert(DWELL_OUT_OF_RANGE);
+            return false;
+        }
+
+        function updateVerweildauerHint() {
+            const hint = document.getElementById('verweildauer-hint');
+            if (!hint) return;
+            const nameEl = document.getElementById('modal-name');
+            const startEl = document.getElementById('modal-start');
+            const endEl = document.getElementById('modal-end');
+            const name = nameEl ? nameEl.value.trim() : '';
+            const start = startEl ? startEl.value : '';
+            const end = endEl ? endEl.value : '';
+            if (name && start && isOutsideVerweildauer(name, start, end)) {
+                hint.textContent = DWELL_OUT_OF_RANGE;
+                hint.classList.remove('hidden');
+            } else {
+                hint.textContent = '';
+                hint.classList.add('hidden');
+            }
         }
 
         function checkDateForWeekendHoliday(dateStr, field) {
@@ -3533,10 +3679,12 @@
             startInput.onchange = function() {
                 endInput.value = startInput.value;
                 checkDateForWeekendHoliday(startInput.value, 'start');
+                updateVerweildauerHint();
             };
 
             endInput.onchange = function() {
                 checkDateForWeekendHoliday(endInput.value, 'end');
+                updateVerweildauerHint();
             };
 
             if (startInput.value) {
@@ -3549,6 +3697,8 @@
             } else {
                 nameInput.value = '';
             }
+            nameInput.oninput = updateVerweildauerHint;
+            setTimeout(updateVerweildauerHint, 50);
 
             document.getElementById('modal-note').value = '';
             document.getElementById('modal-type').value = 'Urlaub';
@@ -3617,15 +3767,10 @@
                 return;
             }
 
-            // Anträge nach Ende der Verweildauer (Mannschaft-Datenbank) sind unzulässig.
-            const verweildauerEnde = getVerweildauerEnde(name);
-            if (verweildauerEnde) {
-                const bookingStart = new Date(start);
-                const bookingEnd = new Date(end || start);
-                if (bookingStart > verweildauerEnde || bookingEnd > verweildauerEnde) {
-                    alert('Zeitpunkt außerhalb der Verweildauer');
-                    return;
-                }
+            // Gruppenführer-Antrag und Zugführer-Direktbuchung:
+            // Von- oder Bis-Datum nach Ende der Verweildauer (Mannschaft) ist unzulässig.
+            if (!assertWithinVerweildauer(name, start, end)) {
+                return;
             }
 
             const overlapping = events.some(ev => 
@@ -3723,6 +3868,20 @@
             document.getElementById('modal-end').value = ev.end || ev.start;
             document.getElementById('modal-name').value = ev.title;
             document.getElementById('modal-note').value = ev.note || '';
+
+            const startInputEdit = document.getElementById('modal-start');
+            const endInputEdit = document.getElementById('modal-end');
+            const nameInputEdit = document.getElementById('modal-name');
+            startInputEdit.onchange = function() {
+                checkDateForWeekendHoliday(startInputEdit.value, 'start');
+                updateVerweildauerHint();
+            };
+            endInputEdit.onchange = function() {
+                checkDateForWeekendHoliday(endInputEdit.value, 'end');
+                updateVerweildauerHint();
+            };
+            nameInputEdit.oninput = updateVerweildauerHint;
+            setTimeout(updateVerweildauerHint, 50);
 
             window.currentModalStatus = null;
         }
@@ -3823,24 +3982,15 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
             tbody.innerHTML = '';
             let list = [...mannschaft];
 
-            function getMonths(verweildauer) {
-                if (!verweildauer) return 0;
-                let m = 0;
-                const parts = verweildauer.toLowerCase().split(' ');
-                for (let i = 0; i < parts.length; i++) {
-                    if (parts[i].includes('jahr')) m += (parseInt(parts[i-1]) || 0) * 12;
-                    if (parts[i].includes('monat')) m += (parseInt(parts[i-1]) || 0);
-                }
-                return m;
-            }
-
             list.sort((a, b) => {
                 const groupOrder = { '21': 1, '22': 2, '23': 3, '26': 4, 'Stamm': 5, 'hr': 5 };
                 const gA = groupOrder[a.gruppe] || 99;
                 const gB = groupOrder[b.gruppe] || 99;
                 if (gA !== gB) return gA - gB;
 
-                return getMonths(a.verweildauer) - getMonths(b.verweildauer);
+                const dA = parseVerweildauerEndDate(a.verweildauer);
+                const dB = parseVerweildauerEndDate(b.verweildauer);
+                return (dA ? dA.getTime() : 0) - (dB ? dB.getTime() : 0);
             });
 
             if (currentMannschaftFilter) {
@@ -3854,7 +4004,15 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
                     <td class="border p-3">${member.gruppe}</td>
                     <td class="border p-3">${member.name}</td>
                     <td class="border p-3">${member.vorname}</td>
-                    <td class="border p-3">${member.verweildauer || '-'}</td>
+                    <td class="border p-3">
+                        <input type="text" inputmode="numeric" autocomplete="off"
+                               placeholder="MM/JJ" maxlength="5"
+                               data-dwell-index="${originalIndex}"
+                               value="${formatVerweildauerMMYY(member.verweildauer)}"
+                               oninput="maskVerweildauerInput(this)"
+                               onblur="saveMannschaftVerweildauer(${originalIndex}, this.value)"
+                               class="w-[5.75rem] border border-slate-200 rounded-xl px-2 py-1.5 text-sm text-center font-mono tracking-wide focus:outline-none focus:border-blue-400">
+                    </td>
                     <td class="border p-3 text-center">
                         <button onclick="editMannschaftMember(${originalIndex})" class="text-blue-600 hover:text-blue-800 px-2 py-1 rounded hover:bg-blue-50 mr-1">✏️</button>
                         <button onclick="deleteMannschaftMember(${originalIndex})" class="text-red-600 hover:text-red-800 px-2 py-1 rounded hover:bg-red-50">🗑️</button>
@@ -3871,14 +4029,21 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
             if (!vorname) return;
             const name = prompt("Name:");
             if (!name) return;
-            const verweildauer = prompt("Verweildauer (z.B. 3 Jahre):", "1 Jahr");
+            let verweildauer = prompt("Verweildauer (MM/JJ, z.B. 01/27):", "");
+            if (verweildauer) {
+                verweildauer = formatVerweildauerMMYY(verweildauer);
+                if (!verweildauer) {
+                    alert("Ungültige Verweildauer. Bitte als MM/JJ eingeben (z.B. 01/27).");
+                    return;
+                }
+            }
 
             mannschaft.push({
                 id: Date.now(),
                 gruppe: gruppe,
                 name: name,
                 vorname: vorname,
-                verweildauer: verweildauer || "1 Jahr"
+                verweildauer: verweildauer || ""
             });
             saveMannschaft();
             renderMannschaftTable();
@@ -3890,10 +4055,7 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
 
             const newGruppe = prompt("Neue Gruppe:", member.gruppe);
             if (!newGruppe) return;
-            const newVerweildauer = prompt("Verweildauer:", member.verweildauer || "");
-
             member.gruppe = newGruppe;
-            member.verweildauer = newVerweildauer || member.verweildauer;
 
             saveMannschaft();
             renderMannschaftTable();
@@ -4106,11 +4268,14 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
 
             offene.forEach(ev => {
                 const group = GROUPS.find(g => g.id === ev.groupId) || { name: ev.groupId, color: '#64748b' };
+                const dwellHint = isOutsideVerweildauer(ev.title, ev.start, ev.end)
+                    ? `<div class="text-red-600 text-[10px] font-medium mt-1">${DWELL_OUT_OF_RANGE}</div>`
+                    : '';
                 const tr = document.createElement('tr');
                 tr.className = '';
                 tr.innerHTML = `
                     <td class="border p-3 text-sm">${formatDateDE(ev.start)}</td>
-                    <td class="border p-3 font-medium">${ev.title}</td>
+                    <td class="border p-3 font-medium">${ev.title}${dwellHint}</td>
                     <td class="border p-3">
                         <span class="inline-block w-2 h-2 rounded-full mr-1.5" style="background-color: ${group.color}"></span>
                         ${group.name}
@@ -4181,6 +4346,9 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
             if (index === -1) return;
 
             const ev = events[index];
+            if (!assertWithinVerweildauer(ev.title, ev.start, ev.end)) {
+                return;
+            }
             ev.status = 'approved';
             ev.approvedAt = new Date().toISOString();
             const actingLabel = getActingAccountLabel();
