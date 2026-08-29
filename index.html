@@ -3617,19 +3617,14 @@
                 return;
             }
 
-            // Warnhinweis, wenn die Buchung nach dem Ende der Verweildauer des
-            // Mitglieds liegt (Mannschaft-Datenbank, Feld "Verweildauer").
+            // Anträge nach Ende der Verweildauer (Mannschaft-Datenbank) sind unzulässig.
             const verweildauerEnde = getVerweildauerEnde(name);
             if (verweildauerEnde) {
                 const bookingStart = new Date(start);
-                if (bookingStart > verweildauerEnde) {
-                    if (!confirm(
-                        'Buchung nach Verweildauer\n\n' +
-                        `Die Verweildauer von ${name} endet laut Datenbank am ${formatDateDE(verweildauerEnde.toISOString().split('T')[0])}. ` +
-                        'Die gewählte Buchung liegt danach.\n\nTrotzdem fortfahren?'
-                    )) {
-                        return;
-                    }
+                const bookingEnd = new Date(end || start);
+                if (bookingStart > verweildauerEnde || bookingEnd > verweildauerEnde) {
+                    alert('Zeitpunkt außerhalb der Verweildauer');
+                    return;
                 }
             }
 
