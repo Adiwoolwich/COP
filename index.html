@@ -347,6 +347,11 @@
                 width: 32px !important;
             }
             .cal-scroll td .cal-dot { width: 14px !important; height: 14px !important; }
+            .cal-scroll tbody tr.cal-sep td { height: 16px; }
+            .cal-scroll tbody tr.cal-sep td.cal-sep-label {
+                font-size: 8px !important;
+                letter-spacing: 0.08em;
+            }
 
             #login-modal {
                 padding: env(safe-area-inset-top, 12px) 0 env(safe-area-inset-bottom, 12px);
@@ -695,8 +700,43 @@
         .cal-scroll .bg-gray-200 { background-color: #333 !important; }
         .cal-scroll .bg-gray-400 { background-color: #45413a !important; color: var(--w-text) !important; }
         .cal-scroll .bg-black    { background-color: #FFFFFF !important; color: #1d1d1d !important; }
-        .cal-scroll .bg-slate-100 { background-color: #1a1a1a !important; }   /* Trennstrich-Zeile */
-        .cal-scroll .border-black { border-color: var(--w-gold) !important; }
+        .cal-scroll tbody tr.cal-sep { pointer-events: none; }
+        .cal-scroll tbody tr.cal-sep td {
+            height: 18px;
+            padding: 0 !important;
+            border-left: none !important;
+            border-right: none !important;
+            border-top: none !important;
+            border-bottom: none !important;
+            background:
+                linear-gradient(90deg,
+                    rgba(246, 218, 74, 0.55) 0%,
+                    rgba(246, 218, 74, 0.18) 28%,
+                    rgba(246, 218, 74, 0.08) 100%)
+                left 60% / 100% 1px no-repeat,
+                var(--w-surface) !important;
+        }
+        .cal-scroll tbody tr.cal-sep td.cal-sep-label {
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--w-gold) !important;
+            padding: 0 8px !important;
+            text-align: left;
+            vertical-align: middle;
+        }
+        .cal-scroll tbody tr.cal-sep:hover td,
+        .cal-scroll tbody tr.cal-sep:hover td:first-child {
+            background:
+                linear-gradient(90deg,
+                    rgba(246, 218, 74, 0.55) 0%,
+                    rgba(246, 218, 74, 0.18) 28%,
+                    rgba(246, 218, 74, 0.08) 100%)
+                left 60% / 100% 1px no-repeat,
+                var(--w-surface) !important;
+            color: var(--w-gold) !important;
+        }
         .cal-scroll .text-slate-600 { color: var(--w-text-dim) !important; }
 
         /* Belegt-Zeile: Ampelfarbe (grün/gelb/rot) gilt IMMER, auch an Sonntagen und
@@ -2463,7 +2503,8 @@
                         <tbody>
                             ${memberList.map(member => {
                                 if (member.isSeparator) {
-                                    return `<tr><td colspan="${daysInMonth + 1}" class="border-t-4 border-black bg-slate-100 h-3 p-0"></td></tr>`;
+                                    const sepDays = Array.from({length: daysInMonth}, () => '<td class="cal-day cal-sep-cell"></td>').join('');
+                                    return `<tr class="cal-sep"><td class="cal-name cal-sep-label">Mannschaft</td>${sepDays}</tr>`;
                                 }
                                 const group = GROUPS.find(g => g.id === member.groupId) || { name: member.groupId, color: '#64748b' };
                                 let cells = '';
