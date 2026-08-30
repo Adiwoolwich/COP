@@ -323,7 +323,7 @@
                 min-width: 100% !important;
             }
             .cal-table col.cal-name-col { width: 6.5rem; }
-            .cal-table col.cal-day-col { width: 2rem; }
+            .cal-table col.cal-day-col { width: 36px; }
             .cal-scroll th, .cal-scroll td { font-size: 10px !important; }
             .cal-scroll thead th:first-child,
             .cal-scroll tbody td:first-child {
@@ -342,12 +342,23 @@
                 text-overflow: ellipsis;
                 white-space: nowrap;
             }
-            .cal-scroll thead tr:first-child th:not(:first-child),
+            .cal-scroll thead th:not(:first-child),
             .cal-table .cal-day {
-                min-width: 32px !important;
-                width: 32px !important;
+                min-width: 36px !important;
+                width: 36px !important;
+                height: 36px !important;
+                min-height: 36px !important;
+                padding: 0 !important;
+                touch-action: manipulation;
+                -webkit-tap-highlight-color: rgba(246, 218, 74, 0.28);
             }
-            .cal-scroll td .cal-dot { width: 14px !important; height: 14px !important; }
+            .cal-scroll tbody td.cal-day {
+                vertical-align: middle;
+            }
+            .cal-scroll td .cal-dot {
+                width: 18px !important;
+                height: 18px !important;
+            }
 
             #login-modal {
                 padding: env(safe-area-inset-top, 12px) 0 env(safe-area-inset-bottom, 12px);
