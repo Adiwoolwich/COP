@@ -79,10 +79,42 @@
             box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
         }
 
-        .calendar-container {
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+        /* Kalender = Breite der drei Cards (Buchung + Tagesrecherche + Nächste 7 Tage).
+           Tage teilen den Rest gleichmäßig, kein horizontaler Scroll. */
+        .cal-scroll {
+            overflow-x: hidden;
+            overflow-y: auto;
+            width: 100%;
+            max-width: 100%;
+        }
+        .cal-table {
+            table-layout: fixed;
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .cal-table col.cal-name-col { width: 8.75rem; }
+        .cal-table col.cal-day-col { width: auto; }
+        .cal-table .cal-name {
+            width: 8.75rem;
+            max-width: 8.75rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .cal-table .cal-day {
+            min-width: 0;
+            padding: 2px 0 !important;
+            overflow: hidden;
+            text-align: center;
+            font-size: 10px;
+            line-height: 1.15;
+        }
+        .cal-table .cal-dot {
+            width: 14px;
+            height: 14px;
+            margin: 0 auto;
+            border-radius: 9999px;
+            flex-shrink: 0;
         }
 
         .modal {
@@ -135,6 +167,18 @@
         /* ==================== DESKTOP-BASIS (Card-Grid) ==================== */
         .cards-grid {
             grid-template-columns: minmax(570px, 1.75fr) minmax(300px, 1.1fr) minmax(260px, 1fr);
+            width: 100%;
+        }
+        .cop-stack {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            gap: 1.5rem;
+        }
+        .calendar-card {
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
         }
         .role-label-short { display: none; }
 
@@ -250,25 +294,25 @@
                 width: min(280px, calc(100vw - 40px));
             }
 
-            /* Tabelle bleibt horizontal scrollbar (31 Tage passen nie), aber kompakter */
+            /* Tabelle: volle Kartenbreite, alle Monatstage ohne Horizontal-Scroll */
             .cal-scroll {
                 max-height: 60vh !important;
+                overflow-x: hidden !important;
+                overflow-y: auto !important;
                 -webkit-overflow-scrolling: touch;
                 border-radius: 1rem !important;
             }
-            .cal-scroll th, .cal-scroll td { font-size: 11px !important; }
+            .cal-scroll th, .cal-scroll td { font-size: 10px !important; }
             .cal-scroll thead th:first-child,
             .cal-scroll tbody td:first-child {
-                min-width: 108px !important;
-                max-width: 108px;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
+                width: 5.5rem !important;
+                min-width: 5.5rem !important;
+                max-width: 5.5rem !important;
             }
             .cal-scroll thead tr:first-child th:not(:first-child) {
-                min-width: 34px !important;
+                min-width: 0 !important;
             }
-            .cal-scroll td .w-5 { width: 1rem !important; height: 1rem !important; }
+            .cal-scroll td .cal-dot { width: 0.75rem !important; height: 0.75rem !important; }
 
             /* --- DB-Buttons + Footer --- */
             .db-links {
@@ -1001,6 +1045,7 @@
             </div>
         </div>
 
+        <div class="cop-stack">
         <div class="cards-grid grid gap-6">
 
                     <!-- Gruppen (erweitert) -->
@@ -1089,6 +1134,14 @@
                         </div>
                     </div>
 
+        </div>
+
+        <div class="calendar-card modern-card bg-white rounded-3xl p-6 shadow-sm">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-semibold text-xl">Kalender</h3>
+            </div>
+            <div id="monthly-view-unified" class="space-y-4"></div>
+        </div>
         </div>
     </div>
 
@@ -1307,23 +1360,8 @@
         </div>
     </div>
 
-    <!-- Kalender (Monatsübersicht) -->
-    <div class="max-w-7xl mx-auto px-6 py-8">
-        <div class="modern-card bg-white rounded-3xl p-6 shadow-sm">
-            <div class="flex items-center justify-between mb-4">
-                <div>
-                    <h3 class="font-semibold text-xl">Kalender</h3>
-                </div>
-            </div>
+    <!-- Kalender sitzt im oberen max-w-7xl, direkt unter den drei Cards. -->
 
-            <!-- Unified Kalender with Filters -->
-            <div class="mb-2">
-                <div id="monthly-view-unified" class="space-y-4"></div>
-            </div>
-        </div>
-    </div>
-
-    
 
     <!-- Mannschaft Datenbank Modal -->
     <div id="mannschaft-modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-[100]">
@@ -2279,11 +2317,15 @@
                     </div>
                 </div>
 
-                <div class="cal-scroll overflow-auto max-h-[480px] border border-slate-200 rounded-3xl shadow-sm">
-                    <table class="w-full border-collapse text-sm">
+                <div class="cal-scroll max-h-[480px] border border-slate-200 rounded-3xl shadow-sm">
+                    <table class="cal-table text-sm">
+                        <colgroup>
+                            <col class="cal-name-col">
+                            ${Array.from({length: daysInMonth}, () => '<col class="cal-day-col">').join('')}
+                        </colgroup>
                         <thead class="sticky top-0 z-[60] bg-white">
                             <tr>
-                                <th class="sticky left-0 z-[70] bg-white border p-1.5 text-left font-medium min-w-[160px] shadow-sm">Mannschaft</th>
+                                <th class="cal-name sticky left-0 z-[70] bg-white border p-1.5 text-left font-medium shadow-sm">Mannschaft</th>
                                 ${Array.from({length: daysInMonth}, (_, i) => {
                                     const d = i + 1;
                                     const date = new Date(year, month, d);
@@ -2293,7 +2335,7 @@
                                     const isSunday = weekdayNum === 0;
                                     const isSaturday = weekdayNum === 6;
 
-                                    let headerClass = "border p-1 text-center min-w-[50px] text-xs";
+                                    let headerClass = "cal-day border text-center";
 
                                     if (isHoliday) {
                                         headerClass += " bg-black text-white font-semibold";
@@ -2305,18 +2347,18 @@
                                         headerClass += " bg-slate-50";
                                     }
 
-                                    const weekday = date.toLocaleDateString('de-DE', {weekday: 'short'});
+                                    const weekday = date.toLocaleDateString('de-DE', {weekday: 'short'}).replace('.', '').slice(0, 2);
                                     return `<th class="${headerClass}">${d}<br><span class="opacity-70">${weekday}</span></th>`;
                                 }).join('')}
                             </tr>
                             <tr class="bg-white">
-                                <th class="sticky left-0 z-[70] bg-white border p-1 text-left text-xs font-semibold shadow-sm">Bemerkung</th>
+                                <th class="cal-name sticky left-0 z-[70] bg-white border p-1 text-left text-xs font-semibold shadow-sm">Bemerkung</th>
                                 ${Array.from({length: daysInMonth}, (_, i) => {
                                     const day = i + 1;
                                     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                                     const remark = dailyRemarks[dateStr] || '';
-                                    const shortRemark = remark ? (remark.length > 10 ? remark.substring(0,10) + '…' : remark) : '—';
-                                    return `<th class="border p-1 text-center text-[10px] cursor-pointer hover:bg-amber-50 transition-colors" 
+                                    const shortRemark = remark ? (remark.length > 6 ? remark.substring(0,6) + '…' : remark) : '—';
+                                    return `<th class="cal-day border cursor-pointer hover:bg-amber-50 transition-colors" 
                                                 onclick="editRemark('${dateStr}', this)" 
                                                 title="${remark || 'Klicken zum Hinzufügen/Bearbeiten'}">
                                         <span class="text-slate-600">${shortRemark}</span>
@@ -2324,7 +2366,7 @@
                                 }).join('')}
                             </tr>
                             <tr class="bg-slate-200">
-                                <th class="sticky left-0 z-[70] bg-slate-200 border p-1 text-left text-xs font-semibold shadow-sm">Belegt</th>
+                                <th class="cal-name sticky left-0 z-[70] bg-slate-200 border p-1 text-left text-xs font-semibold shadow-sm">Belegt</th>
                                 ${Array.from({length: daysInMonth}, (_, i) => {
                                     const day = i + 1;
                                     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
@@ -2334,7 +2376,7 @@
                                     const isSunday = weekdayNum === 0;
                                     const isSaturday = weekdayNum === 6;
 
-                                    let thClass = "border p-1 text-center text-xs font-mono";
+                                    let thClass = "cal-day border font-mono";
                                     if (isHoliday) {
                                         thClass += " bg-black text-white";
                                     } else if (isSunday) {
@@ -2426,21 +2468,19 @@
                                         const created = ev.createdAt ? formatDateDE(ev.createdAt) : 'unbekannt';
                                         const statusDE = ev.status === 'pending' ? 'gewünscht' : (ev.status === 'approved' ? 'genehmigt' : ev.status);
                                         const lastActionInfo = ev.lastActionBy ? ` • Zuletzt gebucht von ${ev.lastActionBy}` : '';
-                                        cells += `<td class="border p-1 text-center" title="${ev.type} • Erstellt am ${created} • ${statusDE}${lastActionInfo}${ev.note ? ' – ' + ev.note : ''}">
-                                            <div class="w-5 h-5 mx-auto rounded-full flex items-center justify-center text-[9px] font-bold" 
-                                                 style="background-color: ${bgColor}; color: ${textColor};">
-                                            </div>
+                                        cells += `<td class="cal-day border" title="${ev.type} • Erstellt am ${created} • ${statusDE}${lastActionInfo}${ev.note ? ' – ' + ev.note : ''}">
+                                            <div class="cal-dot" style="background-color: ${bgColor}; color: ${textColor};"></div>
                                         </td>`;
                                     } else {
-                                        cells += `<td class="border p-1 text-center text-slate-300 text-xs">—</td>`;
+                                        cells += `<td class="cal-day border"></td>`;
                                     }
                                 }
                                 return `
                                     <tr>
-                                        <td class="sticky left-0 z-[20] bg-white border p-1.5 font-medium whitespace-nowrap">
-                                            <div class="flex items-center gap-x-2">
-                                                <div class="w-3 h-3 rounded-full flex-shrink-0" style="background-color: ${group.color}"></div>
-                                                ${member.name}
+                                        <td class="cal-name sticky left-0 z-[20] bg-white border p-1.5 font-medium" title="${member.name}">
+                                            <div class="flex items-center gap-x-1.5 min-w-0">
+                                                <div class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: ${group.color}"></div>
+                                                <span class="truncate">${member.name}</span>
                                             </div>
                                         </td>
                                         ${cells}
