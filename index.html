@@ -1606,6 +1606,33 @@
             { id: 'hr', name: 'Stamm', color: '#475569' }
         ];
 
+        const GROUP_SORT_ORDER = { '21': 1, '22': 2, '23': 3, '26': 4, 'BeSi': 4, 'besi': 4, 'BESI': 4, 'Stamm': 5, 'hr': 5, 'stamm': 5 };
+
+        function compareNachname(a, b) {
+            return String(a || '').localeCompare(String(b || ''), 'de', { sensitivity: 'base' });
+        }
+
+        function compareGruppeThenNachname(aGruppe, aNachname, bGruppe, bNachname, aVorname, bVorname) {
+            const gA = GROUP_SORT_ORDER[String(aGruppe || '').trim()] || 99;
+            const gB = GROUP_SORT_ORDER[String(bGruppe || '').trim()] || 99;
+            if (gA !== gB) return gA - gB;
+            const byName = compareNachname(aNachname, bNachname);
+            if (byName !== 0) return byName;
+            return compareNachname(aVorname, bVorname);
+        }
+
+        function sortPersonenByNachname(list) {
+            return [...list].sort((a, b) =>
+                compareNachname(a.name, b.name) || compareNachname(a.vorname, b.vorname)
+            );
+        }
+
+        function sortMannschaftList(list) {
+            return [...list].sort((a, b) =>
+                compareGruppeThenNachname(a.gruppe, a.name, b.gruppe, b.name, a.vorname, b.vorname)
+            );
+        }
+
         // Ermittelt die tatsächliche Gruppen-ID einer Person anhand ihres Namens aus den
         // Datenbanken (Zugführer, Gruppenführer, Mannschaft). Wird verwendet, um Buchungen
         // beim Speichern immer korrekt der richtigen Gruppe zuzuordnen - unabhängig davon,
@@ -1885,13 +1912,13 @@
             let members = [];
 
             if (groupId === 'hr' || groupId === 'Stamm') {
-                members = [
+                members = sortPersonenByNachname([
                     ...mannschaft.filter(m => m.gruppe === 'Stamm' || m.gruppe === 'hr'),
                     ...gruppenfuehrer,
                     ...zugfuehrer
-                ];
+                ]);
             } else {
-                members = mannschaft.filter(m => m.gruppe === groupId);
+                members = sortMannschaftList(mannschaft.filter(m => m.gruppe === groupId));
             }
 
             if (members.length === 0) {
@@ -2106,14 +2133,14 @@
             const showStamm = (filter === null || filter === 'stamm');
 
             if (showStamm) {
-                const zf = zugfuehrer.map(m => ({
+                const zf = sortPersonenByNachname(zugfuehrer).map(m => ({
                     name: `${m.vorname} ${m.name}`,
                     nachname: m.name,
                     groupId: 'ZF',
                     isStamm: true,
                     isZugfuehrer: true
                 }));
-                const gf = gruppenfuehrer.map(m => ({
+                const gf = sortPersonenByNachname(gruppenfuehrer).map(m => ({
                     name: `${m.vorname} ${m.name}`,
                     nachname: m.name,
                     groupId: 'GF',
@@ -2126,26 +2153,17 @@
             const showMannschaft = (filter === null || ['21','22','23','26'].includes(filter));
 
             if (showMannschaft) {
-                let mannList = mannschaft
-                    .filter(m => {
+                let mannList = sortMannschaftList(
+                    mannschaft.filter(m => {
                         if (filter === null) return ['21','22','23','26'].includes(m.gruppe);
                         return m.gruppe === filter;
                     })
-                    .map(m => ({
-                        name: `${m.vorname} ${m.name}`,
-                        nachname: m.name,
-                        groupId: m.gruppe,
-                        isStamm: false
-                    }));
-
-                const groupOrder = { '21': 1, '22': 2, '23': 3, '26': 4 };
-                mannList.sort((a, b) => {
-                    const gA = groupOrder[a.groupId] || 99;
-                    const gB = groupOrder[b.groupId] || 99;
-                    if (gA !== gB) return gA - gB;
-                    return a.nachname.localeCompare(b.nachname);
-                });
-
+                ).map(m => ({
+                    name: `${m.vorname} ${m.name}`,
+                    nachname: m.name,
+                    groupId: m.gruppe,
+                    isStamm: false
+                }));
                 if (filter === null && memberList.length > 0 && mannList.length > 0) {
                     memberList.push({ isSeparator: true });
                 }
@@ -2460,12 +2478,12 @@
             const holidaysThisYear = getHolidaysForYear(year);
 
             let memberList = [
-                ...gruppenfuehrer.map(m => ({
+                ...sortPersonenByNachname(gruppenfuehrer).map(m => ({
                     name: `${m.vorname} ${m.name}`,
                     nachname: m.name,
                     groupId: 'GF'
                 })),
-                ...zugfuehrer.map(m => ({
+                ...sortPersonenByNachname(zugfuehrer).map(m => ({
                     name: `${m.vorname} ${m.name}`,
                     nachname: m.name,
                     groupId: 'ZF'
@@ -2477,9 +2495,8 @@
                 const gA = groupOrder[a.groupId] || 99;
                 const gB = groupOrder[b.groupId] || 99;
                 if (gA !== gB) return gA - gB;
-                return a.nachname.localeCompare(b.nachname);
+                return compareNachname(a.nachname, b.nachname);
             });
-
             if (memberList.length === 0) {
                 container.innerHTML = `<div class="text-center py-6 text-slate-400 text-sm">Keine Gruppenführer oder Zugführer gefunden.</div>`;
                 return;
@@ -4013,19 +4030,7 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
         function renderMannschaftTable() {
             const tbody = document.getElementById('mannschaft-table-body');
             tbody.innerHTML = '';
-            let list = [...mannschaft];
-
-            list.sort((a, b) => {
-                const groupOrder = { '21': 1, '22': 2, '23': 3, '26': 4, 'Stamm': 5, 'hr': 5 };
-                const gA = groupOrder[a.gruppe] || 99;
-                const gB = groupOrder[b.gruppe] || 99;
-                if (gA !== gB) return gA - gB;
-
-                const dA = parseVerweildauerEndDate(a.verweildauer);
-                const dB = parseVerweildauerEndDate(b.verweildauer);
-                return (dA ? dA.getTime() : 0) - (dB ? dB.getTime() : 0);
-            });
-
+            let list = sortMannschaftList(mannschaft);
             if (currentMannschaftFilter) {
                 list = list.filter(m => m.gruppe === currentMannschaftFilter);
             }
@@ -4160,7 +4165,9 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
         function renderGruppenfuehrerTable() {
             const tbody = document.getElementById('gruppenfuehrer-table-body');
             tbody.innerHTML = '';
-            gruppenfuehrer.forEach((member, index) => {
+            const list = sortMannschaftList(gruppenfuehrer);
+            list.forEach((member) => {
+                const index = gruppenfuehrer.indexOf(member);
                 const tr = document.createElement('tr');
                 tr.className = '';
                 tr.innerHTML = `
@@ -4276,7 +4283,9 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
         function renderZugfuehrerTable() {
             const tbody = document.getElementById('zugfuehrer-table-body');
             tbody.innerHTML = '';
-            zugfuehrer.forEach((member, index) => {
+            const list = sortPersonenByNachname(zugfuehrer);
+            list.forEach((member) => {
+                const index = zugfuehrer.indexOf(member);
                 const tr = document.createElement('tr');
                 tr.className = '';
                 tr.innerHTML = `
