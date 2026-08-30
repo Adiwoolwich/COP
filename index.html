@@ -1218,7 +1218,7 @@
                 <p><strong>Verantwortlicher:</strong> Die für die Contingent-Operations-Planung zuständige Dienststelle (öffentliche Stelle im Sinne des BayDSG).</p>
                 <p><strong>Zweck der Verarbeitung:</strong> Planung und Koordination von Abwesenheiten und Kontingenten (Urlaub, AZA, Lehrgänge, Krankheit u. a.) innerhalb der betroffenen Einheiten. Keine Weitergabe an Dritte außerhalb der dienstlichen Notwendigkeit.</p>
                 <p><strong>Rechtsgrundlage:</strong> Art. 6 Abs. 1 lit. e DSGVO (Wahrnehmung einer Aufgabe im öffentlichen Interesse) in Verbindung mit den einschlägigen Vorschriften des BayDSG sowie beamten-/dienstrechtlichen Regelungen. Eine Einwilligung ist in diesem Abhängigkeitsverhältnis grundsätzlich nicht erforderlich und wird nicht eingeholt.</p>
-                <p><strong>Datenkategorien:</strong> Vorname, Nachname (Klarnamen), Gruppenzugehörigkeit, Verweildauer, Abwesenheitszeiträume, Typ der Abwesenheit, optionale Notizen, Status (offen/genehmigt/abgelehnt), ggf. handelnder Account (lastActionBy).</p>
+                <p><strong>Datenkategorien:</strong> Nachname, Vorname (Klarnamen), Gruppenzugehörigkeit, Verweildauer, Abwesenheitszeiträume, Typ der Abwesenheit, optionale Notizen, Status (offen/genehmigt/abgelehnt), ggf. handelnder Account (lastActionBy).</p>
                 <p><strong>Datenminimierung &amp; Zugriff:</strong> Klarnamen-Datenbanken (Mannschaft, Gruppenführer, Zugführer) sind technisch und organisatorisch auf die Rollen Gruppenführer und Zugführer beschränkt. Die App speichert nur die für die Planung erforderlichen Felder. Demo- und Testdaten werden bereinigt.</p>
                 <p><strong>Speicherdauer:</strong> Solange die Daten für die dienstliche Planung erforderlich sind, maximal bis zum Ausscheiden aus der Einheit bzw. nach Ablauf der Verweildauer zuzüglich einer angemessenen Aufbewahrungsfrist. Abgelehnte Anträge und veraltete Einträge werden regelmäßig bereinigt.</p>
                 <p><strong>Empfänger / Auftragsverarbeitung:</strong> Technische Verarbeitung über Firebase (Google Ireland Ltd. / Google LLC) als Auftragsverarbeiter. Ein Auftragsverarbeitungsvertrag (Art. 28 DSGVO) ist abzuschließen. Serverstandort der genutzten Realtime-Database-Instanz: Europa (europe-west1).</p>
@@ -1398,8 +1398,8 @@
                     <thead class="sticky top-0 z-[50] bg-white shadow-sm">
                         <tr class="bg-slate-100">
                             <th class="border p-3 text-left font-semibold">Gruppe</th>
-                            <th class="border p-3 text-left font-semibold">Vorname</th>
                             <th class="border p-3 text-left font-semibold">Name</th>
+                            <th class="border p-3 text-left font-semibold">Vorname</th>
                             <th class="border p-3 text-center font-semibold">Aktionen</th>
                         </tr>
                     </thead>
@@ -1440,8 +1440,8 @@
                 <table class="w-full border-collapse text-sm">
                     <thead class="sticky top-0 z-[50] bg-white shadow-sm">
                         <tr class="bg-slate-100">
-                            <th class="border p-3 text-left font-semibold">Vorname</th>
                             <th class="border p-3 text-left font-semibold">Name</th>
+                            <th class="border p-3 text-left font-semibold">Vorname</th>
                             <th class="border p-3 text-center font-semibold">Aktionen</th>
                         </tr>
                     </thead>
@@ -1633,24 +1633,57 @@
             );
         }
 
+        function personDisplayName(m) {
+            return `${(m.name || '').trim()} ${(m.vorname || '').trim()}`.trim();
+        }
+
+        function personLegacyName(m) {
+            return `${(m.vorname || '').trim()} ${(m.name || '').trim()}`.trim();
+        }
+
+        function personNameMatches(fullName, m) {
+            const n = (fullName || '').trim();
+            if (!n || !m) return false;
+            return n === personDisplayName(m) || n === personLegacyName(m);
+        }
+
+        function findPersonByAnyName(fullName) {
+            const lists = [zugfuehrer, gruppenfuehrer, mannschaft];
+            for (const list of lists) {
+                if (!Array.isArray(list)) continue;
+                const found = list.find(m => personNameMatches(fullName, m));
+                if (found) return found;
+            }
+            return null;
+        }
+
+        function canonicalPersonName(fullName) {
+            const p = findPersonByAnyName(fullName);
+            return p ? personDisplayName(p) : (fullName || '').trim();
+        }
+
+        function eventTitleMatchesMember(evTitle, member) {
+            const t = (evTitle || '').trim();
+            if (!t) return false;
+            if (t === member.name) return true;
+            if (member.nachname && member.vorname) {
+                return t === `${member.vorname} ${member.nachname}`.trim()
+                    || t === `${member.nachname} ${member.vorname}`.trim();
+            }
+            return false;
+        }
+
         // Ermittelt die tatsächliche Gruppen-ID einer Person anhand ihres Namens aus den
         // Datenbanken (Zugführer, Gruppenführer, Mannschaft). Wird verwendet, um Buchungen
         // beim Speichern immer korrekt der richtigen Gruppe zuzuordnen - unabhängig davon,
         // welche Gruppe zuvor evtl. fälschlich voreingestellt war.
         function resolveGroupIdForName(name) {
             if (!name) return null;
-            const normalized = name.trim();
-
-            const isZf = zugfuehrer.some(m => `${m.vorname} ${m.name}`.trim() === normalized);
-            if (isZf) return 'ZF';
-
-            const isGf = gruppenfuehrer.some(m => `${m.vorname} ${m.name}`.trim() === normalized);
-            if (isGf) return 'GF';
-
-            const mannMember = mannschaft.find(m => `${m.vorname} ${m.name}`.trim() === normalized);
-            if (mannMember) return mannMember.gruppe;
-
-            return null;
+            const person = findPersonByAnyName(name);
+            if (!person) return null;
+            if (zugfuehrer.includes(person)) return 'ZF';
+            if (gruppenfuehrer.includes(person)) return 'GF';
+            return person.gruppe || null;
         }
 
         // Mannschaft Datenbank (Mitarbeiter)
@@ -1931,7 +1964,7 @@
                     let actionButton = '';
                     if (canCreateBookings()) {
                         actionButton = `
-                            <button onclick="quickAddForMember('${member.vorname} ${member.name}', '${groupId}', '${group.color}'); event.stopImmediatePropagation();" 
+                            <button onclick="quickAddForMember('${personDisplayName(member).replace(/'/g, "\\'")}', '${groupId}', '${group.color}'); event.stopImmediatePropagation();" 
                                     class="w-6 h-6 rounded-lg flex-shrink-0 flex items-center justify-center text-white text-sm font-bold shadow-sm active:scale-95 transition-transform"
                                     style="background-color: ${group.color}">
                                 +
@@ -1942,7 +1975,7 @@
                     div.innerHTML = `
                         <div class="flex items-center gap-x-3 min-w-0">
                             ${actionButton}
-                            <span class="text-sm font-medium truncate">${member.vorname} ${member.name}</span>
+                            <span class="text-sm font-medium truncate">${personDisplayName(member)}</span>
                         </div>
                     `;
                     listContainer.appendChild(div);
@@ -2134,15 +2167,17 @@
 
             if (showStamm) {
                 const zf = sortPersonenByNachname(zugfuehrer).map(m => ({
-                    name: `${m.vorname} ${m.name}`,
+                    name: personDisplayName(m),
                     nachname: m.name,
+                    vorname: m.vorname,
                     groupId: 'ZF',
                     isStamm: true,
                     isZugfuehrer: true
                 }));
                 const gf = sortPersonenByNachname(gruppenfuehrer).map(m => ({
-                    name: `${m.vorname} ${m.name}`,
+                    name: personDisplayName(m),
                     nachname: m.name,
+                    vorname: m.vorname,
                     groupId: 'GF',
                     isStamm: true,
                     isZugfuehrer: false
@@ -2159,8 +2194,9 @@
                         return m.gruppe === filter;
                     })
                 ).map(m => ({
-                    name: `${m.vorname} ${m.name}`,
+                    name: personDisplayName(m),
                     nachname: m.name,
+                    vorname: m.vorname,
                     groupId: m.gruppe,
                     isStamm: false
                 }));
@@ -2344,7 +2380,7 @@
                                     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                                     const dayDate = new Date(dateStr);
                                     const dayEvents = events.filter(ev => {
-                                        if (ev.title !== member.name) return false;
+                                        if (!eventTitleMatchesMember(ev.title, member)) return false;
                                         const start = new Date(ev.start);
                                         const end = new Date(ev.end || ev.start);
                                         return dayDate >= start && dayDate <= end && ev.status !== 'rejected';
@@ -2479,13 +2515,15 @@
 
             let memberList = [
                 ...sortPersonenByNachname(gruppenfuehrer).map(m => ({
-                    name: `${m.vorname} ${m.name}`,
+                    name: personDisplayName(m),
                     nachname: m.name,
+                    vorname: m.vorname,
                     groupId: 'GF'
                 })),
                 ...sortPersonenByNachname(zugfuehrer).map(m => ({
-                    name: `${m.vorname} ${m.name}`,
+                    name: personDisplayName(m),
                     nachname: m.name,
+                    vorname: m.vorname,
                     groupId: 'ZF'
                 }))
             ];
@@ -2569,7 +2607,7 @@
                                 for (let day = 1; day <= daysInMonth; day++) {
                                     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                                     const dayDate = new Date(dateStr);
-                                    const dayEvents = events.filter(ev => ev.title === member.name && new Date(ev.start) <= dayDate && new Date(ev.end || ev.start) >= dayDate && ev.status !== 'rejected');
+                                    const dayEvents = events.filter(ev => eventTitleMatchesMember(ev.title, member) && new Date(ev.start) <= dayDate && new Date(ev.end || ev.start) >= dayDate && ev.status !== 'rejected');
                                     if (dayEvents.length > 0) {
                                         const ev = dayEvents[0];
                                         let bg = '#e5e7eb', tc = '#111827';
@@ -2779,7 +2817,7 @@
         function getVerweildauerEnde(fullName) {
             if (!fullName || typeof mannschaft === 'undefined') return null;
             const trimmed = fullName.trim();
-            const member = mannschaft.find(m => `${m.vorname} ${m.name}`.trim() === trimmed);
+            const member = mannschaft.find(m => personNameMatches(trimmed, m));
             if (!member || !member.verweildauer) return null;
             return parseVerweildauerEndDate(member.verweildauer);
         }
@@ -2823,7 +2861,7 @@
             const ende = name ? getVerweildauerEnde(name) : null;
             const mmjj = name ? (() => {
                 const member = (typeof mannschaft !== 'undefined')
-                    ? mannschaft.find(m => `${m.vorname} ${m.name}`.trim() === name)
+                    ? mannschaft.find(m => personNameMatches(name, m))
                     : null;
                 return member ? formatVerweildauerMMYY(member.verweildauer) : '';
             })() : '';
@@ -3794,7 +3832,8 @@
             const type = document.getElementById('modal-type').value;
             const start = document.getElementById('modal-start').value;
             const end = document.getElementById('modal-end').value;
-            const name = document.getElementById('modal-name').value.trim();
+            const name = canonicalPersonName(document.getElementById('modal-name').value.trim());
+            document.getElementById('modal-name').value = name;
             const note = document.getElementById('modal-note').value.trim();
 
             // Gruppe: wird anhand des Namens aus den Datenbanken (Zugführer, Gruppenführer,
@@ -3823,11 +3862,13 @@
                 return;
             }
 
-            const overlapping = events.some(ev => 
-                ev.title === name && 
-                ev.status !== 'rejected' &&
-                !(new Date(ev.end || ev.start) < new Date(start) || new Date(ev.start) > new Date(end || start))
-            );
+            const personForOverlap = findPersonByAnyName(name);
+            const overlapping = events.some(ev => {
+                const samePerson = personForOverlap ? personNameMatches(ev.title, personForOverlap) : ev.title === name;
+                return samePerson &&
+                    ev.status !== 'rejected' &&
+                    !(new Date(ev.end || ev.start) < new Date(start) || new Date(ev.start) > new Date(end || start));
+            });
             if (overlapping && !editingEventId) {
                 if (!confirm('Für diese Person existiert bereits eine aktive Buchung im gewählten Zeitraum. Trotzdem fortfahren?')) {
                     return;
@@ -3916,7 +3957,7 @@
             document.getElementById('modal-type').value = ev.type;
             document.getElementById('modal-start').value = ev.start;
             document.getElementById('modal-end').value = ev.end || ev.start;
-            document.getElementById('modal-name').value = ev.title;
+            document.getElementById('modal-name').value = canonicalPersonName(ev.title);
             document.getElementById('modal-note').value = ev.note || '';
 
             const startInputEdit = document.getElementById('modal-start');
@@ -4063,10 +4104,10 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
         function addNewMannschaftMember() {
             const gruppe = prompt("Gruppe (z.B. 21, 22, 23, 26, Stamm):");
             if (!gruppe) return;
-            const vorname = prompt("Vorname:");
-            if (!vorname) return;
             const name = prompt("Name:");
             if (!name) return;
+            const vorname = prompt("Vorname:");
+            if (!vorname) return;
             let verweildauer = prompt("Verweildauer (MM/JJ, z.B. 01/27):", "");
             if (verweildauer) {
                 verweildauer = formatVerweildauerMMYY(verweildauer);
@@ -4087,13 +4128,18 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
             renderMannschaftTable();
         }
 
-        function renamePersonInEvents(oldFullName, newFullName) {
-            if (!oldFullName || !newFullName || oldFullName === newFullName) return;
+        function renamePersonInEvents(oldVorname, oldName, newVorname, newName) {
+            const olds = new Set([
+                `${(oldVorname || '').trim()} ${(oldName || '').trim()}`.trim(),
+                `${(oldName || '').trim()} ${(oldVorname || '').trim()}`.trim()
+            ]);
+            const neu = `${(newName || '').trim()} ${(newVorname || '').trim()}`.trim();
+            if (!neu) return;
             let changed = false;
             events.forEach(ev => {
-                if (ev.title === oldFullName) {
-                    ev.title = newFullName;
-                    if (ev.createdBy === oldFullName) ev.createdBy = newFullName;
+                if (olds.has((ev.title || '').trim()) && ev.title !== neu) {
+                    ev.title = neu;
+                    if (olds.has((ev.createdBy || '').trim())) ev.createdBy = neu;
                     changed = true;
                     if (typeof saveEventToFirebase === 'function') saveEventToFirebase(ev);
                 }
@@ -4105,14 +4151,15 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
             const member = mannschaft[index];
             if (!member) return;
 
-            const oldFullName = `${member.vorname || ''} ${member.name || ''}`.trim();
+            const oldVorname = member.vorname || '';
+            const oldName = member.name || '';
 
             const newGruppe = prompt("Neue Gruppe:", member.gruppe);
             if (!newGruppe) return;
-            const newVorname = prompt("Neuer Vorname:", member.vorname || "");
-            if (!newVorname) return;
             const newName = prompt("Neuer Name:", member.name || "");
             if (!newName) return;
+            const newVorname = prompt("Neuer Vorname:", member.vorname || "");
+            if (!newVorname) return;
             const currentDwell = formatVerweildauerMMYY(member.verweildauer) || member.verweildauer || "";
             let newVerweildauer = prompt("Neue Verweildauer (MM/JJ, z.B. 01/27). Leer = keine:", currentDwell);
             if (newVerweildauer === null) return;
@@ -4132,7 +4179,7 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
             member.verweildauer = newVerweildauer;
 
             saveMannschaft();
-            renamePersonInEvents(oldFullName, `${member.vorname} ${member.name}`.trim());
+            renamePersonInEvents(oldVorname, oldName, member.vorname, member.name);
             renderMannschaftTable();
         }
 
@@ -4172,8 +4219,8 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
                 tr.className = '';
                 tr.innerHTML = `
                     <td class="border p-3">${member.gruppe}</td>
-                    <td class="border p-3">${member.vorname}</td>
                     <td class="border p-3">${member.name}</td>
+                    <td class="border p-3">${member.vorname}</td>
                     <td class="border p-3 text-center">
                         <button onclick="editGruppenfuehrerMember(${index})" class="text-blue-600 hover:text-blue-800 px-2 py-1 rounded hover:bg-blue-50 mr-1">✏️</button>
                         <button onclick="deleteGruppenfuehrerMember(${index})" class="text-red-600 hover:text-red-800 px-2 py-1 rounded hover:bg-red-50">🗑️</button>
@@ -4186,10 +4233,10 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
         function addNewGruppenfuehrerMember() {
             const gruppe = prompt("Gruppe (z.B. 21, 22, 23, 26, Stamm):");
             if (!gruppe) return;
-            const vorname = prompt("Vorname:");
-            if (!vorname) return;
             const name = prompt("Name:");
             if (!name) return;
+            const vorname = prompt("Vorname:");
+            if (!vorname) return;
 
             gruppenfuehrer.push({
                 id: Date.now(),
@@ -4205,20 +4252,21 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
             const member = gruppenfuehrer[index];
             if (!member) return;
 
-            const oldFullName = `${member.vorname || ''} ${member.name || ''}`.trim();
+            const oldVorname = member.vorname || '';
+            const oldName = member.name || '';
 
             const newGruppe = prompt("Neue Gruppe:", member.gruppe);
             if (!newGruppe) return;
-            const newVorname = prompt("Neuer Vorname:", member.vorname || "");
-            if (!newVorname) return;
             const newName = prompt("Neuer Name:", member.name || "");
             if (!newName) return;
+            const newVorname = prompt("Neuer Vorname:", member.vorname || "");
+            if (!newVorname) return;
 
             member.gruppe = newGruppe;
             member.vorname = newVorname.trim();
             member.name = newName.trim();
             saveGruppenfuehrer();
-            renamePersonInEvents(oldFullName, `${member.vorname} ${member.name}`.trim());
+            renamePersonInEvents(oldVorname, oldName, member.vorname, member.name);
             renderGruppenfuehrerTable();
         }
 
@@ -4289,8 +4337,8 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
                 const tr = document.createElement('tr');
                 tr.className = '';
                 tr.innerHTML = `
-                    <td class="border p-3">${member.vorname}</td>
                     <td class="border p-3">${member.name}</td>
+                    <td class="border p-3">${member.vorname}</td>
                     <td class="border p-3 text-center">
                         <button onclick="editZugfuehrerMember(${index})" class="text-blue-600 hover:text-blue-800 px-2 py-1 rounded hover:bg-blue-50 mr-1">✏️</button>
                         <button onclick="deleteZugfuehrerMember(${index})" class="text-red-600 hover:text-red-800 px-2 py-1 rounded hover:bg-red-50">🗑️</button>
@@ -4301,10 +4349,10 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
         }
 
         function addNewZugfuehrerMember() {
-            const vorname = prompt("Vorname:");
-            if (!vorname) return;
             const name = prompt("Name:");
             if (!name) return;
+            const vorname = prompt("Vorname:");
+            if (!vorname) return;
 
             zugfuehrer.push({
                 id: Date.now(),
@@ -4319,17 +4367,18 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
             const member = zugfuehrer[index];
             if (!member) return;
 
-            const oldFullName = `${member.vorname || ''} ${member.name || ''}`.trim();
+            const oldVorname = member.vorname || '';
+            const oldName = member.name || '';
 
-            const newVorname = prompt("Neuer Vorname:", member.vorname || "");
-            if (!newVorname) return;
             const newName = prompt("Neuer Name:", member.name || "");
             if (!newName) return;
+            const newVorname = prompt("Neuer Vorname:", member.vorname || "");
+            if (!newVorname) return;
 
             member.vorname = newVorname.trim();
             member.name = newName.trim();
             saveZugfuehrer();
-            renamePersonInEvents(oldFullName, `${member.vorname} ${member.name}`.trim());
+            renamePersonInEvents(oldVorname, oldName, member.vorname, member.name);
             renderZugfuehrerTable();
         }
 
@@ -4617,6 +4666,24 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
             refreshCalendar();
         }
 
+        function normalizeEventPersonNames() {
+            let changed = false;
+            events.forEach(ev => {
+                const person = findPersonByAnyName(ev.title);
+                if (!person) return;
+                const display = personDisplayName(person);
+                if ((ev.title || '').trim() === display) return;
+                ev.title = display;
+                if (ev.createdBy && personNameMatches(ev.createdBy, person)) ev.createdBy = display;
+                changed = true;
+                saveEventToFirebase(ev);
+            });
+            if (changed) {
+                saveToLocalStorage();
+                console.log('%c[Datenkorrektur] Buchungsnamen auf Nachname Vorname umgestellt.', 'color:#f59e0b');
+            }
+        }
+
         function normalizeEventGroupIds() {
             let changed = false;
             events.forEach(ev => {
@@ -4667,6 +4734,7 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
                         loadInitialData();
                     }
 
+                    normalizeEventPersonNames();
                     normalizeEventGroupIds();
                     pruneExpiredApprovedBookings();
                     setupFirebaseListener();
@@ -4682,6 +4750,7 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
                     
                 }).catch(() => {
                     loadInitialData();
+                    normalizeEventPersonNames();
                     normalizeEventGroupIds();
                     pruneExpiredApprovedBookings();
                     applyRoleFromClaims();
@@ -4694,6 +4763,7 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
                 });
             } else {
                 loadInitialData();
+                normalizeEventPersonNames();
                 normalizeEventGroupIds();
                 pruneExpiredApprovedBookings();
                 switchRole('mitarbeiter');
