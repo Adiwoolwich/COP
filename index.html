@@ -3,7 +3,7 @@
 <head>
     <!-- Removed suspicious external script include (long encoded payload) for security and stability -->
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>C O P • Contingent-Operations-Planung</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -181,6 +181,7 @@
             box-sizing: border-box;
         }
         .role-label-short { display: none; }
+        .btn-label-short { display: none; }
 
         /* ==================== MOBILE (<= 767px) ====================
            !important ist hier noetig: das Tailwind-CDN injiziert sein CSS zur Laufzeit
@@ -196,9 +197,11 @@
                 gap: 0.5rem !important;
                 padding: 0.5rem 0 !important;
             }
-            .nav-brand img { height: 2.5rem !important; }
-            .nav-brand h1 { font-size: 1.25rem !important; }
-            .nav-brand p  { font-size: 9px !important; }
+            .nav-brand img { height: 2.25rem !important; }
+            .nav-brand h1 { font-size: 1.35rem !important; white-space: nowrap; }
+            .nav-brand p  { display: none !important; }
+
+            .header-stats > .flex-1 { display: none !important; }
 
             .nav-actions {
                 width: 100% !important;
@@ -294,25 +297,71 @@
                 width: min(280px, calc(100vw - 40px));
             }
 
-            /* Tabelle: volle Kartenbreite, alle Monatstage ohne Horizontal-Scroll */
+            html, body { overflow-x: hidden; }
+            .cop-stack { gap: 0.75rem !important; }
+            .calendar-card { padding: 0.75rem !important; }
+
+            .btn-label-full { display: none !important; }
+            .btn-label-short { display: inline !important; }
+
+            /* Header-Buttons: weniger Luft, volle Breite */
+            .header-stats { margin-bottom: 0.75rem !important; }
+
+            /* Kalender: Tage per Wischen, Namensspalte bleibt stehen */
             .cal-scroll {
-                max-height: 60vh !important;
-                overflow-x: hidden !important;
+                max-height: 70vh !important;
+                overflow-x: auto !important;
                 overflow-y: auto !important;
                 -webkit-overflow-scrolling: touch;
+                overscroll-behavior-x: contain;
                 border-radius: 1rem !important;
             }
+            .cal-table {
+                table-layout: auto !important;
+                width: max-content !important;
+                min-width: 100% !important;
+            }
+            .cal-table col.cal-name-col { width: 6.5rem; }
+            .cal-table col.cal-day-col { width: 2rem; }
             .cal-scroll th, .cal-scroll td { font-size: 10px !important; }
             .cal-scroll thead th:first-child,
             .cal-scroll tbody td:first-child {
-                width: 5.5rem !important;
-                min-width: 5.5rem !important;
-                max-width: 5.5rem !important;
+                width: 6.5rem !important;
+                min-width: 6.5rem !important;
+                max-width: 6.5rem !important;
+                position: sticky;
+                left: 0;
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
             }
-            .cal-scroll thead tr:first-child th:not(:first-child) {
-                min-width: 0 !important;
+            .cal-scroll tbody td:first-child .truncate {
+                display: block;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
             }
-            .cal-scroll td .cal-dot { width: 0.75rem !important; height: 0.75rem !important; }
+            .cal-scroll thead tr:first-child th:not(:first-child),
+            .cal-table .cal-day {
+                min-width: 32px !important;
+                width: 32px !important;
+            }
+            .cal-scroll td .cal-dot { width: 14px !important; height: 14px !important; }
+
+            #login-modal {
+                padding: env(safe-area-inset-top, 12px) 0 env(safe-area-inset-bottom, 12px);
+                align-items: flex-start !important;
+                padding-top: 12vh !important;
+            }
+            #login-modal > div {
+                width: calc(100% - 1.5rem) !important;
+                max-width: 24rem;
+                margin: 0.75rem auto;
+            }
+            #login-modal button[onclick="submitLoginModal()"] {
+                min-height: 44px;
+                flex: 1 1 auto;
+            }
 
             /* --- DB-Buttons + Footer --- */
             .db-links {
@@ -1025,7 +1074,7 @@
     <div class="max-w-7xl mx-auto px-6 py-8">
         
         <!-- Header Stats -->
-        <div class="flex flex-col md:flex-row md:items-end md:justify-between mb-8 gap-y-4">
+        <div class="header-stats flex flex-col md:flex-row md:items-end md:justify-between mb-8 gap-y-4">
             <div class="flex-1"></div>
             
             <div class="header-actions flex items-center gap-x-3">
@@ -1034,13 +1083,13 @@
                 <button id="btn-offene-antraege" onclick="showOffeneAntraegeModal()" 
                         class="flex items-center gap-x-2 bg-amber-500 hover:bg-amber-600 transition-colors text-white px-4 py-2.5 rounded-2xl font-semibold text-sm shadow-sm">
                     <i class="fa-solid fa-clock mr-2"></i>
-                    <span>Offene Anträge</span>
+                    <span class="btn-label-full">Offene Anträge</span><span class="btn-label-short hidden">Offen</span>
                 </button>
 
                 <button id="btn-genehmigte-antraege" onclick="showGenehmigteAntraegeModal()" 
                         class="flex items-center gap-x-2 bg-emerald-600 hover:bg-emerald-700 transition-colors text-white px-4 py-2.5 rounded-2xl font-semibold text-sm shadow-sm">
                     <i class="fa-solid fa-check-double mr-2"></i>
-                    <span>Genehmigte Anträge</span>
+                    <span class="btn-label-full">Genehmigte Anträge</span><span class="btn-label-short hidden">Genehmigt</span>
                 </button>
             </div>
         </div>
