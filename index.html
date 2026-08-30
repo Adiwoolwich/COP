@@ -347,11 +347,6 @@
                 width: 32px !important;
             }
             .cal-scroll td .cal-dot { width: 14px !important; height: 14px !important; }
-            .cal-scroll tbody tr.cal-sep td { height: 16px; }
-            .cal-scroll tbody tr.cal-sep td.cal-sep-label {
-                font-size: 8px !important;
-                letter-spacing: 0.08em;
-            }
 
             #login-modal {
                 padding: env(safe-area-inset-top, 12px) 0 env(safe-area-inset-bottom, 12px);
@@ -700,42 +695,14 @@
         .cal-scroll .bg-gray-200 { background-color: #333 !important; }
         .cal-scroll .bg-gray-400 { background-color: #45413a !important; color: var(--w-text) !important; }
         .cal-scroll .bg-black    { background-color: #FFFFFF !important; color: #1d1d1d !important; }
-        .cal-scroll tbody tr.cal-sep { pointer-events: none; }
-        .cal-scroll tbody tr.cal-sep td {
-            height: 18px;
-            padding: 0 !important;
-            border-left: none !important;
-            border-right: none !important;
-            border-top: none !important;
+        .cal-scroll tbody tr.cal-split td {
+            border-top: 1px solid rgba(246, 218, 74, 0.4) !important;
+        }
+        .cal-scroll tbody tr.cal-split td:first-child {
+            border-top: 1px solid rgba(246, 218, 74, 0.4) !important;
+        }
+        .cal-scroll tbody tr:has(+ tr.cal-split) td {
             border-bottom: none !important;
-            background:
-                linear-gradient(90deg,
-                    rgba(246, 218, 74, 0.55) 0%,
-                    rgba(246, 218, 74, 0.18) 28%,
-                    rgba(246, 218, 74, 0.08) 100%)
-                left 60% / 100% 1px no-repeat,
-                var(--w-surface) !important;
-        }
-        .cal-scroll tbody tr.cal-sep td.cal-sep-label {
-            font-size: 9px;
-            font-weight: 600;
-            letter-spacing: 0.16em;
-            text-transform: uppercase;
-            color: var(--w-gold) !important;
-            padding: 0 8px !important;
-            text-align: left;
-            vertical-align: middle;
-        }
-        .cal-scroll tbody tr.cal-sep:hover td,
-        .cal-scroll tbody tr.cal-sep:hover td:first-child {
-            background:
-                linear-gradient(90deg,
-                    rgba(246, 218, 74, 0.55) 0%,
-                    rgba(246, 218, 74, 0.18) 28%,
-                    rgba(246, 218, 74, 0.08) 100%)
-                left 60% / 100% 1px no-repeat,
-                var(--w-surface) !important;
-            color: var(--w-gold) !important;
         }
         .cal-scroll .text-slate-600 { color: var(--w-text-dim) !important; }
 
@@ -2501,11 +2468,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            ${memberList.map(member => {
-                                if (member.isSeparator) {
-                                    const sepDays = Array.from({length: daysInMonth}, () => '<td class="cal-day cal-sep-cell"></td>').join('');
-                                    return `<tr class="cal-sep"><td class="cal-name cal-sep-label">Mannschaft</td>${sepDays}</tr>`;
-                                }
+                            ${memberList.map((member, idx) => {
+                                if (member.isSeparator) return '';
+                                const splitAfter = idx > 0 && memberList[idx - 1] && memberList[idx - 1].isSeparator;
                                 const group = GROUPS.find(g => g.id === member.groupId) || { name: member.groupId, color: '#64748b' };
                                 let cells = '';
                                 for (let day = 1; day <= daysInMonth; day++) {
@@ -2566,7 +2531,7 @@
                                     }
                                 }
                                 return `
-                                    <tr>
+                                    <tr class="${splitAfter ? 'cal-split' : ''}">
                                         <td class="cal-name sticky left-0 z-[20] bg-white border p-1.5 font-medium" title="${member.name}">
                                             <div class="flex items-center gap-x-1.5 min-w-0">
                                                 <div class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: ${group.color}"></div>
