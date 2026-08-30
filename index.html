@@ -1075,7 +1075,7 @@
                     </div>
 
                     <div class="role-switcher flex items-center bg-slate-100 rounded-3xl p-1 text-sm">
-                        <button onclick="switchRole('mitarbeiter')" id="role-mitarbeiter"
+                        <button onclick="switchToMannschaft()" id="role-mitarbeiter"
                                 class="px-4 py-1.5 rounded-3xl flex items-center gap-x-2 text-sm font-medium transition-all active-role">
                             <i class="fa-solid fa-user mr-1.5"></i>
                             <span class="role-label">Mannschaft</span><span class="role-label-short">Mann.</span>
@@ -2133,11 +2133,7 @@
         function setDefaultDateForTagesrecherche() {
             const dateInput = document.getElementById('day-search-input');
             if (dateInput) {
-                const d = new Date();
-                const day = String(d.getDate()).padStart(2, '0');
-                const month = String(d.getMonth() + 1).padStart(2, '0');
-                const year = d.getFullYear();
-                dateInput.value = `${year}-${month}-${day}`;
+                dateInput.value = todayISODateDE();
                 searchDayStats();
             }
         }
@@ -2183,14 +2179,11 @@
             let lehrgangCount = 0;
             let gvCount = 0;
 
-            const searchDate = new Date(dateInput);
             const operativeGroups = ['21','22','23','26'];
             events.forEach(ev => {
                 if (ev.status === 'rejected') return;
                 if (!operativeGroups.includes(ev.groupId)) return; // Stamm/GF/ZF nicht berücksichtigen
-                const start = new Date(ev.start);
-                const end = new Date(ev.end || ev.start);
-                if (searchDate >= start && searchDate <= end) {
+                if (eventCoversDate(ev, dateInput)) {
                     if (ev.type === 'Urlaub') urlaubCount++;
                     if (ev.type === 'AZA') azaCount++;
                     if (ev.type === 'Krank') krankCount++;
@@ -2221,16 +2214,19 @@
             if (!container) return;
             container.innerHTML = '';
 
-            const today = new Date();
+            const today = dateOnly(todayISODateDE());
             const in7Days = new Date(today);
             in7Days.setDate(today.getDate() + 7);
 
             const upcoming = events
                 .filter(ev => {
-                    const start = new Date(ev.start);
-                    return start >= today && start <= in7Days && ev.status !== 'rejected';
+                    if (ev.status === 'rejected') return false;
+                    const start = dateOnly(ev.start);
+                    const end = dateOnly(ev.end || ev.start);
+                    if (!start || !end) return false;
+                    return start <= in7Days && end >= today;
                 })
-                .sort((a, b) => new Date(a.start) - new Date(b.start));
+                .sort((a, b) => dateOnly(a.start) - dateOnly(b.start));
 
             if (upcoming.length === 0) {
                 container.innerHTML = `<div class="text-sm text-slate-400 px-2 py-3">Keine Abwesenheiten in den nächsten 7 Tagen</div>`;
@@ -2472,10 +2468,7 @@
                                         const operativeGroups = ['21','22','23','26'];
                                         if (!operativeGroups.includes(ev.groupId)) return;
                                         if (ev.status !== 'pending' && ev.status !== 'approved') return;
-                                        const start = new Date(ev.start);
-                                        const end = new Date(ev.end || ev.start);
-                                        const current = new Date(dateStr);
-                                        if (current >= start && current <= end) {
+                                        if (eventCoversDate(ev, dateStr)) {
                                             if (ev.type === 'Urlaub') urlaub++;
                                             if (ev.type === 'AZA') aza++;
                                         }
@@ -2497,12 +2490,10 @@
                                 let cells = '';
                                 for (let day = 1; day <= daysInMonth; day++) {
                                     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                                    const dayDate = new Date(dateStr);
                                     const dayEvents = events.filter(ev => {
                                         if (!eventTitleMatchesMember(ev.title, member)) return false;
-                                        const start = new Date(ev.start);
-                                        const end = new Date(ev.end || ev.start);
-                                        return dayDate >= start && dayDate <= end && ev.status !== 'rejected';
+                                        if (ev.status === 'rejected') return false;
+                                        return eventCoversDate(ev, dateStr);
                                     });
                                     if (dayEvents.length > 0) {
                                         const ev = dayEvents[0];
@@ -2545,7 +2536,9 @@
                                         const created = ev.createdAt ? formatDateDE(ev.createdAt) : 'unbekannt';
                                         const statusDE = ev.status === 'pending' ? 'gewünscht' : (ev.status === 'approved' ? 'genehmigt' : ev.status);
                                         const lastActionInfo = ev.lastActionBy ? ` • Zuletzt gebucht von ${ev.lastActionBy}` : '';
-                                        cells += `<td class="cal-day border" title="${ev.type} • Erstellt am ${created} • ${statusDE}${lastActionInfo}${ev.note ? ' – ' + ev.note : ''}">
+                                        const canEditDot = currentRole === 'admin';
+                                        const evIdSafe = String(ev.id || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+                                        cells += `<td class="cal-day border${canEditDot ? ' cursor-pointer' : ''}"${canEditDot ? ` onclick="editEvent('${evIdSafe}')"` : ''} title="${ev.type} • Erstellt am ${created} • ${statusDE}${lastActionInfo}${ev.note ? ' – ' + ev.note : ''}${canEditDot ? ' • Klicken zum Bearbeiten' : ''}">
                                             <div class="cal-dot" style="background-color: ${bgColor}; color: ${textColor};"></div>
                                         </td>`;
                                     } else {
@@ -2693,10 +2686,7 @@
                                     let urlaub = 0, aza = 0;
                                     events.forEach(ev => {
                                         if ((ev.status !== 'pending' && ev.status !== 'approved') || !ev.title) return;
-                                        const start = new Date(ev.start);
-                                        const end = new Date(ev.end || ev.start);
-                                        const current = new Date(dateStr);
-                                        if (current >= start && current <= end) {
+                                        if (eventCoversDate(ev, dateStr)) {
                                             if (ev.type === 'Urlaub') urlaub++;
                                             if (ev.type === 'AZA') aza++;
                                         }
@@ -2723,8 +2713,7 @@
                                 let cells = '';
                                 for (let day = 1; day <= daysInMonth; day++) {
                                     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                                    const dayDate = new Date(dateStr);
-                                    const dayEvents = events.filter(ev => eventTitleMatchesMember(ev.title, member) && new Date(ev.start) <= dayDate && new Date(ev.end || ev.start) >= dayDate && ev.status !== 'rejected');
+                                    const dayEvents = events.filter(ev => eventTitleMatchesMember(ev.title, member) && ev.status !== 'rejected' && eventCoversDate(ev, dateStr));
                                     if (dayEvents.length > 0) {
                                         const ev = dayEvents[0];
                                         let bg = '#e5e7eb', tc = '#111827';
@@ -2941,11 +2930,33 @@
 
         const DWELL_OUT_OF_RANGE = 'Zeitpunkt außerhalb der Verweildauer';
 
+        const COP_TZ = 'Europe/Berlin';
+
+        function todayISODateDE() {
+            return new Date().toLocaleDateString('en-CA', { timeZone: COP_TZ });
+        }
+
         function dateOnly(value) {
             if (!value) return null;
+            if (typeof value === 'string') {
+                const iso = value.trim().slice(0, 10);
+                if (/^\d{4}-\d{2}-\d{2}$/.test(iso)) {
+                    const [y, m, d] = iso.split('-').map(Number);
+                    return new Date(y, m - 1, d);
+                }
+            }
             const d = (value instanceof Date) ? value : new Date(value);
             if (isNaN(d.getTime())) return null;
-            return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+            const parts = d.toLocaleDateString('en-CA', { timeZone: COP_TZ }).split('-');
+            return new Date(+parts[0], +parts[1] - 1, +parts[2]);
+        }
+
+        function eventCoversDate(ev, dateStr) {
+            const day = dateOnly(dateStr);
+            const start = dateOnly(ev && ev.start);
+            const end = dateOnly(ev && (ev.end || ev.start));
+            if (!day || !start || !end) return false;
+            return day >= start && day <= end;
         }
 
         function isOutsideVerweildauer(fullName, startStr, endStr) {
@@ -3783,6 +3794,11 @@
             if (ok) await applyRoleFromClaims();
         }
 
+        function switchToMannschaft() {
+            if (currentRole === 'manager' || currentRole === 'admin') return;
+            switchRole('mitarbeiter');
+        }
+
         async function switchToGruppenfuehrer() {
             await switchAccount();
         }
@@ -3866,6 +3882,7 @@
         let modalCurrentGroup = null;
 
         function showAddModal(preselectedDate = null, prefilledName = null) {
+            if (!canCreateBookings()) return;
             const modal = document.getElementById('add-modal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
@@ -3877,7 +3894,7 @@
 
             const startInput = document.getElementById('modal-start');
             const endInput = document.getElementById('modal-end');
-            const today = new Date().toISOString().split('T')[0];
+            const today = preselectedDate || todayISODateDE();
             startInput.value = today;
             endInput.value = today;
 
@@ -3959,16 +3976,19 @@
             let groupId = resolveGroupIdForName(name);
             if (!groupId && editingEventId) {
                 const existing = events.find(e => e.id === editingEventId);
-                groupId = existing ? existing.groupId : '21';
+                groupId = existing ? existing.groupId : null;
             }
-            if (!groupId) groupId = '21';
+            if (!groupId) {
+                alert('Person nicht in der Datenbank gefunden. Gruppe kann nicht zugeordnet werden.');
+                return;
+            }
 
             if (!start || !name) {
                 alert('Bitte Datum und Namen ausfüllen.');
                 return;
             }
 
-            if (end && new Date(end) < new Date(start)) {
+            if (end && dateOnly(end) < dateOnly(start)) {
                 alert('Das "Bis"-Datum darf nicht vor dem "Von"-Datum liegen.');
                 return;
             }
@@ -3980,21 +4000,21 @@
             }
 
             const personForOverlap = findPersonByAnyName(name);
+            const newStart = dateOnly(start);
+            const newEnd = dateOnly(end || start);
             const overlapping = events.some(ev => {
+                if (editingEventId && ev.id === editingEventId) return false;
                 const samePerson = personForOverlap ? personNameMatches(ev.title, personForOverlap) : ev.title === name;
-                return samePerson &&
-                    ev.status !== 'rejected' &&
-                    !(new Date(ev.end || ev.start) < new Date(start) || new Date(ev.start) > new Date(end || start));
+                if (!samePerson || ev.status === 'rejected') return false;
+                const evStart = dateOnly(ev.start);
+                const evEnd = dateOnly(ev.end || ev.start);
+                if (!evStart || !evEnd || !newStart || !newEnd) return false;
+                return evStart <= newEnd && evEnd >= newStart;
             });
-            if (overlapping && !editingEventId) {
+            if (overlapping) {
                 if (!confirm('Für diese Person existiert bereits eine aktive Buchung im gewählten Zeitraum. Trotzdem fortfahren?')) {
                     return;
                 }
-            }
-
-            let status = 'pending';
-            if (currentRole === 'admin') {
-                status = 'approved';
             }
 
             let savedEvent = null;
@@ -4008,15 +4028,12 @@
                     events[index].end = end;
                     events[index].title = name;
                     events[index].note = note;
-                    events[index].status = status;
-                    if (status === 'approved' && !events[index].approvedAt) {
-                        events[index].approvedAt = new Date().toISOString();
-                    }
                     const actingLabel = getActingAccountLabel();
                     if (actingLabel) events[index].lastActionBy = actingLabel;
                     savedEvent = events[index];
                 }
             } else {
+                const status = currentRole === 'admin' ? 'approved' : 'pending';
                 savedEvent = {
                     id: 'e' + Date.now(),
                     title: name,
@@ -4578,6 +4595,16 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
             });
         }
 
+        function resolveFirebaseEventKey(ev, data) {
+            if (!ev || !data) return null;
+            if (isFirebaseEventKey(ev.id) && data[ev.id]) return ev.id;
+            const matches = Object.keys(data).filter(key => {
+                const fbEv = data[key] || {};
+                return key === ev.id || fbEv.id === ev.id;
+            });
+            return matches.length === 1 ? matches[0] : null;
+        }
+
         function updateOrDeleteInFirebase(ev, doDelete = false) {
             if (typeof database === 'undefined' || !ev) return;
 
@@ -4586,13 +4613,7 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
                 const data = snapshot.val();
                 if (!data) return;
 
-                let foundKey = null;
-                Object.keys(data).forEach(key => {
-                    const fbEv = data[key];
-                    if (fbEv.id === ev.id || (fbEv.title === ev.title && fbEv.start === ev.start)) {
-                        foundKey = key;
-                    }
-                });
+                const foundKey = resolveFirebaseEventKey(ev, data);
 
                 if (foundKey) {
                     if (doDelete) {
@@ -4727,18 +4748,15 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
          * vergangen ist (heute > Enddatum). Wirkt lokal und in Firebase.
          */
         function pruneExpiredApprovedBookings() {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
+            const today = dateOnly(todayISODateDE());
 
             const toRemove = [];
             events = events.filter(ev => {
                 if (ev.status !== 'approved') return true;
                 const endStr = ev.end || ev.start;
                 if (!endStr) return true;
-                const endDate = new Date(endStr);
-                endDate.setHours(0, 0, 0, 0);
-                // End-Tag ist vergangen → löschen
-                if (endDate < today) {
+                const endDate = dateOnly(endStr);
+                if (endDate && endDate < today) {
                     toRemove.push(ev);
                     return false;
                 }
@@ -4767,14 +4785,9 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
                 const eventsRef = database.ref('events');
                 eventsRef.once('value').then(snapshot => {
                     const data = snapshot.val();
-                    if (data) {
-                        Object.keys(data).forEach(key => {
-                            const fbEv = data[key];
-                            if (fbEv.id === eventId || (fbEv.title === ev.title && fbEv.start === ev.start)) {
-                                eventsRef.child(key).remove();
-                            }
-                        });
-                    }
+                    if (!data) return;
+                    const foundKey = resolveFirebaseEventKey(ev, data);
+                    if (foundKey) eventsRef.child(foundKey).remove();
                 });
             }
 
@@ -4817,14 +4830,27 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
             }
         }
 
+        function cleanupDemoAndOldRejected() {
+            const demoNames = ["Anna Schmidt", "Lisa Müller", "Tom Berger", "Peter Sittlich"];
+            const retentionCutoff = new Date();
+            retentionCutoff.setMonth(retentionCutoff.getMonth() - 24);
+            const before = events.length;
+            events = events.filter(ev => {
+                if (ev.status === 'pending' && demoNames.includes(ev.title)) return false;
+                if (ev.status === 'rejected') {
+                    const refDate = ev.end || ev.start || ev.createdAt;
+                    if (refDate && dateOnly(refDate) && dateOnly(refDate) < dateOnly(retentionCutoff)) return false;
+                }
+                return true;
+            });
+            if (events.length !== before) {
+                saveToLocalStorage();
+                console.log('%c[Cleanup] Demo-Pending und veraltete abgelehnte Einträge entfernt (Datenminimierung).', 'color:#10b981');
+            }
+        }
+
         async function initializeApp() {
             initializeTailwind();
-
-            try {
-                localStorage.removeItem('mannschaft');
-                localStorage.removeItem('gruppenfuehrer');
-                localStorage.removeItem('zugfuehrer');
-            } catch(e) {}
 
             // Sicherstellen, dass die Mitgliederdatenbanken geladen sind, bevor Buchungen
             // anhand ihrer Namen der richtigen Gruppe zugeordnet werden.
@@ -4853,6 +4879,7 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
 
                     normalizeEventPersonNames();
                     normalizeEventGroupIds();
+                    cleanupDemoAndOldRejected();
                     pruneExpiredApprovedBookings();
                     setupFirebaseListener();
 
@@ -4869,6 +4896,7 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
                     loadInitialData();
                     normalizeEventPersonNames();
                     normalizeEventGroupIds();
+                    cleanupDemoAndOldRejected();
                     pruneExpiredApprovedBookings();
                     applyRoleFromClaims();
                     updateHeaderButtons();
@@ -4898,30 +4926,6 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
             renderMonthlyView();
             setDefaultDateForTagesrecherche();
 
-            // Datenminimierung (Art. 5 Abs. 1 lit. c DSGVO): Demo-Pending-Anträge entfernen
-            // und sehr alte abgelehnte Einträge (> 24 Monate) bereinigen.
-            const demoNames = ["Anna Schmidt", "Lisa Müller", "Tom Berger", "Peter Sittlich"];
-            const retentionCutoff = new Date();
-            retentionCutoff.setMonth(retentionCutoff.getMonth() - 24);
-            const before = events.length;
-            events = events.filter(ev => {
-                if (ev.status === 'pending' && demoNames.includes(ev.title)) return false;
-                if (ev.status === 'rejected') {
-                    const refDate = ev.end || ev.start || ev.createdAt;
-                    if (refDate && new Date(refDate) < retentionCutoff) return false;
-                }
-                return true;
-            });
-            if (events.length !== before) {
-                saveToLocalStorage();
-                // Entfernte Einträge möglichst auch in Firebase bereinigen (best effort)
-                if (typeof database !== 'undefined') {
-                    // Einzelne Removes würden zu viele Reads erzeugen – hier nur lokal + Log.
-                    // Vollständige Firebase-Bereinigung erfolgt über Admin-Prozess / Rules.
-                }
-                console.log('%c[Cleanup] Demo-Pending und veraltete abgelehnte Einträge entfernt (Datenminimierung).', 'color:#10b981');
-            }
-
             document.addEventListener('keydown', function(e) {
                 if (e.key === "Escape") {
                     const modal = document.getElementById('add-modal');
@@ -4935,7 +4939,7 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
                 }
                 if (e.key === "/" && document.activeElement.tagName === "BODY") {
                     e.preventDefault();
-                    showAddModal();
+                    if (canCreateBookings()) showAddModal();
                 }
             });
 
@@ -4989,19 +4993,24 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
             console.log('%c[Firebase] Live-Synchronisation aktiviert', 'color:#475569');
         }
 
+        function isFirebaseEventKey(id) {
+            return typeof id === 'string' && id.length > 0 && !id.startsWith('e');
+        }
+
         function saveEventToFirebase(eventData) {
             if (typeof database === 'undefined' || !eventData) return;
 
             const eventsRef = database.ref('events');
 
-            if (eventData.id && !eventData.id.startsWith('e')) {
+            if (isFirebaseEventKey(eventData.id)) {
                 eventsRef.child(eventData.id).set(eventData);
             } else {
                 const newRef = eventsRef.push();
+                eventData.id = newRef.key;
                 const cleanEvent = { ...eventData };
                 delete cleanEvent.id;
-                newRef.set(cleanEvent).then(() => {
-                    eventData.id = newRef.key;
+                newRef.set(cleanEvent).catch(err => {
+                    console.warn('Firebase-Save fehlgeschlagen:', err);
                 });
             }
         }
