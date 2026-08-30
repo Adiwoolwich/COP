@@ -1433,16 +1433,12 @@
             
             <!-- Scrollbarer Inhalt -->
             <div class="flex-1 overflow-auto p-6">
-                <div class="flex justify-between items-center mb-1">
+                <div class="flex justify-between items-center mb-4">
                     <h4 class="font-medium">Mitarbeiterliste</h4>
                     <button onclick="addNewMannschaftMember()" class="flex items-center gap-x-2 bg-yellow-400 hover:bg-yellow-500 text-black px-4 py-2 rounded-2xl text-sm font-semibold">
                         <i class="fa-solid fa-plus mr-2"></i> Neues Mitglied
                     </button>
                 </div>
-                <p class="text-xs text-slate-400 mb-4">
-                    Kontingentbeginn (Basis der Verweildauer-Berechnung): <span id="kontingent-beginn-display" class="font-medium text-slate-600"></span>
-                    <button onclick="setKontingentBeginn()" class="text-blue-600 hover:text-blue-800 underline ml-1">ändern</button>
-                </p>
                 
                 <table class="w-full border-collapse text-sm">
                     <thead class="sticky top-0 z-[50] bg-white shadow-sm">
@@ -1450,7 +1446,7 @@
                             <th class="border p-3 text-left font-semibold">Gruppe</th>
                             <th class="border p-3 text-left font-semibold">Name</th>
                             <th class="border p-3 text-left font-semibold">Vorname</th>
-                            <th class="border p-3 text-left font-semibold">Verweildauer <span class="font-normal text-slate-400">(MM/JJ)</span></th>
+                            <th class="border p-3 text-left font-semibold">Verweildauer bis Ende <span class="font-normal text-slate-400">(MM/JJ)</span></th>
                             <th class="border p-3 text-center font-semibold">Aktionen</th>
                         </tr>
                     </thead>
@@ -4203,7 +4199,7 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
             if (!name) return;
             const vorname = prompt("Vorname:");
             if (!vorname) return;
-            let verweildauer = prompt("Verweildauer (MM/JJ, z.B. 01/27):", "");
+            let verweildauer = prompt("Verweildauer bis Ende (MM/JJ, z.B. 01/27):", "");
             if (verweildauer) {
                 verweildauer = formatVerweildauerMMYY(verweildauer);
                 if (!verweildauer) {
@@ -4256,7 +4252,7 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
             const newVorname = prompt("Neuer Vorname:", member.vorname || "");
             if (!newVorname) return;
             const currentDwell = formatVerweildauerMMYY(member.verweildauer) || member.verweildauer || "";
-            let newVerweildauer = prompt("Neue Verweildauer (MM/JJ, z.B. 01/27). Leer = keine:", currentDwell);
+            let newVerweildauer = prompt("Neue Verweildauer bis Ende (MM/JJ, z.B. 01/27). Leer = keine:", currentDwell);
             if (newVerweildauer === null) return;
             newVerweildauer = newVerweildauer.trim();
             if (newVerweildauer) {
