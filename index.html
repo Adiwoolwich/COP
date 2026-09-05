@@ -120,15 +120,37 @@
         }
         .cal-table .cal-dot {
             display: block;
-            width: 14px;
-            height: 14px;
-            min-width: 14px;
-            min-height: 14px;
+            width: 16px;
+            height: 16px;
+            min-width: 16px;
+            min-height: 16px;
             margin: 0 auto;
-            border-radius: 9999px;
+            border-radius: 0;
             flex-shrink: 0;
-            box-shadow: 0 0 0 1px rgba(255,255,255,0.28);
+            --cal-dot-mask: url("data:image/png;base64,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");
+            -webkit-mask-image: var(--cal-dot-mask);
+            mask-image: var(--cal-dot-mask);
+            -webkit-mask-size: contain;
+            mask-size: contain;
+            -webkit-mask-repeat: no-repeat;
+            mask-repeat: no-repeat;
+            -webkit-mask-position: center;
+            mask-position: center;
         }
+        .cal-split-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            padding: 1px;
+        }
+        .cal-block {
+            border: 1px solid rgba(246, 218, 74, 0.55);
+            border-radius: 14px;
+            overflow: hidden;
+            background: var(--w-surface, #1d1d1d);
+        }
+        .cal-block .cal-table { width: 100%; border-collapse: collapse; }
+        .cal-block-gap { height: 4px; flex-shrink: 0; }
 
         .modal {
             animation: modalPop 0.2s ease-out forwards;
@@ -360,7 +382,11 @@
                 min-width: 32px !important;
                 width: 32px !important;
             }
-            .cal-scroll td .cal-dot { width: 14px !important; height: 14px !important; }
+            .cal-scroll td .cal-dot { width: 20px !important; height: 20px !important; border-radius: 0 !important; }
+            .cal-block {
+                overflow: hidden !important;
+                border-radius: 14px !important;
+            }
 
             #login-modal {
                 padding: env(safe-area-inset-top, 12px) 0 env(safe-area-inset-bottom, 12px);
@@ -676,9 +702,9 @@
 
         /* ---------- Kalender ---------- */
         .cal-scroll {
-            border: 1px solid var(--w-line) !important;
-            border-radius: var(--w-radius) !important;
-            background: var(--w-surface) !important;
+            border: none !important;
+            border-radius: 0 !important;
+            background: transparent !important;
             overflow-x: auto !important;
             overflow-y: auto !important;
             isolation: isolate;
@@ -686,7 +712,7 @@
         .cal-block-head {
             position: sticky;
             top: 0;
-            z-index: 4;
+            z-index: 8;
             background: var(--w-surface);
         }
         .cal-scroll th, .cal-scroll td { border-color: rgba(255,255,255,.07) !important; }
@@ -2343,6 +2369,91 @@
             });
         }
 
+        function calendarBlockKey(member) {
+            if (!member || member.isSeparator) return null;
+            if (member.isStamm || member.groupId === 'GF' || member.groupId === 'ZF' || member.groupId === 'hr') return 'stamm';
+            const g = String(member.groupId || '').trim();
+            if (/^besi$/i.test(g) || g === '26') return '26';
+            return g;
+        }
+
+        function isOperativeGruppe(gruppe) {
+            const g = String(gruppe || '').trim();
+            return ['21', '22', '23', '26'].includes(g) || /^besi$/i.test(g);
+        }
+
+        function calendarColgroup(daysInMonth) {
+            return `<colgroup><col class="cal-name-col">${Array.from({length: daysInMonth}, () => '<col class="cal-day-col">').join('')}</colgroup>`;
+        }
+
+        function calendarDayHeaderCells(year, month, daysInMonth, holidaysThisYear) {
+            return Array.from({length: daysInMonth}, (_, i) => {
+                const d = i + 1;
+                const date = new Date(year, month, d);
+                const weekdayNum = date.getDay();
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                const isHoliday = holidaysThisYear.has(dateStr);
+                let headerClass = "cal-day border text-center";
+                if (isHoliday) headerClass += " bg-black text-white font-semibold";
+                else if (weekdayNum === 0) headerClass += " bg-gray-400 text-black";
+                else if (weekdayNum === 6) headerClass += " bg-gray-200";
+                else headerClass += " bg-slate-50";
+                const weekday = date.toLocaleDateString('de-DE', {weekday: 'short'}).replace('.', '').slice(0, 2);
+                return `<th class="${headerClass}">${d}<br><span class="opacity-70">${weekday}</span></th>`;
+            }).join('');
+        }
+
+        function renderCalendarMemberRow(member, year, month, daysInMonth) {
+            const group = GROUPS.find(g => g.id === member.groupId) || { name: member.groupId, color: '#64748b' };
+            let cells = '';
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const dayEvents = events.filter(ev => {
+                    if (ev.status === 'rejected') return false;
+                    if (!eventTitleMatchesMember(ev.title, member) && !personNameMatches(ev.title, {
+                        name: member.nachname || member.name,
+                        vorname: member.vorname
+                    })) return false;
+                    return eventCoversDate(ev, dateStr);
+                });
+                if (dayEvents.length > 0) {
+                    const ev = dayEvents[0];
+                    let bgColor = '#e5e7eb';
+                    const type = (ev.type || '').toLowerCase();
+                    const status = ev.status || 'pending';
+                    if (type.includes('os')) bgColor = '#22c55e';
+                    else if (type.includes('lehrgang')) bgColor = '#eab308';
+                    else if (type.includes('krank')) bgColor = '#f8fafc';
+                    else if (type.includes('urlaub')) bgColor = status === 'approved' ? '#b91c1c' : '#fda4af';
+                    else if (type.includes('aza')) bgColor = status === 'approved' ? '#1e40af' : '#7dd3fc';
+                    else if (type.includes('gv')) bgColor = '#7c3aed';
+                    const created = ev.createdAt ? formatDateDE(ev.createdAt) : 'unbekannt';
+                    const statusDE = ev.status === 'pending' ? 'gewünscht' : (ev.status === 'approved' ? 'genehmigt' : ev.status);
+                    const lastActionInfo = ev.lastActionBy ? ` • Zuletzt gebucht von ${ev.lastActionBy}` : '';
+                    cells += `<td class="cal-day border" title="${ev.type} • Erstellt am ${created} • ${statusDE}${lastActionInfo}${ev.note ? ' – ' + ev.note : ''}">
+                        <div class="cal-dot" style="background-color: ${bgColor};"></div>
+                    </td>`;
+                } else {
+                    cells += `<td class="cal-day border"></td>`;
+                }
+            }
+            return `<tr>
+                <td class="cal-name sticky left-0 z-[2] bg-white border p-1.5 font-medium" title="${member.name}">
+                    <div class="flex items-center gap-x-1.5 min-w-0">
+                        <div class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: ${group.color}"></div>
+                        <span class="truncate">${member.name}</span>
+                    </div>
+                </td>
+                ${cells}
+            </tr>`;
+        }
+
+        function renderCalendarGroupTable(members, year, month, daysInMonth) {
+            return `<table class="cal-table text-sm">${calendarColgroup(daysInMonth)}
+                <tbody>${members.map(m => renderCalendarMemberRow(m, year, month, daysInMonth)).join('')}</tbody>
+            </table>`;
+        }
+
         // ==================== MANN SCHAFT KALENDER ====================
         function renderMonthlyView() {
             const container = document.getElementById('monthly-view-unified');
@@ -2426,6 +2537,16 @@
             const monthDate = new Date(year, month);
             const monthName = monthDate.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
 
+            const BLOCK_ORDER = ['stamm', '21', '22', '23', '26'];
+            const calGrouped = {};
+            memberList.forEach(m => {
+                const key = calendarBlockKey(m);
+                if (!key) return;
+                if (!calGrouped[key]) calGrouped[key] = [];
+                calGrouped[key].push(m);
+            });
+            const calGroups = BLOCK_ORDER.filter(k => calGrouped[k] && calGrouped[k].length);
+
             const tableHTML = `
                 <div class="cal-toolbar mb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3 px-1">
                     <div class="cal-monthnav flex items-center gap-x-2">
@@ -2474,42 +2595,18 @@
                     </div>
                 </div>
 
-                <div class="cal-scroll max-h-[480px] border border-slate-200 rounded-3xl shadow-sm">
+                <div class="cal-scroll max-h-[480px]">
+                    <div class="cal-split-wrap">
+                    <div class="cal-block cal-block-head">
                     <table class="cal-table text-sm">
-                        <colgroup>
-                            <col class="cal-name-col">
-                            ${Array.from({length: daysInMonth}, () => '<col class="cal-day-col">').join('')}
-                        </colgroup>
-                        <thead class="sticky top-0 z-[10] bg-white">
+                        ${calendarColgroup(daysInMonth)}
+                        <thead class="bg-white">
                             <tr>
-                                <th class="cal-name sticky left-0 z-[20] bg-white border p-1.5 text-left font-medium shadow-sm">Mannschaft</th>
-                                ${Array.from({length: daysInMonth}, (_, i) => {
-                                    const d = i + 1;
-                                    const date = new Date(year, month, d);
-                                    const weekdayNum = date.getDay();
-                                    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-                                    const isHoliday = holidaysThisYear.has(dateStr);
-                                    const isSunday = weekdayNum === 0;
-                                    const isSaturday = weekdayNum === 6;
-
-                                    let headerClass = "cal-day border text-center";
-
-                                    if (isHoliday) {
-                                        headerClass += " bg-black text-white font-semibold";
-                                    } else if (isSunday) {
-                                        headerClass += " bg-gray-400 text-black";
-                                    } else if (isSaturday) {
-                                        headerClass += " bg-gray-200";
-                                    } else {
-                                        headerClass += " bg-slate-50";
-                                    }
-
-                                    const weekday = date.toLocaleDateString('de-DE', {weekday: 'short'}).replace('.', '').slice(0, 2);
-                                    return `<th class="${headerClass}">${d}<br><span class="opacity-70">${weekday}</span></th>`;
-                                }).join('')}
+                                <th class="cal-name sticky left-0 z-[9] bg-white border p-1.5 text-left font-medium shadow-sm"></th>
+                                ${calendarDayHeaderCells(year, month, daysInMonth, holidaysThisYear)}
                             </tr>
                             <tr class="bg-white">
-                                <th class="cal-name sticky left-0 z-[70] bg-white border p-1 text-left text-xs font-semibold shadow-sm">Bemerkung</th>
+                                <th class="cal-name sticky left-0 z-[9] bg-white border p-1 text-left text-xs font-semibold shadow-sm">Bemerkung</th>
                                 ${Array.from({length: daysInMonth}, (_, i) => {
                                     const day = i + 1;
                                     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
@@ -2523,132 +2620,44 @@
                                 }).join('')}
                             </tr>
                             <tr class="bg-slate-200">
-                                <th class="cal-name sticky left-0 z-[70] bg-slate-200 border p-1 text-left text-xs font-semibold shadow-sm">Belegt</th>
+                                <th class="cal-name sticky left-0 z-[9] bg-slate-200 border p-1 text-left text-xs font-semibold shadow-sm">Belegt</th>
                                 ${Array.from({length: daysInMonth}, (_, i) => {
                                     const day = i + 1;
                                     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                                     const date = new Date(year, month, day);
                                     const weekdayNum = date.getDay();
                                     const isHoliday = holidaysThisYear.has(dateStr);
-                                    const isSunday = weekdayNum === 0;
-                                    const isSaturday = weekdayNum === 6;
-
                                     let thClass = "cal-day border font-mono";
-                                    if (isHoliday) {
-                                        thClass += " bg-black text-white";
-                                    } else if (isSunday) {
-                                        thClass += " bg-gray-400 text-black";
-                                    } else if (isSaturday) {
-                                        thClass += " bg-gray-200";
-                                    }
-
+                                    if (isHoliday) thClass += " bg-black text-white";
+                                    else if (weekdayNum === 0) thClass += " bg-gray-400 text-black";
+                                    else if (weekdayNum === 6) thClass += " bg-gray-200";
                                     let urlaub = 0;
                                     let aza = 0;
-
                                     events.forEach(ev => {
-                                        // Nur Buchungen der Mannschaft (Datenbank "mannschaft": 1. Gruppe, 2. Gruppe, 3. Gruppe, BeSi) zählen.
-                                        // Stamm-, Gruppenführer- und Zugführer-Buchungen (groupId 'hr', 'Stamm', 'GF', 'ZF') werden NICHT eingerechnet.
-                                        const operativeGroups = ['21','22','23','26'];
-                                        if (!operativeGroups.includes(ev.groupId)) return;
+                                        if (!isOperativeGruppe(ev.groupId)) return;
                                         if (ev.status !== 'pending' && ev.status !== 'approved') return;
-                                        const start = new Date(ev.start);
-                                        const end = new Date(ev.end || ev.start);
-                                        const current = new Date(dateStr);
-                                        if (current >= start && current <= end) {
+                                        if (eventCoversDate(ev, dateStr)) {
                                             if (ev.type === 'Urlaub') urlaub++;
                                             if (ev.type === 'AZA') aza++;
                                         }
                                     });
-
                                     let color = '#166534';
                                     if (urlaub >= 6 && aza >= 3) color = '#b91c1c';
                                     else if (urlaub >= 6 || aza >= 3) color = '#854d0e';
-
                                     return `<th class="${thClass} belegt-cell" style="--bc: ${color}">${urlaub}/${aza}</th>`;
                                 }).join('')}
                             </tr>
                         </thead>
-                        <tbody>
-                            ${memberList.map((member, idx) => {
-                                if (member.isSeparator) return '';
-                                const splitAfter = idx > 0 && memberList[idx - 1] && memberList[idx - 1].isSeparator;
-                                const group = GROUPS.find(g => g.id === member.groupId) || { name: member.groupId, color: '#64748b' };
-                                let cells = '';
-                                for (let day = 1; day <= daysInMonth; day++) {
-                                    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                                    const dayEvents = events.filter(ev => {
-                                        if (ev.status === 'rejected') return false;
-                                        if (!eventTitleMatchesMember(ev.title, member) && !personNameMatches(ev.title, {
-                                            name: member.nachname || member.name,
-                                            vorname: member.vorname
-                                        })) return false;
-                                        return eventCoversDate(ev, dateStr);
-                                    });
-                                    if (dayEvents.length > 0) {
-                                        const ev = dayEvents[0];
-                                        let bgColor = '#e5e7eb';
-                                        let textColor = '#111827';
-
-                                        const type = (ev.type || '').toLowerCase();
-                                        const status = ev.status || 'pending';
-
-                                        if (type.includes('os')) {
-                                            bgColor = '#22c55e';
-                                            textColor = '#fff';
-                                        } else if (type.includes('lehrgang')) {
-                                            bgColor = '#eab308';
-                                            textColor = '#111827';
-                                        } else if (type.includes('krank')) {
-                                            bgColor = '#111827';
-                                            textColor = '#fff';
-                                        } else if (type.includes('urlaub')) {
-                                            if (status === 'approved') {
-                                                bgColor = '#b91c1c';
-                                                textColor = '#fff';
-                                            } else {
-                                                bgColor = '#fda4af';
-                                                textColor = '#111827';
-                                            }
-                                        } else if (type.includes('aza')) {
-                                            if (status === 'approved') {
-                                                bgColor = '#1e40af';
-                                                textColor = '#fff';
-                                            } else {
-                                                bgColor = '#7dd3fc';
-                                                textColor = '#111827';
-                                            }
-                                        } else if (type.includes('gv')) {
-                                            bgColor = '#7c3aed';
-                                            textColor = '#fff';
-                                        }
-
-                                        const created = ev.createdAt ? formatDateDE(ev.createdAt) : 'unbekannt';
-                                        const statusDE = ev.status === 'pending' ? 'gewünscht' : (ev.status === 'approved' ? 'genehmigt' : ev.status);
-                                        const lastActionInfo = ev.lastActionBy ? ` • Zuletzt gebucht von ${ev.lastActionBy}` : '';
-                                        cells += `<td class="cal-day border" title="${ev.type} • Erstellt am ${created} • ${statusDE}${lastActionInfo}${ev.note ? ' – ' + ev.note : ''}">
-                                            <div class="cal-dot" style="background-color: ${bgColor}; color: ${textColor};"></div>
-                                        </td>`;
-                                    } else {
-                                        cells += `<td class="cal-day border"></td>`;
-                                    }
-                                }
-                                return `
-                                    <tr class="${splitAfter ? 'cal-split' : ''}">
-                                        <td class="cal-name sticky left-0 z-[20] bg-white border p-1.5 font-medium" title="${member.name}">
-                                            <div class="flex items-center gap-x-1.5 min-w-0">
-                                                <div class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: ${group.color}"></div>
-                                                <span class="truncate">${member.name}</span>
-                                            </div>
-                                        </td>
-                                        ${cells}
-                                    </tr>
-                                `;
-                            }).join('')}
-                        </tbody>
                     </table>
+                    </div>
+                    ${calGroups.map(key => `
+                    <div class="cal-block-gap"></div>
+                    <div class="cal-block">
+                        ${renderCalendarGroupTable(calGrouped[key], year, month, daysInMonth)}
+                    </div>`).join('')}
+                    </div>
                 </div>
             `;
-
             container.innerHTML = tableHTML;
             updateCurrentMonthDisplay();
         }
