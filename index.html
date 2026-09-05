@@ -223,6 +223,21 @@
             width: 100%;
             align-items: start;
         }
+        .cards-grid > .modern-card {
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+        .cards-grid > .modern-card .buchung-split {
+            flex: 1 1 auto;
+            min-height: 0;
+        }
+        .cards-grid > .modern-card #next7days-list {
+            flex: 1 1 auto;
+            min-height: 0;
+            max-height: none;
+            overflow-y: auto;
+        }
         .cop-stack {
             display: flex;
             flex-direction: column;
@@ -1298,7 +1313,7 @@
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="font-semibold text-lg">Nächste 7 Tage</h3>
                         </div>
-                        <div class="space-y-2 max-h-[280px] overflow-auto pr-1" id="next7days-list">
+                        <div class="space-y-2 flex-1 min-h-0 overflow-auto pr-1" id="next7days-list">
                             <!-- Wird per JS gefüllt -->
                         </div>
                     </div>
@@ -2165,13 +2180,29 @@
 
         function applyBookingListHeight() {
             const list = document.getElementById('group-members-list');
-            const groups = document.getElementById('groups-list');
             if (!list) return;
-            const h = groups && groups.offsetHeight ? groups.offsetHeight : 220;
             list.style.minHeight = '0px';
             list.style.height = 'auto';
-            list.style.maxHeight = h + 'px';
+            list.style.maxHeight = 'none';
             list.style.overflowY = 'auto';
+            syncTopCardHeights();
+        }
+
+        function syncTopCardHeights() {
+            const grid = document.querySelector('.cards-grid');
+            if (!grid) return;
+            const cards = Array.from(grid.children).filter(el => el.classList.contains('modern-card'));
+            const booking = cards[0];
+            const tages = cards[1];
+            const next7 = cards[2];
+            if (!booking || !tages || !next7) return;
+            booking.style.height = 'auto';
+            next7.style.height = 'auto';
+            tages.style.height = 'auto';
+            const h = Math.ceil(tages.getBoundingClientRect().height);
+            if (h < 80) return;
+            booking.style.height = h + 'px';
+            next7.style.height = h + 'px';
         }
 
         function renderGroupMembers(groupId) {
@@ -2380,6 +2411,7 @@
             if (gvEl) gvEl.textContent = gvCount;
 
             statsDiv.classList.remove('hidden');
+            syncTopCardHeights();
         }
 
         // ==================== NÄCHSTE 7 TAGE ====================
@@ -2433,6 +2465,7 @@
                 };
                 container.appendChild(div);
             });
+            syncTopCardHeights();
         }
 
         function calendarBlockKey(member) {
@@ -5197,6 +5230,10 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
                     if (canCreateBookings()) showAddModal();
                 }
             });
+
+            window.addEventListener('resize', syncTopCardHeights);
+            setTimeout(syncTopCardHeights, 50);
+            setTimeout(syncTopCardHeights, 300);
 
             console.log('%c[Urlaubsplaner] App ready with Firebase sync. Save button fixed in v1.2', 'color:#64748b');
         }
