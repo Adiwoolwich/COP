@@ -119,24 +119,31 @@
             vertical-align: middle;
         }
         .cal-table .cal-dot {
-            display: block;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             width: 16px;
             height: 16px;
             min-width: 16px;
             min-height: 16px;
             margin: 0 auto;
-            border-radius: 0;
+            padding: 0;
+            border: 0;
+            border-radius: 50%;
             flex-shrink: 0;
-            --cal-dot-mask: url("data:image/png;base64,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");
-            -webkit-mask-image: var(--cal-dot-mask);
-            mask-image: var(--cal-dot-mask);
-            -webkit-mask-size: contain;
-            mask-size: contain;
-            -webkit-mask-repeat: no-repeat;
-            mask-repeat: no-repeat;
-            -webkit-mask-position: center;
-            mask-position: center;
+            position: relative;
+            background-color: var(--dot-color, #e5e7eb);
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
         }
+        .cal-table .cal-dot svg {
+            width: 12px;
+            height: 12px;
+            display: block;
+            pointer-events: none;
+        }
+        .cal-table td.cal-day.has-dot { cursor: pointer; }
         .cal-split-wrap {
             display: flex;
             flex-direction: column;
@@ -382,7 +389,8 @@
                 min-width: 32px !important;
                 width: 32px !important;
             }
-            .cal-scroll td .cal-dot { width: 20px !important; height: 20px !important; border-radius: 0 !important; }
+            .cal-scroll td .cal-dot { width: 20px !important; height: 20px !important; border-radius: 50% !important; }
+            .cal-scroll td .cal-dot svg { width: 15px !important; height: 15px !important; }
             .cal-block {
                 overflow: hidden !important;
                 border-radius: 14px !important;
@@ -2194,6 +2202,24 @@
             showAddModal(null, fullName);
         }
 
+        function calendarFilterOptions(filter) {
+            return `
+                <option value="" ${filter === null ? 'selected' : ''}>Alle Gruppen</option>
+                <option value="mannschaft" ${filter === 'mannschaft' ? 'selected' : ''}>Mannschaft</option>
+                <option value="21" ${filter === '21' ? 'selected' : ''}>1. Gruppe</option>
+                <option value="22" ${filter === '22' ? 'selected' : ''}>2. Gruppe</option>
+                <option value="23" ${filter === '23' ? 'selected' : ''}>3. Gruppe</option>
+                <option value="26" ${filter === '26' ? 'selected' : ''}>BeSi</option>
+                <option value="stamm" ${filter === 'stamm' ? 'selected' : ''}>Stamm (ZF + GF)</option>
+            `;
+        }
+
+        function openCalendarEvent(eventId) {
+            if (!eventId) return;
+            if (typeof canCreateBookings === 'function' && !canCreateBookings()) return;
+            editEvent(eventId);
+        }
+
         function filterCalendar(filterValue) {
             currentCalendarFilter = filterValue || null;
             renderMonthlyView();
@@ -2427,11 +2453,17 @@
                     else if (type.includes('urlaub')) bgColor = status === 'approved' ? '#b91c1c' : '#fda4af';
                     else if (type.includes('aza')) bgColor = status === 'approved' ? '#1e40af' : '#7dd3fc';
                     else if (type.includes('gv')) bgColor = '#7c3aed';
+                    const evId = String(ev.id || '').replace(/'/g, '');
                     const created = ev.createdAt ? formatDateDE(ev.createdAt) : 'unbekannt';
                     const statusDE = ev.status === 'pending' ? 'gewünscht' : (ev.status === 'approved' ? 'genehmigt' : ev.status);
                     const lastActionInfo = ev.lastActionBy ? ` • Zuletzt gebucht von ${ev.lastActionBy}` : '';
-                    cells += `<td class="cal-day border" title="${ev.type} • Erstellt am ${created} • ${statusDE}${lastActionInfo}${ev.note ? ' – ' + ev.note : ''}">
-                        <div class="cal-dot" style="background-color: ${bgColor};"></div>
+                    cells += `<td class="cal-day has-dot border" onclick="openCalendarEvent('${evId}')" title="${ev.type} • Erstellt am ${created} • ${statusDE}${lastActionInfo}${ev.note ? ' – ' + ev.note : ''}">
+                        <button type="button" class="cal-dot" style="--dot-color:${bgColor};background-color:${bgColor}" onclick="event.stopPropagation();openCalendarEvent('${evId}')">
+                            <svg viewBox="0 0 32 32" aria-hidden="true">
+                                <circle cx="16" cy="16" r="13" fill="none" stroke="#fff" stroke-width="2.2"/>
+                                <path d="M8 8l16 16M24 8L8 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round"/>
+                            </svg>
+                        </button>
                     </td>`;
                 } else {
                     cells += `<td class="cal-day border"></td>`;
@@ -2491,13 +2523,14 @@
                 memberList.push(...zf, ...gf);
             }
 
-            const showMannschaft = (filter === null || ['21','22','23','26'].includes(filter));
+            const showMannschaft = (filter === null || filter === 'mannschaft' || ['21','22','23','26'].includes(filter));
 
             if (showMannschaft) {
                 let mannList = sortMannschaftList(
                     mannschaft.filter(m => {
-                        if (filter === null) return ['21','22','23','26'].includes(m.gruppe);
-                        return m.gruppe === filter;
+                        if (filter === null || filter === 'mannschaft') return ['21','22','23','26'].includes(String(m.gruppe)) || /^besi$/i.test(String(m.gruppe||''));
+                        if (filter === '26') return String(m.gruppe) === '26' || /^besi$/i.test(String(m.gruppe||''));
+                        return String(m.gruppe) === filter;
                     })
                 ).map(m => ({
                     name: personDisplayName(m),
@@ -2518,12 +2551,7 @@
                     <div class="flex justify-end mb-3 px-1">
                         <select id="group-filter-select" onchange="filterCalendar(this.value || null)"
                                 class="px-4 py-2 text-sm font-medium border border-slate-300 rounded-2xl bg-white focus:outline-none focus:border-blue-400">
-                            <option value="" ${filter === null ? 'selected' : ''}>Alle Gruppen</option>
-                            <option value="21" ${filter === '21' ? 'selected' : ''}>1. Gruppe</option>
-                            <option value="22" ${filter === '22' ? 'selected' : ''}>2. Gruppe</option>
-                            <option value="23" ${filter === '23' ? 'selected' : ''}>3. Gruppe</option>
-                            <option value="26" ${filter === '26' ? 'selected' : ''}>BeSi</option>
-                            <option value="stamm" ${filter === 'stamm' ? 'selected' : ''}>Stamm (ZF + GF)</option>
+                            ${calendarFilterOptions(filter)}
                         </select>
                     </div>
                     <div class="text-center py-8 text-slate-400">
@@ -2585,12 +2613,7 @@
 
                         <select id="group-filter-select" onchange="filterCalendar(this.value || null)"
                                 class="px-4 py-2 text-sm font-medium border border-slate-300 rounded-2xl bg-white focus:outline-none focus:border-blue-400">
-                            <option value="" ${filter === null ? 'selected' : ''}>Alle Gruppen</option>
-                            <option value="21" ${filter === '21' ? 'selected' : ''}>1. Gruppe</option>
-                            <option value="22" ${filter === '22' ? 'selected' : ''}>2. Gruppe</option>
-                            <option value="23" ${filter === '23' ? 'selected' : ''}>3. Gruppe</option>
-                            <option value="26" ${filter === '26' ? 'selected' : ''}>BeSi</option>
-                            <option value="stamm" ${filter === 'stamm' ? 'selected' : ''}>Stamm (ZF + GF)</option>
+                            ${calendarFilterOptions(filter)}
                         </select>
                     </div>
                 </div>
