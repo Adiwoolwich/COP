@@ -221,6 +221,7 @@
         .cards-grid {
             grid-template-columns: minmax(570px, 1.75fr) minmax(300px, 1.1fr) minmax(260px, 1fr);
             width: 100%;
+            align-items: start;
         }
         .cop-stack {
             display: flex;
@@ -319,7 +320,7 @@
             .groups-col,
             .members-col { width: 100% !important; }     /* schlaegt w-[210px] / w-[280px] */
             #groups-list > div { min-height: 44px; }
-            #group-members-list { max-height: none !important; }
+            #group-members-list { max-height: 220px !important; }
             #group-members-section button,
             #group-members-header button { min-height: 36px; min-width: 36px; }
             #group-members-list button { width: 36px !important; height: 36px !important; }
@@ -2162,19 +2163,15 @@
             });
         }
 
-        function bookingListReferencePx() {
-            const n = (mannschaft || []).filter(m => String(m.gruppe) === '21').length;
-            const rows = Math.max(n, 1);
-            return rows * 48 + Math.max(rows - 1, 0) * 4;
-        }
-
         function applyBookingListHeight() {
             const list = document.getElementById('group-members-list');
+            const groups = document.getElementById('groups-list');
             if (!list) return;
-            const h = bookingListReferencePx();
-            list.style.minHeight = h + 'px';
-            list.style.height = h + 'px';
+            const h = groups && groups.offsetHeight ? groups.offsetHeight : 220;
+            list.style.minHeight = '0px';
+            list.style.height = 'auto';
             list.style.maxHeight = h + 'px';
+            list.style.overflowY = 'auto';
         }
 
         function renderGroupMembers(groupId) {
