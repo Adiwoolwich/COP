@@ -82,10 +82,11 @@
         /* Kalender = Breite der drei Cards (Buchung + Tagesrecherche + Nächste 7 Tage).
            Tage teilen den Rest gleichmäßig, kein horizontaler Scroll. */
         .cal-scroll {
-            overflow-x: hidden;
-            overflow-y: auto;
+            overflow-x: auto;
+            overflow-y: visible;
             width: 100%;
             max-width: 100%;
+            max-height: none;
             isolation: isolate;
         }
         .cal-scroll thead,
@@ -137,26 +138,37 @@
             appearance: none;
             -webkit-appearance: none;
         }
-        .cal-table .cal-dot svg {
-            width: 12px;
-            height: 12px;
-            display: block;
-            pointer-events: none;
-        }
         .cal-table td.cal-day.has-dot { cursor: pointer; }
         .cal-split-wrap {
             display: flex;
             flex-direction: column;
             gap: 0;
-            padding: 1px;
+            padding: 0;
         }
         .cal-block {
             border: 1px solid rgba(246, 218, 74, 0.55);
             border-radius: 14px;
             overflow: hidden;
             background: var(--w-surface, #1d1d1d);
+            clip-path: inset(0 round 14px);
         }
-        .cal-block .cal-table { width: 100%; border-collapse: collapse; }
+        .cal-block .cal-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        .cal-block-head thead tr:first-child th:first-child {
+            border-top-left-radius: 14px;
+        }
+        .cal-block-head thead tr:first-child th:last-child {
+            border-top-right-radius: 14px;
+        }
+        .cal-block tbody tr:last-child td:first-child {
+            border-bottom-left-radius: 14px;
+        }
+        .cal-block tbody tr:last-child td:last-child {
+            border-bottom-right-radius: 14px;
+        }
         .cal-block-gap { height: 4px; flex-shrink: 0; }
 
         .modal {
@@ -352,12 +364,12 @@
 
             /* Kalender: Tage per Wischen, Namensspalte bleibt stehen */
             .cal-scroll {
-                max-height: 70vh !important;
+                max-height: none !important;
                 overflow-x: auto !important;
-                overflow-y: auto !important;
+                overflow-y: visible !important;
                 -webkit-overflow-scrolling: touch;
                 overscroll-behavior-x: contain;
-                border-radius: 1rem !important;
+                border-radius: 0 !important;
             }
             .cal-table {
                 table-layout: auto !important;
@@ -390,7 +402,6 @@
                 width: 32px !important;
             }
             .cal-scroll td .cal-dot { width: 20px !important; height: 20px !important; border-radius: 50% !important; }
-            .cal-scroll td .cal-dot svg { width: 15px !important; height: 15px !important; }
             .cal-block {
                 overflow: hidden !important;
                 border-radius: 14px !important;
@@ -714,7 +725,8 @@
             border-radius: 0 !important;
             background: transparent !important;
             overflow-x: auto !important;
-            overflow-y: auto !important;
+            overflow-y: visible !important;
+            max-height: none !important;
             isolation: isolate;
         }
         .cal-block-head {
@@ -2458,12 +2470,7 @@
                     const statusDE = ev.status === 'pending' ? 'gewünscht' : (ev.status === 'approved' ? 'genehmigt' : ev.status);
                     const lastActionInfo = ev.lastActionBy ? ` • Zuletzt gebucht von ${ev.lastActionBy}` : '';
                     cells += `<td class="cal-day has-dot border" onclick="openCalendarEvent('${evId}')" title="${ev.type} • Erstellt am ${created} • ${statusDE}${lastActionInfo}${ev.note ? ' – ' + ev.note : ''}">
-                        <button type="button" class="cal-dot" style="--dot-color:${bgColor};background-color:${bgColor}" onclick="event.stopPropagation();openCalendarEvent('${evId}')">
-                            <svg viewBox="0 0 32 32" aria-hidden="true">
-                                <circle cx="16" cy="16" r="13" fill="none" stroke="#fff" stroke-width="2.2"/>
-                                <path d="M8 8l16 16M24 8L8 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round"/>
-                            </svg>
-                        </button>
+                        <button type="button" class="cal-dot" style="--dot-color:${bgColor};background-color:${bgColor}" onclick="event.stopPropagation();openCalendarEvent('${evId}')"></button>
                     </td>`;
                 } else {
                     cells += `<td class="cal-day border"></td>`;
@@ -2618,7 +2625,7 @@
                     </div>
                 </div>
 
-                <div class="cal-scroll max-h-[480px]">
+                <div class="cal-scroll">
                     <div class="cal-split-wrap">
                     <div class="cal-block cal-block-head">
                     <table class="cal-table text-sm">
