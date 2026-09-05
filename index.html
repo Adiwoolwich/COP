@@ -726,8 +726,7 @@
         #group-members-list {
             flex: 1 1 auto;
             min-height: 0;
-            max-height: none;
-            height: 100%;
+            overflow-y: auto;
         }
         #group-members-list > div {
             background: var(--w-surface2);
@@ -1277,7 +1276,7 @@
                                         <span id="day-stats-krank" class="font-semibold text-black">0</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span class="text-slate-600">OS:</span>
+                                        <span class="text-slate-600">Sonderdienste:</span>
                                         <span id="day-stats-os" class="font-semibold text-black">0</span>
                                     </div>
                                     <div class="flex justify-between">
@@ -1285,7 +1284,7 @@
                                         <span id="day-stats-lehrgang" class="font-semibold text-black">0</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span class="text-slate-600">GV:</span>
+                                        <span class="text-slate-600">Gerichtsverhandlung:</span>
                                         <span id="day-stats-gv" class="font-semibold text-black">0</span>
                                     </div>
                                 </div>
@@ -1469,10 +1468,10 @@
                     <select id="modal-type" class="w-full border border-slate-200 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-400">
                         <option value="Urlaub">Urlaub</option>
                         <option value="AZA">AZA</option>
-                        <option value="OS">OS</option>
+                        <option value="OS">Sonderdienste</option>
                         <option value="Lehrgang">Lehrgang</option>
                         <option value="Krank">Krank</option>
-                        <option value="GV">GV</option>
+                        <option value="GV">Gerichtsverhandlung</option>
                     </select>
                 </div>
 
@@ -1493,13 +1492,6 @@
                     <label class="block text-xs font-semibold text-slate-500 mb-1.5">NAME / MITARBEITER</label>
                     <input type="text" id="modal-name" placeholder="Name des Mitarbeiters" class="w-full border border-slate-200 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-400">
                     <div id="verweildauer-hint" class="hidden mt-1.5 text-red-600 text-xs font-medium"></div>
-                </div>
-
-                <div id="modal-verweildauer-wrap">
-                    <label class="block text-xs font-semibold text-slate-500 mb-1.5">VERWEILDAUER</label>
-                    <input type="text" id="modal-verweildauer" readonly placeholder="MM/JJ"
-                           class="w-full border border-slate-200 rounded-2xl px-4 py-2.5 text-sm bg-slate-50 text-slate-700 font-mono tracking-wide focus:outline-none">
-                    <p id="modal-verweildauer-note" class="mt-1.5 text-xs text-slate-400">wird aus der Mannschaft übernommen</p>
                 </div>
 
                 <div>
@@ -1867,6 +1859,14 @@
             return p ? personDisplayName(p) : (fullName || '').trim();
         }
 
+        function formatAbsenceType(type) {
+            const t = String(type || '').trim();
+            const key = t.toLowerCase();
+            if (key === 'os' || key.includes('sonderdienst')) return 'Sonderdienste';
+            if (key === 'gv' || key.includes('gerichtsverhandlung')) return 'Gerichtsverhandlung';
+            return t;
+        }
+
         function eventTitleMatchesMember(evTitle, member) {
             const t = (evTitle || '').trim();
             if (!t || !member) return false;
@@ -2162,6 +2162,21 @@
             });
         }
 
+        function bookingListReferencePx() {
+            const n = (mannschaft || []).filter(m => String(m.gruppe) === '21').length;
+            const rows = Math.max(n, 1);
+            return rows * 48 + Math.max(rows - 1, 0) * 4;
+        }
+
+        function applyBookingListHeight() {
+            const list = document.getElementById('group-members-list');
+            if (!list) return;
+            const h = bookingListReferencePx();
+            list.style.minHeight = h + 'px';
+            list.style.height = h + 'px';
+            list.style.maxHeight = h + 'px';
+        }
+
         function renderGroupMembers(groupId) {
             const section = document.getElementById('group-members-section');
             const listContainer = document.getElementById('group-members-list');
@@ -2212,6 +2227,7 @@
 
             section.classList.remove('hidden');
             section.classList.add('flex');
+            applyBookingListHeight();
             const header = document.getElementById('group-members-header');
             if (header) { header.classList.remove('hidden'); header.classList.add('flex'); }
             updateStats();
@@ -2408,7 +2424,7 @@
                             <span class="font-medium text-sm">${ev.title}</span>
                             <span class="text-[10px] text-slate-500 font-mono">${rangeLabel}</span>
                         </div>
-                        <div class="text-xs text-slate-500">${ev.type} • ${group.name}</div>
+                        <div class="text-xs text-slate-500">${formatAbsenceType(ev.type)} • ${group.name}</div>
                     </div>
                 `;
                 div.onclick = () => {
@@ -2484,7 +2500,7 @@
                     const created = ev.createdAt ? formatDateDE(ev.createdAt) : 'unbekannt';
                     const statusDE = ev.status === 'pending' ? 'gewünscht' : (ev.status === 'approved' ? 'genehmigt' : ev.status);
                     const lastActionInfo = ev.lastActionBy ? ` • Zuletzt gebucht von ${ev.lastActionBy}` : '';
-                    cells += `<td class="cal-day has-dot border" onclick="openCalendarEvent('${evId}')" title="${ev.type} • Erstellt am ${created} • ${statusDE}${lastActionInfo}${ev.note ? ' – ' + ev.note : ''}">
+                    cells += `<td class="cal-day has-dot border" onclick="openCalendarEvent('${evId}')" title="${formatAbsenceType(ev.type)} • Erstellt am ${created} • ${statusDE}${lastActionInfo}${ev.note ? ' – ' + ev.note : ''}">
                         <button type="button" class="cal-dot" style="--dot-color:${bgColor};background-color:${bgColor}" onclick="event.stopPropagation();openCalendarEvent('${evId}')"></button>
                     </td>`;
                 } else {
@@ -3209,17 +3225,7 @@
             })() : '';
 
             if (wrap && field) {
-                wrap.classList.remove('hidden');
-                if (mmjj && ende) {
-                    field.value = mmjj;
-                    if (note) note.textContent = 'Ende: ' + pad2(ende.getDate()) + '.' + pad2(ende.getMonth() + 1) + '.' + ende.getFullYear();
-                } else if (name) {
-                    field.value = '';
-                    if (note) note.textContent = 'keine Verweildauer hinterlegt';
-                } else {
-                    field.value = '';
-                    if (note) note.textContent = 'wird aus der Mannschaft übernommen';
-                }
+                wrap.classList.add('hidden');
             }
 
             if (hint) {
@@ -4808,7 +4814,7 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
                         <span class="inline-block w-2 h-2 rounded-full mr-1.5" style="background-color: ${group.color}"></span>
                         ${group.name}
                     </td>
-                    <td class="border p-3">${ev.type}</td>
+                    <td class="border p-3">${formatAbsenceType(ev.type)}</td>
                     <td class="border p-3 text-sm">${formatDateDE(ev.start)} ${ev.end && ev.end !== ev.start ? '– ' + formatDateDE(ev.end) : ''}</td>
                     <td class="border p-3 text-sm text-slate-500">${ev.note || '-'}</td>
                     <td class="border p-3 text-xs text-slate-500">
@@ -4958,7 +4964,7 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
                         <span class="inline-block w-2 h-2 rounded-full mr-1.5" style="background-color: ${group.color}"></span>
                         ${group.name}
                     </td>
-                    <td class="border p-3">${ev.type}</td>
+                    <td class="border p-3">${formatAbsenceType(ev.type)}</td>
                     <td class="border p-3 text-sm">${formatDateDE(ev.start)} ${ev.end && ev.end !== ev.start ? '– ' + formatDateDE(ev.end) : ''}</td>
                     <td class="border p-3 text-sm text-slate-500">${ev.note || '-'}</td>
                     <td class="border p-3 text-xs text-slate-500">
