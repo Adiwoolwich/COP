@@ -1348,6 +1348,59 @@
             }
         }
 
+        /* ==================== DESKTOP ONLY (>=768) — Mobile bleibt unangetastet ==================== */
+        @media (min-width: 768px) {
+            .cards-grid {
+                align-items: stretch;
+            }
+            .cards-grid > .modern-card {
+                display: flex !important;
+                flex-direction: column !important;
+                overflow: hidden;
+            }
+            .buchung-split {
+                display: flex !important;
+                flex: 1 1 auto !important;
+                min-height: 0 !important;
+                align-items: stretch !important;
+                height: 100% !important;
+            }
+            .groups-col {
+                align-self: stretch;
+            }
+            #group-members-section,
+            #group-members-section.block,
+            #group-members-section.flex {
+                display: flex !important;
+                flex-direction: column !important;
+                align-self: stretch !important;
+                flex: 1 1 auto !important;
+                min-height: 0 !important;
+                height: auto !important;
+            }
+            #group-members-section.hidden {
+                display: none !important;
+            }
+            #group-members-list,
+            #group-members-list.max-h-\[220px\] {
+                flex: 1 1 auto !important;
+                max-height: none !important;
+                height: 100% !important;
+                min-height: 0 !important;
+                overflow-y: auto !important;
+            }
+            /* Kalender auf Desktop: kein eigener Scrollbalken, Seite scrollt */
+            .cal-scroll,
+            .cal-scroll.max-h-\[480px\] {
+                max-height: none !important;
+                height: auto !important;
+                overflow: visible !important;
+            }
+            .calendar-card {
+                overflow: visible !important;
+            }
+        }
+
     </style>
 </head>
 <body class="bg-[#1d1d1d]"> <!-- Hintergrund passend zum Schwarz des Wappen-Logos -->
@@ -1457,7 +1510,7 @@
 
                             <!-- Right: Group Members -->
                             <div id="group-members-section" class="members-col w-[280px] flex-shrink-0 hidden">
-                                <div id="group-members-list" class="space-y-1 text-sm max-h-[220px] overflow-auto pr-1">
+                                <div id="group-members-list" class="space-y-1 text-sm overflow-auto pr-1">
                                     <!-- Wird per JS gefüllt -->
                                 </div>
                             </div>
@@ -2432,10 +2485,31 @@
             if (window.matchMedia('(max-width: 767px)').matches) {
                 const bookingCard = section.closest('.modern-card');
                 if (bookingCard) bookingCard.style.height = 'auto';
+            } else {
+                section.classList.add('flex');
+                syncTopCardHeights();
             }
             const header = document.getElementById('group-members-header');
             if (header) { header.classList.remove('hidden'); header.classList.add('flex'); }
             updateStats();
+        }
+
+        function syncTopCardHeights() {
+            if (window.matchMedia('(max-width: 767px)').matches) return;
+            const grid = document.querySelector('.cards-grid');
+            if (!grid) return;
+            const cards = Array.from(grid.children).filter(el => el.classList.contains('modern-card'));
+            const booking = cards[0];
+            const tages = cards[1];
+            const next7 = cards[2];
+            if (!booking || !tages || !next7) return;
+            booking.style.height = 'auto';
+            next7.style.height = 'auto';
+            tages.style.height = 'auto';
+            const h = Math.ceil(tages.getBoundingClientRect().height);
+            if (h < 80) return;
+            booking.style.height = h + 'px';
+            next7.style.height = h + 'px';
         }
 
         function hideGroupMembers() {
@@ -2839,7 +2913,7 @@
                     </div>
                 </div>
 
-                <div class="cal-scroll max-h-[480px]">
+                <div class="cal-scroll">
                     <div class="cal-split-wrap">
                     <div class="cal-head-pin">
                     <div class="cal-block cal-block-head">
@@ -5312,7 +5386,11 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
             }
             initializeApp();
             updateCopNavHeight();
-            window.addEventListener('resize', updateCopNavHeight);
+            syncTopCardHeights();
+            window.addEventListener('resize', () => {
+                updateCopNavHeight();
+                syncTopCardHeights();
+            });
         };
     
     </script>
