@@ -1257,6 +1257,87 @@
             }
         }
 
+        /* ==================== MOBILE ONLY (<=767) — vollständig getrennt vom Desktop-Block ==================== */
+        @media (max-width: 767px) {
+            .cards-grid > .modern-card {
+                height: auto !important;
+                overflow: visible !important;
+            }
+            #group-members-list {
+                max-height: 220px !important;
+                height: auto !important;
+            }
+
+            /* Tagesrecherche: gleicher Goldrahmen wie Einträge in „Nächste 7 Tage“ */
+            #day-search-input,
+            #day-stats,
+            #next7days-list > div {
+                border: 1px solid var(--w-line) !important;
+                border-radius: 12px !important;
+                background: var(--w-surface2) !important;
+                box-shadow: none !important;
+            }
+            #day-search-input {
+                display: block !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: 0 !important;
+                box-sizing: border-box !important;
+                padding: 10px 12px !important;
+                -webkit-appearance: none;
+                appearance: none;
+            }
+
+            /* Kalender mobil: Seite scrollt vertikal, Gitter wischen horizontal */
+            .cop-stack,
+            .calendar-card,
+            #monthly-view-unified,
+            .cal-scroll,
+            .cal-split-wrap {
+                overflow: visible !important;
+                max-width: 100% !important;
+            }
+            .cal-scroll {
+                max-height: none !important;
+            }
+            .cal-block,
+            .cal-block.cal-block-head {
+                clip-path: none !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                border-radius: 14px !important;
+                overflow-x: auto !important;
+                overflow-y: hidden !important;
+                -webkit-overflow-scrolling: touch !important;
+                touch-action: pan-x pan-y;
+                overscroll-behavior-x: contain;
+            }
+            .cal-block.cal-block-head {
+                position: -webkit-sticky !important;
+                position: sticky !important;
+                top: var(--cal-head-top, 4.25rem) !important;
+                z-index: 55 !important;
+                background: var(--w-surface, #1d1d1d) !important;
+            }
+            .cal-block .cal-table,
+            .cal-block-head .cal-table {
+                width: max-content !important;
+                min-width: calc(6.5rem + 31 * 32px) !important;
+                table-layout: auto !important;
+            }
+            .cal-scroll thead th:first-child,
+            .cal-scroll tbody td:first-child,
+            .cal-table .cal-name {
+                position: sticky !important;
+                left: 0 !important;
+                z-index: 8 !important;
+                background: var(--w-surface, #1d1d1d) !important;
+            }
+            .cal-block-head thead th:first-child {
+                z-index: 36 !important;
+            }
+        }
+
     </style>
 </head>
 <body class="bg-[#1d1d1d]"> <!-- Hintergrund passend zum Schwarz des Wappen-Logos -->
