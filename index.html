@@ -1191,13 +1191,20 @@
             }
             html.cop-desktop .cal-head-pin {
                 display: block;
-                overflow: visible;
+                position: -webkit-sticky !important;
+                position: sticky !important;
+                top: var(--cal-head-top, 4rem) !important;
+                z-index: 60 !important;
+                overflow: visible !important;
+                background: var(--w-surface, #1d1d1d) !important;
             }
             html.cop-desktop .cop-stack,
             html.cop-desktop .calendar-card,
             html.cop-desktop #monthly-view-unified,
+            html.cop-desktop .cal-scroll,
             html.cop-desktop .cal-split-wrap {
                 overflow: visible !important;
+                max-height: none !important;
             }
             html.cop-desktop .calendar-card.modern-card:hover {
                 transform: none !important;
@@ -1208,10 +1215,9 @@
                 clip-path: inset(0 round 14px);
             }
             html.cop-desktop .cal-block.cal-block-head {
-                position: -webkit-sticky !important;
-                position: sticky !important;
-                top: var(--cal-head-top, 4rem) !important;
-                z-index: 60 !important;
+                position: relative !important;
+                top: auto !important;
+                z-index: 1 !important;
                 overflow: hidden !important;
                 border-radius: 14px !important;
                 clip-path: inset(0 round 14px);
