@@ -1222,14 +1222,38 @@
             .calendar-card.modern-card:hover {
                 transform: none !important;
             }
+            .cal-block {
+                overflow: hidden !important;
+                border-radius: 14px !important;
+                clip-path: inset(0 round 14px);
+            }
             .cal-block.cal-block-head {
                 position: -webkit-sticky !important;
                 position: sticky !important;
                 top: var(--cal-head-top, 4rem) !important;
                 z-index: 60 !important;
-                clip-path: none !important;
-                overflow: visible !important;
+                overflow: hidden !important;
+                border-radius: 14px !important;
+                clip-path: inset(0 round 14px);
                 background: var(--w-surface, #1d1d1d) !important;
+            }
+            .cal-block-head thead tr:first-child th:first-child {
+                border-top-left-radius: 14px;
+            }
+            .cal-block-head thead tr:first-child th:last-child {
+                border-top-right-radius: 14px;
+            }
+            .cal-block-head thead tr:last-child th:first-child {
+                border-bottom-left-radius: 14px;
+            }
+            .cal-block-head thead tr:last-child th:last-child {
+                border-bottom-right-radius: 14px;
+            }
+            .cal-block tbody tr:last-child td:first-child {
+                border-bottom-left-radius: 14px;
+            }
+            .cal-block tbody tr:last-child td:last-child {
+                border-bottom-right-radius: 14px;
             }
         }
 
