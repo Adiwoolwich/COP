@@ -2521,24 +2521,25 @@
                 });
             }
 
-            let totalStrength = 0;
-            let availStrength = 0;
+            let qe3Avail = 0;
+            let qe2Avail = 0;
             const counted = new Set();
-            function countStrength(list) {
+            function countAvailableQE(list, fallback) {
                 if (!Array.isArray(list)) return;
                 list.forEach(m => {
                     const key = personDisplayName(m).toLowerCase();
                     if (!key || counted.has(key)) return;
                     counted.add(key);
-                    totalStrength++;
-                    if (!personBookedOnSearchDay(m)) availStrength++;
+                    if (personBookedOnSearchDay(m)) return;
+                    if (normalizeQE(m.qe, fallback) === '3. QE') qe3Avail++;
+                    else qe2Avail++;
                 });
             }
-            countStrength(mannschaft);
-            countStrength(gruppenfuehrer);
-            countStrength(zugfuehrer);
+            countAvailableQE(mannschaft, '2. QE');
+            countAvailableQE(gruppenfuehrer, '2. QE');
+            countAvailableQE(zugfuehrer, '3. QE');
             const staerkeEl = document.getElementById('day-stats-staerke');
-            if (staerkeEl) staerkeEl.textContent = availStrength + '/' + totalStrength;
+            if (staerkeEl) staerkeEl.textContent = qe3Avail + '/' + qe2Avail;
 
             urlaubEl.textContent = urlaubCount;
             azaEl.textContent = azaCount;
