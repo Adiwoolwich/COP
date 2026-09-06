@@ -97,6 +97,11 @@
         .cal-block-head {
             background: var(--w-surface, #1d1d1d);
         }
+        .cal-head-month {
+            font-size: 0.75rem;
+            letter-spacing: 0.01em;
+            text-transform: capitalize;
+        }
         .cal-table {
             table-layout: fixed;
             width: 100%;
@@ -2888,6 +2893,7 @@
 
             const monthDate = new Date(year, month);
             const monthName = monthDate.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
+            const monthLabel = monthDate.toLocaleDateString('de-DE', { month: 'long' });
 
             const BLOCK_ORDER = ['stamm', '21', '22', '23', '26'];
             const calGrouped = {};
@@ -2950,7 +2956,7 @@
                         ${calendarColgroup(daysInMonth)}
                         <thead class="bg-white">
                             <tr>
-                                <th class="cal-name sticky left-0 z-[9] bg-white border p-1.5 text-left font-medium shadow-sm"></th>
+                                <th class="cal-name sticky left-0 z-[9] bg-white border p-1.5 text-left font-semibold shadow-sm cal-head-month">${monthLabel}</th>
                                 ${calendarDayHeaderCells(year, month, daysInMonth, holidaysThisYear)}
                             </tr>
                             <tr class="bg-white">
