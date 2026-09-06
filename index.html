@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
+    <script>
+      (function () {
+        var mobile = window.matchMedia('(max-width: 767px)').matches;
+        document.documentElement.classList.add(mobile ? 'cop-mobile' : 'cop-desktop');
+        document.documentElement.classList.remove(mobile ? 'cop-desktop' : 'cop-mobile');
+      })();
+    </script>
     <!-- Removed suspicious external script include (long encoded payload) for security and stability -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -79,20 +86,16 @@
             box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
         }
 
-        /* Kalender = Breite der drei Cards (Buchung + Tagesrecherche + Nächste 7 Tage).
-           Tage teilen den Rest gleichmäßig, kein horizontaler Scroll. */
+        /* Kalender-Chrome (geteilt). Layout (overflow/clip/sticky/scroll)
+           steht NUR in den getrennten Blöcken
+           DESKTOP ONLY (>=768 / html.cop-desktop) und
+           MOBILE ONLY (<=767 / html.cop-mobile). */
         .cal-scroll {
-            overflow: visible;
             width: 100%;
             max-width: 100%;
-            max-height: none;
         }
         .cal-block-head {
-            position: sticky;
-            top: var(--cal-head-top, 4rem);
-            z-index: 45;
             background: var(--w-surface, #1d1d1d);
-            box-shadow: 0 10px 18px rgba(0,0,0,0.28);
         }
         .cal-table {
             table-layout: fixed;
@@ -147,30 +150,12 @@
         .cal-block {
             border: 1px solid rgba(246, 218, 74, 0.55);
             border-radius: 14px;
-            overflow: hidden;
             background: var(--w-surface, #1d1d1d);
-            clip-path: inset(0 round 14px);
         }
         .cal-block .cal-table {
             width: 100%;
             border-collapse: separate;
             border-spacing: 0;
-        }
-        .cal-block-head thead tr:first-child th:first-child {
-            border-top-left-radius: 14px;
-        }
-        .cal-block-head thead tr:first-child th:last-child {
-            border-top-right-radius: 14px;
-        }
-        .cal-block tbody tr:last-child td:first-child {
-            border-bottom-left-radius: 14px;
-        }
-        .cal-block tbody tr:last-child td:last-child {
-            border-bottom-right-radius: 14px;
-        }
-        .cal-block.cal-block-head {
-            clip-path: none;
-            overflow: visible;
         }
         .cal-block-gap { height: 4px; flex-shrink: 0; }
 
@@ -760,19 +745,13 @@
             padding: 6px 10px;
         }
 
-        /* ---------- Kalender ---------- */
+        /* ---------- Kalender (Farben, geteilt — Layout nur in View-Blöcken) ---------- */
         .cal-scroll {
             border: none !important;
             border-radius: 0 !important;
             background: transparent !important;
-            overflow: visible !important;
-            max-height: none !important;
         }
         .cal-block-head {
-            position: -webkit-sticky;
-            position: sticky;
-            top: var(--cal-head-top, 4rem);
-            z-index: 45;
             background: var(--w-surface);
         }
         .cal-scroll th, .cal-scroll td { border-color: rgba(255,255,255,.07) !important; }
@@ -1175,22 +1154,23 @@
         }
         .cal-scroll::-webkit-scrollbar-thumb:hover { background: var(--w-gold-dim); }
 
-        /* ==================== DESKTOP ONLY (>=768) — Mobile-Block oben bleibt unverändert ==================== */
+        /* ==================== DESKTOP ONLY (>=768 / html.cop-desktop) ====================
+           Hier NUR Desktop-Layout. Mobile-Regeln gehören in den MOBILE-ONLY-Block. */
         @media (min-width: 768px) {
-            .cards-grid {
+            html.cop-desktop .cards-grid {
                 align-items: start;
             }
-            .cards-grid > .modern-card {
+            html.cop-desktop .cards-grid > .modern-card {
                 display: flex;
                 flex-direction: column;
                 overflow: hidden;
             }
-            .buchung-split {
+            html.cop-desktop .buchung-split {
                 flex: 1 1 auto;
                 min-height: 0;
                 align-items: stretch;
             }
-            #group-members-section.flex {
+            html.cop-desktop #group-members-section.flex {
                 display: flex !important;
                 flex-direction: column;
                 align-self: stretch;
@@ -1198,36 +1178,36 @@
                 min-height: 0;
                 height: auto !important;
             }
-            #group-members-list {
+            html.cop-desktop #group-members-list {
                 flex: 1 1 auto !important;
                 min-height: 0 !important;
                 overflow-y: auto !important;
             }
-            #next7days-list {
+            html.cop-desktop #next7days-list {
                 flex: 1 1 auto !important;
                 min-height: 0 !important;
                 max-height: none !important;
                 overflow-y: auto !important;
             }
-            .cal-scroll {
-                max-height: none !important;
+            html.cop-desktop .cal-head-pin {
+                display: block;
+                overflow: visible;
+            }
+            html.cop-desktop .cop-stack,
+            html.cop-desktop .calendar-card,
+            html.cop-desktop #monthly-view-unified,
+            html.cop-desktop .cal-split-wrap {
                 overflow: visible !important;
             }
-            .cop-stack,
-            .calendar-card,
-            #monthly-view-unified,
-            .cal-split-wrap {
-                overflow: visible !important;
-            }
-            .calendar-card.modern-card:hover {
+            html.cop-desktop .calendar-card.modern-card:hover {
                 transform: none !important;
             }
-            .cal-block {
+            html.cop-desktop .cal-block {
                 overflow: hidden !important;
                 border-radius: 14px !important;
                 clip-path: inset(0 round 14px);
             }
-            .cal-block.cal-block-head {
+            html.cop-desktop .cal-block.cal-block-head {
                 position: -webkit-sticky !important;
                 position: sticky !important;
                 top: var(--cal-head-top, 4rem) !important;
@@ -1236,48 +1216,49 @@
                 border-radius: 14px !important;
                 clip-path: inset(0 round 14px);
                 background: var(--w-surface, #1d1d1d) !important;
+                box-shadow: 0 10px 18px rgba(0,0,0,0.28);
             }
-            .cal-block-head thead tr:first-child th:first-child {
+            html.cop-desktop .cal-block-head thead tr:first-child th:first-child {
                 border-top-left-radius: 14px;
             }
-            .cal-block-head thead tr:first-child th:last-child {
+            html.cop-desktop .cal-block-head thead tr:first-child th:last-child {
                 border-top-right-radius: 14px;
             }
-            .cal-block-head thead tr:last-child th:first-child {
+            html.cop-desktop .cal-block-head thead tr:last-child th:first-child {
                 border-bottom-left-radius: 14px;
             }
-            .cal-block-head thead tr:last-child th:last-child {
+            html.cop-desktop .cal-block-head thead tr:last-child th:last-child {
                 border-bottom-right-radius: 14px;
             }
-            .cal-block tbody tr:last-child td:first-child {
+            html.cop-desktop .cal-block tbody tr:last-child td:first-child {
                 border-bottom-left-radius: 14px;
             }
-            .cal-block tbody tr:last-child td:last-child {
+            html.cop-desktop .cal-block tbody tr:last-child td:last-child {
                 border-bottom-right-radius: 14px;
             }
         }
 
-        /* ==================== MOBILE ONLY (<=767) — vollständig getrennt vom Desktop-Block ==================== */
+        /* ==================== MOBILE ONLY (<=767 / html.cop-mobile) ====================
+           Hier NUR Mobile-Layout. Desktop-Regeln gehören in den DESKTOP-ONLY-Block. */
         @media (max-width: 767px) {
-            .cards-grid > .modern-card {
+            html.cop-mobile .cards-grid > .modern-card {
                 height: auto !important;
                 overflow: visible !important;
             }
-            #group-members-list {
+            html.cop-mobile #group-members-list {
                 max-height: 220px !important;
                 height: auto !important;
             }
 
-            /* Tagesrecherche: gleicher Goldrahmen wie Einträge in „Nächste 7 Tage“ */
-            #day-search-input,
-            #day-stats,
-            #next7days-list > div {
+            html.cop-mobile #day-search-input,
+            html.cop-mobile #day-stats,
+            html.cop-mobile #next7days-list > div {
                 border: 1px solid var(--w-line) !important;
                 border-radius: 12px !important;
                 background: var(--w-surface2) !important;
                 box-shadow: none !important;
             }
-            #day-search-input {
+            html.cop-mobile #day-search-input {
                 display: block !important;
                 width: 100% !important;
                 max-width: 100% !important;
@@ -1288,20 +1269,31 @@
                 appearance: none;
             }
 
-            /* Kalender mobil: Seite scrollt vertikal, Gitter wischen horizontal */
-            .cop-stack,
-            .calendar-card,
-            #monthly-view-unified,
-            .cal-scroll,
-            .cal-split-wrap {
+            html.cop-mobile,
+            html.cop-mobile body {
+                overflow-x: clip !important;
+            }
+            html.cop-mobile .cop-stack,
+            html.cop-mobile .calendar-card,
+            html.cop-mobile #monthly-view-unified,
+            html.cop-mobile .cal-scroll,
+            html.cop-mobile .cal-split-wrap,
+            html.cop-mobile .cal-head-pin {
                 overflow: visible !important;
                 max-width: 100% !important;
             }
-            .cal-scroll {
+            html.cop-mobile .cal-scroll {
                 max-height: none !important;
             }
-            .cal-block,
-            .cal-block.cal-block-head {
+            html.cop-mobile .cal-head-pin {
+                position: -webkit-sticky !important;
+                position: sticky !important;
+                top: var(--cal-head-top, 4.25rem) !important;
+                z-index: 55 !important;
+                background: var(--w-surface, #1d1d1d) !important;
+            }
+            html.cop-mobile .cal-block,
+            html.cop-mobile .cal-block.cal-block-head {
                 clip-path: none !important;
                 width: 100% !important;
                 max-width: 100% !important;
@@ -1312,28 +1304,26 @@
                 touch-action: pan-x pan-y;
                 overscroll-behavior-x: contain;
             }
-            .cal-block.cal-block-head {
-                position: -webkit-sticky !important;
-                position: sticky !important;
-                top: var(--cal-head-top, 4.25rem) !important;
-                z-index: 55 !important;
-                background: var(--w-surface, #1d1d1d) !important;
+            html.cop-mobile .cal-block.cal-block-head {
+                position: relative !important;
+                top: auto !important;
+                z-index: 1 !important;
             }
-            .cal-block .cal-table,
-            .cal-block-head .cal-table {
+            html.cop-mobile .cal-block .cal-table,
+            html.cop-mobile .cal-block-head .cal-table {
                 width: max-content !important;
                 min-width: calc(6.5rem + 31 * 32px) !important;
                 table-layout: auto !important;
             }
-            .cal-scroll thead th:first-child,
-            .cal-scroll tbody td:first-child,
-            .cal-table .cal-name {
+            html.cop-mobile .cal-scroll thead th:first-child,
+            html.cop-mobile .cal-scroll tbody td:first-child,
+            html.cop-mobile .cal-table .cal-name {
                 position: sticky !important;
                 left: 0 !important;
                 z-index: 8 !important;
                 background: var(--w-surface, #1d1d1d) !important;
             }
-            .cal-block-head thead th:first-child {
+            html.cop-mobile .cal-block-head thead th:first-child {
                 z-index: 36 !important;
             }
         }
@@ -2373,6 +2363,16 @@
             });
         }
 
+        const COP_MOBILE_MQ = '(max-width: 767px)';
+        function isCopMobile() {
+            return window.matchMedia(COP_MOBILE_MQ).matches;
+        }
+        function applyCopViewMode() {
+            const mobile = isCopMobile();
+            document.documentElement.classList.toggle('cop-mobile', mobile);
+            document.documentElement.classList.toggle('cop-desktop', !mobile);
+        }
+
         function applyBookingListHeight() {
             syncTopCardHeights();
         }
@@ -2386,7 +2386,7 @@
             const next7 = cards[2];
             const list = document.getElementById('group-members-list');
 
-            if (window.matchMedia('(max-width: 767px)').matches) {
+            if (isCopMobile()) {
                 cards.forEach(c => { if (c) c.style.height = 'auto'; });
                 if (list) {
                     list.style.height = '';
@@ -2938,6 +2938,7 @@
 
                 <div class="cal-scroll">
                     <div class="cal-split-wrap">
+                    <div class="cal-head-pin">
                     <div class="cal-block cal-block-head">
                     <table class="cal-table text-sm">
                         ${calendarColgroup(daysInMonth)}
@@ -2990,6 +2991,7 @@
                             </tr>
                         </thead>
                     </table>
+                    </div>
                     </div>
                     ${calGroups.map(key => `
                     <div class="cal-block-gap"></div>
@@ -5341,6 +5343,7 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
         }
 
         async function initializeApp() {
+            applyCopViewMode();
             initializeTailwind();
 
             try {
@@ -5464,6 +5467,7 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
             });
 
             window.addEventListener('resize', () => {
+                applyCopViewMode();
                 syncTopCardHeights();
                 updateCalHeadOffset();
             });
