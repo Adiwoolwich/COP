@@ -1452,13 +1452,14 @@
         /* ==================== DESKTOP ONLY (>=768) — Mobile bleibt unangetastet ==================== */
         @media (min-width: 768px) {
             .cards-grid {
-                align-items: stretch;
+                align-items: start;
             }
             .cards-grid > .modern-card {
                 display: flex !important;
                 flex-direction: column !important;
                 overflow: hidden;
-                height: 100%;
+                height: auto;
+                align-self: start;
             }
             .buchung-split {
                 display: flex !important;
@@ -2677,11 +2678,14 @@
             const tages = cards[1];
             const next7 = cards[2];
             if (!booking || !tages || !next7) return;
-            booking.style.height = '';
-            next7.style.height = '';
-            tages.style.height = '';
+            booking.style.height = 'auto';
+            next7.style.height = 'auto';
+            tages.style.height = 'auto';
+            tages.style.alignSelf = 'start';
+            booking.style.alignSelf = 'start';
+            next7.style.alignSelf = 'start';
             requestAnimationFrame(function() {
-                const h = Math.ceil(tages.getBoundingClientRect().height);
+                const h = Math.ceil(tages.offsetHeight);
                 if (h < 80) return;
                 booking.style.height = h + 'px';
                 next7.style.height = h + 'px';
@@ -2694,6 +2698,11 @@
             section.classList.add('hidden');
             const header = document.getElementById('group-members-header');
             if (header) { header.classList.remove('flex'); header.classList.add('hidden'); }
+            if (!window.matchMedia('(max-width: 767px)').matches) {
+                const bookingCard = section && section.closest('.modern-card');
+                if (bookingCard) bookingCard.style.height = 'auto';
+                syncTopCardHeights();
+            }
         }
 
         function quickAddForMember(fullName, groupId, groupColor) {
