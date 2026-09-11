@@ -1,13 +1,6 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <script>
-      (function () {
-        var mobile = window.matchMedia('(max-width: 767px)').matches;
-        document.documentElement.classList.add(mobile ? 'cop-mobile' : 'cop-desktop');
-        document.documentElement.classList.remove(mobile ? 'cop-desktop' : 'cop-mobile');
-      })();
-    </script>
     <!-- Removed suspicious external script include (long encoded payload) for security and stability -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -86,21 +79,13 @@
             box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
         }
 
-        /* Kalender-Chrome (geteilt). Layout (overflow/clip/sticky/scroll)
-           steht NUR in den getrennten Blöcken
-           DESKTOP ONLY (>=768 / html.cop-desktop) und
-           MOBILE ONLY (<=767 / html.cop-mobile). */
+        /* Kalender = Breite der drei Cards (Buchung + Tagesrecherche + Nächste 7 Tage).
+           Tage teilen den Rest gleichmäßig, kein horizontaler Scroll. */
         .cal-scroll {
+            overflow-x: hidden;
+            overflow-y: auto;
             width: 100%;
             max-width: 100%;
-        }
-        .cal-block-head {
-            background: var(--w-surface, #1d1d1d);
-        }
-        .cal-head-month {
-            font-size: 0.75rem;
-            letter-spacing: 0.01em;
-            text-transform: capitalize;
         }
         .cal-table {
             table-layout: fixed;
@@ -118,59 +103,85 @@
         }
         .cal-table .cal-day {
             min-width: 0;
-            min-height: 22px;
             padding: 2px 0 !important;
             overflow: hidden;
             text-align: center;
             font-size: 10px;
             line-height: 1.15;
-            vertical-align: middle;
         }
         .cal-table .cal-dot {
-            display: flex;
-            align-items: center;
-            justify-content: center;
             width: 16px;
             height: 16px;
-            min-width: 16px;
-            min-height: 16px;
             margin: 0 auto;
-            padding: 0;
-            border: 0;
-            border-radius: 50%;
+            border-radius: 0;
             flex-shrink: 0;
-            position: relative;
-            background-color: var(--dot-color, #e5e7eb);
-            cursor: pointer;
-            appearance: none;
-            -webkit-appearance: none;
+            --cal-dot-mask: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAAAAADmVT4XAAAF4ElEQVR42tVby7bkIAikOPf/f7lmEWN8IIJJL6YXvcgDEKFAIJCTH82rOCGFb3ifE8SXzE9o4pA9srffCsDgG8xSRo49vn44RRHp3cIXAvDMuqOv4Tfs46/iV+yf13EuAF+xj1HA7u037CNE8MPlh+jgp8sPkNLf87/IMKWBr9QfWA5+vfwdSX3Fn4+6eLgNOOT/oH0U9xdkcb5+1qcYesEmrN/sP46dQX9vf76U6j9IvjZ/9oTpC8BJUH7gfp4E6vPHSwk40xsIqr/+lxLQotcT1IDl8Dv+8wX1FfBKAvqhZhKAC085lYBLci09DeDJmQSMxT+N+NuJBD48cxaAm7yJ3/HvNkFjgJ6VgOFEVOPHfn7Fv2Oo0YjmS8Acf0waCKzOlQDJ9U+nLgaPqQhkRDlaulRAjaPM2QFzRQesXmJ7M6EoxvNZVA1wcZ9Ckv2G8aP130TVdoErMwNFIEBcAqZrQ7pIo4BLBBFcQjDojdl8Uo0dYLvo+h+QgAd1R3V3YE5GsZcgxx+bjIhSLJA3d2y8kUf5vBrU6vZXdTCABzwrPMN6kwIhhGMG6YFdcykFBepF7AJBACACeDoYmDJ8olFLmyiM1xFnlKDnDyAoA520HF24QntpkqDjX0AMqNbjO8OfPOM+hpd/7Dado7H4hTAglr0LWjEGtpMo7O1hKcFGAOHFlStLYD3z+8FyKQFLvHElfLS/kqDhv1zJFopduMRj3JizNDYQSRbgYviErxKoFz9wLGhdYdzvy/A7GO3TNmN9fy5z2lcx+ermbEfC08CmxPJEJKOEE8yoQQ9u4JThOCwSHD3McWPsDJGeBlgRuUSC2aBYAJsScD7mt6A3wOICmFisojNCWKCS+gEGTUuCcrNkEsz3C4agitnI2VklTf1VHVFOvYA3sHDNX1zA3hUL1kZspERtmIOfkBWY3rYFVXZ1DAgmDJ5tytJBCCQ0UOStmUnFE5r1P84RCNvESNfsHxWQpICg51OYdyuSF/5tYICo7GocWvh0B5ms9rXr5bgJ0TLpDx6Ndt0H7mNBIr/Z3Et7gSDNf6/w11Dc858tPC+BSrIACHFjHJLlxKQGGBnJyOlAkefvQ0tOAujR+g0RyDMJ9IA/DD/pkuOMBCpRK6RZEngAl+ldYEoDQ/5fgLWRASR0gHBtF36x9QATnQpJkF6bLp/6gkrECHjST2fEBORvPl5Z/eOD+tt0HrP7smr7M1/zn3RAG0CMjsmYAPJ0ngB9GWnILGkfz5nZf9LHZXQDlvOwC2wciMOY4wX2aX1REhx6IrvTfn57LKJsNYBFIvR+gGOggmma4cmK27KHWQw55r8eVnq8YHHi+mKahssogSEcc7993/2m7jl+yd0dhVfnOX6/3vmCrrebH41UYe3/MtS1MfSEsXfzvZtwOCOiD0uQhQR3aeoD/UM46QPz6RgcgYr40gZgY6zaxmHV/Y9NgL1ql6NcTUHo6hl/5/ZoWl5DXqJ2Bequkn4zzoer4GJ+eACzJtF0il4qgmPbaUzMdC6MDR0YfsG/Fny5NsfeXm/v9QecAtaPhpZVstEZn3qIwLtpurL+ZiXwD6d4irwUsJSZT2yRXctrOauChdqK4tCWCw+0L/fqsYouagUJVv7tSphbfX2JbtkWa9Mp3Rk2E8nIIW+pVjZV78ho9/MkO3cIzvyzTbaxCIG7tK8BpGIJ2J7HTe5oW+DrCU9PCfcsBZuxKv/M0YxfsYtEiQ8cBgy5AzWxS9XaB0BE0AxbP+p3cp0vYs5BWuuBJAXoNq8kLIEUrbr9MHWU/8xHhoG6sqH30swPI24Zu7C3ATHdnG05TP1JGXqgsPwJKd2kEe+wBzSQdKKBAVPu5Ba3WYxlILDtkiCGXn+7Qk9Z0tzHBonSmeNYG0IINSICVBTHflCWIiDl6SyFwHtfJ0RTIcejd8ztoeeR+vw+eKQ+eu2yVl5Ic3tFa2yZ7ySzn/1aY293uHOffCuARD4p5gHZfJ5jvspjmv/Xx++xmkfu9w9vMOq8YnmYfQAAAABJRU5ErkJggg==");
+            -webkit-mask-image: var(--cal-dot-mask);
+            mask-image: var(--cal-dot-mask);
+            -webkit-mask-size: contain;
+            mask-size: contain;
+            -webkit-mask-repeat: no-repeat;
+            mask-repeat: no-repeat;
+            -webkit-mask-position: center;
+            mask-position: center;
         }
-        .cal-table td.cal-day.has-dot { cursor: pointer; }
-        .cal-split-wrap {
-            display: flex;
-            flex-direction: column;
-            gap: 0;
-            padding: 0;
+
+        .modal {
+            animation: modalPop 0.2s ease-out;
         }
-        .cal-block {
-            border: 1px solid rgba(246, 218, 74, 0.55);
-            border-radius: 14px;
-            background: var(--w-surface, #1d1d1d);
+        .db-table-wrap {
+            overflow: auto;
+            -webkit-overflow-scrolling: touch;
+            min-height: 0;
         }
-        .cal-block .cal-table {
-            width: 100%;
+        .db-table-wrap table {
             border-collapse: separate;
             border-spacing: 0;
         }
-        .cal-block-gap { height: 4px; flex-shrink: 0; }
-
-        .modal {
-            animation: modalPop 0.2s ease-out forwards;
+        .db-table-wrap thead th {
+            position: sticky;
+            top: 0;
+            z-index: 6;
+            background: var(--w-surface2, #2a2a2a);
+            box-shadow: 0 1px 0 rgba(246, 218, 74, 0.35);
+        }
+        .db-table-wrap th:last-child,
+        .db-table-wrap td:last-child {
+            position: sticky;
+            right: 0;
+            z-index: 4;
+            background: var(--w-surface, #1d1d1d);
+            box-shadow: -8px 0 10px -8px rgba(0,0,0,0.45);
+            white-space: nowrap;
+        }
+        .db-table-wrap thead th:last-child {
+            z-index: 7;
+            background: var(--w-surface2, #2a2a2a);
+        }
+        .db-act-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 44px;
+            min-height: 44px;
+            padding: 0 10px;
+            margin: 0 2px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid rgba(246, 218, 74, 0.35);
+            background: rgba(246, 218, 74, 0.12);
+            color: var(--w-text, #f5f5f5);
+            -webkit-tap-highlight-color: rgba(246, 218, 74, 0.28);
+        }
+        .db-act-btn.del {
+            border-color: rgba(248, 113, 113, 0.45);
+            background: rgba(248, 113, 113, 0.12);
         }
 
         @keyframes modalPop {
             from { transform: scale(0.95); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
+            to { transform: none; opacity: 1; }
         }
 
         .absence-card {
@@ -183,12 +194,7 @@
         }
 
         .modal {
-            animation: modalPop 0.2s ease-out forwards;
-        }
-
-        @keyframes modalPop {
-            from { transform: scale(0.95); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
+            animation: modalPop 0.2s ease-out;
         }
 
         .fc-toolbar-title {
@@ -215,35 +221,17 @@
         .cards-grid {
             grid-template-columns: minmax(570px, 1.75fr) minmax(300px, 1.1fr) minmax(260px, 1fr);
             width: 100%;
-            align-items: start;
-        }
-        .cards-grid > .modern-card {
-            display: flex;
-            flex-direction: column;
-            box-sizing: border-box;
-        }
-        .cards-grid > .modern-card .buchung-split {
-            flex: 1 1 auto;
-            min-height: 0;
-        }
-        .cards-grid > .modern-card #next7days-list {
-            flex: 1 1 auto;
-            min-height: 0;
-            max-height: none;
-            overflow-y: auto;
         }
         .cop-stack {
             display: flex;
             flex-direction: column;
             width: 100%;
             gap: 1.5rem;
-            overflow: visible;
         }
         .calendar-card {
             width: 100%;
             max-width: 100%;
             box-sizing: border-box;
-            overflow: visible;
         }
         .role-label-short { display: none; }
         .btn-label-short { display: none; }
@@ -331,7 +319,7 @@
             .groups-col,
             .members-col { width: 100% !important; }     /* schlaegt w-[210px] / w-[280px] */
             #groups-list > div { min-height: 44px; }
-            #group-members-list { max-height: 220px !important; }
+            #group-members-list { max-height: 40vh !important; }
             #group-members-section button,
             #group-members-header button { min-height: 36px; min-width: 36px; }
             #group-members-list button { width: 36px !important; height: 36px !important; }
@@ -375,21 +363,15 @@
 
             /* Kalender: Tage per Wischen, Namensspalte bleibt stehen */
             .cal-scroll {
-                max-height: none !important;
-                overflow: visible !important;
+                max-height: 70vh !important;
+                overflow-x: scroll !important;
+                overflow-y: auto !important;
                 -webkit-overflow-scrolling: touch;
+                overscroll-behavior-x: contain;
+                touch-action: pan-x pan-y;
+                border: none !important;
                 border-radius: 0 !important;
-            }
-            .cal-block {
-                overflow-x: auto !important;
-                overflow-y: hidden !important;
-            }
-            .cal-block-head {
-                overflow: visible !important;
-                position: -webkit-sticky !important;
-                position: sticky !important;
-                top: var(--cal-head-top, 4.25rem) !important;
-                z-index: 45 !important;
+                background: transparent !important;
             }
             .cal-table {
                 table-layout: auto !important;
@@ -397,7 +379,7 @@
                 min-width: 100% !important;
             }
             .cal-table col.cal-name-col { width: 6.5rem; }
-            .cal-table col.cal-day-col { width: 2rem; }
+            .cal-table col.cal-day-col { width: 36px; }
             .cal-scroll th, .cal-scroll td { font-size: 10px !important; }
             .cal-scroll thead th:first-child,
             .cal-scroll tbody td:first-child {
@@ -416,15 +398,54 @@
                 text-overflow: ellipsis;
                 white-space: nowrap;
             }
-            .cal-scroll thead tr:first-child th:not(:first-child),
+            .cal-scroll thead th:not(:first-child),
             .cal-table .cal-day {
-                min-width: 32px !important;
-                width: 32px !important;
+                min-width: 36px !important;
+                width: 36px !important;
+                height: 36px !important;
+                min-height: 36px !important;
+                padding: 0 !important;
+                touch-action: pan-x pan-y;
+                -webkit-tap-highlight-color: rgba(246, 218, 74, 0.28);
             }
-            .cal-scroll td .cal-dot { width: 20px !important; height: 20px !important; border-radius: 50% !important; }
+            .cal-scroll tbody td.cal-day {
+                vertical-align: middle;
+            }
+            .cal-scroll td .cal-dot {
+                width: 20px !important;
+                height: 20px !important;
+                border-radius: 50% !important;
+                -webkit-mask-image: none !important;
+                mask-image: none !important;
+            }
+
+            /* Gitter-Blöcke dürfen die Monatstabelle nicht auf Viewport-Breite stauchen,
+               sonst gibt es nichts zum horizontalen Wischen. */
+            .cal-split-wrap {
+                display: flex !important;
+                flex-direction: column !important;
+                width: max-content !important;
+                min-width: calc(6.5rem + 31 * 36px) !important;
+                gap: 0 !important;
+                padding: 1px;
+            }
             .cal-block {
+                width: max-content !important;
+                min-width: calc(6.5rem + 31 * 36px) !important;
                 overflow: hidden !important;
                 border-radius: 14px !important;
+            }
+            .cal-block .cal-table {
+                width: max-content !important;
+                min-width: calc(6.5rem + 31 * 36px) !important;
+                table-layout: auto !important;
+            }
+            .cal-block-gap {
+                height: 4px !important;
+            }
+            .cal-scroll thead th:not(:first-child),
+            .cal-table .cal-day {
+                touch-action: pan-x pan-y !important;
             }
 
             #login-modal {
@@ -460,6 +481,11 @@
             .modal table { min-width: 640px; }   /* erzwingt Scroll statt Quetschung */
             .modal .overflow-auto,
             .modal .overflow-x-auto { -webkit-overflow-scrolling: touch; }
+            #mannschaft-modal .modal,
+            #gruppenfuehrer-modal .modal,
+            #zugfuehrer-modal .modal {
+                overflow: hidden;
+            }
 
             /* Einsatzwunsch-Panel hat bereits seinen eigenen internen Scrollbereich
                (.ew-table-wrap) - die generische .modal-Regel darüber würde sonst
@@ -732,17 +758,6 @@
             background: var(--w-surface3);
             border-color: var(--w-gold-dim);
         }
-        .buchung-split { align-items: stretch; }
-        #group-members-section.flex {
-            display: flex !important;
-            flex-direction: column;
-            align-self: stretch;
-        }
-        #group-members-list {
-            flex: 1 1 auto;
-            min-height: 0;
-            overflow-y: auto;
-        }
         #group-members-list > div {
             background: var(--w-surface2);
             border: 1px solid var(--w-line);
@@ -750,14 +765,11 @@
             padding: 6px 10px;
         }
 
-        /* ---------- Kalender (Farben, geteilt — Layout nur in View-Blöcken) ---------- */
+        /* ---------- Kalender ---------- */
         .cal-scroll {
             border: none !important;
             border-radius: 0 !important;
             background: transparent !important;
-        }
-        .cal-block-head {
-            background: var(--w-surface);
         }
         .cal-scroll th, .cal-scroll td { border-color: rgba(255,255,255,.07) !important; }
         .cal-scroll thead th { background: var(--w-surface2) !important; }
@@ -821,6 +833,32 @@
         }
         .cal-scroll tbody tr:has(+ tr.cal-split) td {
             border-bottom: none !important;
+        }
+        .cal-split-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            padding: 1px;
+        }
+        .cal-block {
+            border: 1px solid rgba(246, 218, 74, 0.55);
+            border-radius: 14px;
+            overflow: hidden;
+            background: var(--w-surface);
+        }
+        .cal-block .cal-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .cal-block-gap {
+            height: 4px;
+            flex-shrink: 0;
+        }
+        .cal-block-head {
+            position: sticky;
+            top: 0;
+            z-index: 65;
+            background: var(--w-surface);
         }
         .cal-scroll .text-slate-600 { color: var(--w-text-dim) !important; }
 
@@ -1107,32 +1145,28 @@
         .bg-black\/40 { background-color: rgba(0,0,0,.65) !important; backdrop-filter: blur(2px); }
 
         /* ---------- Abwesenheits-Karten (Naechste 7 Tage) ---------- */
-        #next7days-list > div {
+        #next7days-list > div,
+        .day-search-box {
             background: var(--w-surface2) !important;
             border: 1px solid var(--w-line) !important;
             border-radius: 12px !important;
+        }
+        .day-search-box {
+            padding: 0;
+            overflow: hidden;
         }
         #day-search-input {
             width: 100% !important;
             max-width: 100% !important;
             min-width: 0 !important;
             box-sizing: border-box !important;
+            background: transparent !important;
+            border: 0 !important;
             border-radius: 12px !important;
-            background: var(--w-surface2) !important;
-            border: 1px solid var(--w-line) !important;
-        }
-        #day-stats {
-            border-radius: 12px !important;
-            background: var(--w-surface2) !important;
-            border: 1px solid var(--w-line) !important;
-            overflow: hidden;
-        }
-        .cards-grid > .modern-card {
-            overflow: hidden;
-            border-radius: var(--w-radius) !important;
-        }
-        .calendar-card.modern-card {
-            overflow: visible;
+            padding: 10px 12px !important;
+            color: var(--w-text) !important;
+            -webkit-appearance: none;
+            appearance: none;
         }
 
         .logout-btn {
@@ -1159,183 +1193,318 @@
         }
         .cal-scroll::-webkit-scrollbar-thumb:hover { background: var(--w-gold-dim); }
 
-        /* ==================== DESKTOP ONLY (>=768 / html.cop-desktop) ====================
-           Hier NUR Desktop-Layout. Mobile-Regeln gehören in den MOBILE-ONLY-Block. */
-        @media (min-width: 768px) {
-            html.cop-desktop .cards-grid {
-                align-items: start;
-            }
-            html.cop-desktop .cards-grid > .modern-card {
-                display: flex;
-                flex-direction: column;
-                overflow: hidden;
-            }
-            html.cop-desktop .buchung-split {
-                flex: 1 1 auto;
-                min-height: 0;
-                align-items: stretch;
-            }
-            html.cop-desktop #group-members-section.flex {
-                display: flex !important;
-                flex-direction: column;
-                align-self: stretch;
-                flex: 1 1 auto;
-                min-height: 0;
-                height: auto !important;
-            }
-            html.cop-desktop #group-members-list {
-                flex: 1 1 auto !important;
-                min-height: 0 !important;
-                overflow-y: auto !important;
-            }
-            html.cop-desktop #next7days-list {
-                flex: 1 1 auto !important;
-                min-height: 0 !important;
-                max-height: none !important;
-                overflow-y: auto !important;
-            }
-            html.cop-desktop .cal-head-pin {
-                display: block;
-                position: -webkit-sticky !important;
-                position: sticky !important;
-                top: var(--cal-head-top, 4rem) !important;
-                z-index: 60 !important;
-                overflow: visible !important;
-                background: var(--w-surface, #1d1d1d) !important;
-            }
-            html.cop-desktop .cop-stack,
-            html.cop-desktop .calendar-card,
-            html.cop-desktop #monthly-view-unified,
-            html.cop-desktop .cal-scroll,
-            html.cop-desktop .cal-split-wrap {
-                overflow: visible !important;
-                max-height: none !important;
-            }
-            html.cop-desktop .calendar-card.modern-card:hover {
-                transform: none !important;
-            }
-            html.cop-desktop .cal-block {
-                overflow: hidden !important;
-                border-radius: 14px !important;
-                clip-path: inset(0 round 14px);
-            }
-            html.cop-desktop .cal-block.cal-block-head {
-                position: relative !important;
-                top: auto !important;
-                z-index: 1 !important;
-                overflow: hidden !important;
-                border-radius: 14px !important;
-                clip-path: inset(0 round 14px);
-                background: var(--w-surface, #1d1d1d) !important;
-                box-shadow: 0 10px 18px rgba(0,0,0,0.28);
-            }
-            html.cop-desktop .cal-block-head thead tr:first-child th:first-child {
-                border-top-left-radius: 14px;
-            }
-            html.cop-desktop .cal-block-head thead tr:first-child th:last-child {
-                border-top-right-radius: 14px;
-            }
-            html.cop-desktop .cal-block-head thead tr:last-child th:first-child {
-                border-bottom-left-radius: 14px;
-            }
-            html.cop-desktop .cal-block-head thead tr:last-child th:last-child {
-                border-bottom-right-radius: 14px;
-            }
-            html.cop-desktop .cal-block tbody tr:last-child td:first-child {
-                border-bottom-left-radius: 14px;
-            }
-            html.cop-desktop .cal-block tbody tr:last-child td:last-child {
-                border-bottom-right-radius: 14px;
-            }
-        }
-
-        /* ==================== MOBILE ONLY (<=767 / html.cop-mobile) ====================
-           Hier NUR Mobile-Layout. Desktop-Regeln gehören in den DESKTOP-ONLY-Block. */
+        /* ==================== MOBILE FIX (nur <=767px, Desktop unverändert) ==================== */
         @media (max-width: 767px) {
-            html.cop-mobile .cards-grid > .modern-card {
+            html, body {
+                overflow-x: hidden !important;
+                max-width: 100vw !important;
+            }
+            .cop-stack,
+            .cards-grid,
+            .calendar-card {
+                max-width: 100% !important;
+                min-width: 0 !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
+            .cards-grid {
+                grid-template-columns: 1fr !important;
+                align-items: stretch !important;
+            }
+            .cards-grid > .modern-card {
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: 0 !important;
                 height: auto !important;
                 overflow: visible !important;
+                box-sizing: border-box !important;
             }
-            html.cop-mobile #group-members-list {
-                max-height: 220px !important;
-                height: auto !important;
+            .cards-grid > .modern-card:first-child {
+                overflow: hidden !important;
             }
-
-            html.cop-mobile #day-search-input,
-            html.cop-mobile #day-stats,
-            html.cop-mobile #next7days-list > div {
-                border: 1px solid var(--w-line) !important;
+            .day-search-box,
+            #day-stats,
+            #next7days-list > div {
                 border-radius: 12px !important;
+                border: 1px solid var(--w-line) !important;
                 background: var(--w-surface2) !important;
-                box-shadow: none !important;
             }
-            html.cop-mobile #day-search-input {
+            #day-search-input {
                 display: block !important;
                 width: 100% !important;
                 max-width: 100% !important;
                 min-width: 0 !important;
-                box-sizing: border-box !important;
+                border: 0 !important;
+                background: transparent !important;
+                border-radius: 12px !important;
                 padding: 10px 12px !important;
-                -webkit-appearance: none;
-                appearance: none;
+            }
+            #day-stats .flex {
+                gap: 0.5rem !important;
+            }
+            #day-stats .flex span:first-child {
+                min-width: 0 !important;
+                overflow-wrap: anywhere;
             }
 
-            html.cop-mobile,
-            html.cop-mobile body {
-                overflow-x: clip !important;
+            /* Buchung: Mitgliederliste bleibt IN der Karte */
+            .buchung-split {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                width: 100% !important;
+                min-width: 0 !important;
+                overflow: hidden !important;
             }
-            html.cop-mobile .cop-stack,
-            html.cop-mobile .calendar-card,
-            html.cop-mobile #monthly-view-unified,
-            html.cop-mobile .cal-scroll,
-            html.cop-mobile .cal-split-wrap,
-            html.cop-mobile .cal-head-pin {
-                overflow: visible !important;
-                max-width: 100% !important;
-            }
-            html.cop-mobile .cal-scroll {
-                max-height: none !important;
-            }
-            html.cop-mobile .cal-head-pin {
-                position: -webkit-sticky !important;
-                position: sticky !important;
-                top: var(--cal-head-top, 4.25rem) !important;
-                z-index: 55 !important;
-                background: var(--w-surface, #1d1d1d) !important;
-            }
-            html.cop-mobile .cal-block,
-            html.cop-mobile .cal-block.cal-block-head {
-                clip-path: none !important;
+            .groups-col,
+            .members-col,
+            #group-members-section {
                 width: 100% !important;
                 max-width: 100% !important;
+                min-width: 0 !important;
+                flex: 1 1 auto !important;
+            }
+            #group-members-section.hidden { display: none !important; }
+            #group-members-section.block,
+            #group-members-section.flex {
+                display: flex !important;
+                flex-direction: column !important;
+                position: relative !important;
+                z-index: 1 !important;
+                overflow: hidden !important;
+                margin-top: 0.25rem !important;
+            }
+            #group-members-list {
+                width: 100% !important;
+                max-width: 100% !important;
+                max-height: 42vh !important;
+                overflow-x: hidden !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch;
+            }
+            #group-members-list > div {
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+            }
+
+            /* Kalender: Gitter clippen rund, Wischen im Gitter, Namen links fix */
+            .calendar-card {
+                overflow: hidden !important;
+            }
+            .cal-scroll {
+                width: 100% !important;
+                max-width: 100% !important;
+                max-height: 70vh !important;
+                overflow-x: hidden !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+            }
+            .cal-split-wrap,
+            .cal-head-pin {
+                width: 100% !important;
+                min-width: 0 !important;
+                max-width: 100% !important;
+            }
+            .cal-head-pin {
+                position: -webkit-sticky !important;
+                position: sticky !important;
+                top: 0 !important;
+                z-index: 30 !important;
+                background: var(--w-surface, #1d1d1d) !important;
+                padding-bottom: 4px;
+            }
+            .cal-block,
+            .cal-block-head {
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: 0 !important;
+                box-sizing: border-box !important;
                 border-radius: 14px !important;
                 overflow-x: auto !important;
                 overflow-y: hidden !important;
-                -webkit-overflow-scrolling: touch !important;
+                -webkit-overflow-scrolling: touch;
                 touch-action: pan-x pan-y;
                 overscroll-behavior-x: contain;
             }
-            html.cop-mobile .cal-block.cal-block-head {
-                position: relative !important;
-                top: auto !important;
-                z-index: 1 !important;
-            }
-            html.cop-mobile .cal-block .cal-table,
-            html.cop-mobile .cal-block-head .cal-table {
+            .cal-block .cal-table,
+            .cal-block-head .cal-table {
                 width: max-content !important;
-                min-width: calc(6.5rem + 31 * 32px) !important;
+                min-width: calc(6.5rem + 31 * 36px) !important;
                 table-layout: auto !important;
             }
-            html.cop-mobile .cal-scroll thead th:first-child,
-            html.cop-mobile .cal-scroll tbody td:first-child,
-            html.cop-mobile .cal-table .cal-name {
+            .cal-table col.cal-day-col,
+            .cal-scroll thead th:not(:first-child),
+            .cal-table .cal-day {
+                min-width: 36px !important;
+                width: 36px !important;
+            }
+            .cal-scroll thead th:first-child,
+            .cal-scroll tbody td:first-child,
+            .cal-table .cal-name {
                 position: sticky !important;
                 left: 0 !important;
                 z-index: 8 !important;
                 background: var(--w-surface, #1d1d1d) !important;
             }
-            html.cop-mobile .cal-block-head thead th:first-child {
-                z-index: 36 !important;
+            .cal-block-head thead th:first-child {
+                z-index: 34 !important;
+            }
+            .cal-scroll td .cal-dot,
+            .cal-table .cal-dot {
+                width: 20px !important;
+                height: 20px !important;
+                border-radius: 50% !important;
+                -webkit-mask-image: none !important;
+                mask-image: none !important;
+            }
+
+            /* Buchungsfenster: volle Breite, Felder untereinander, Inhalt scrollbar */
+            #add-modal {
+                align-items: flex-end !important;
+                justify-content: center !important;
+                padding: env(safe-area-inset-top, 10px) 10px env(safe-area-inset-bottom, 10px) !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch;
+            }
+            #add-modal > div {
+                width: 100% !important;
+                max-width: 100% !important;
+                margin: 0 !important;
+                max-height: min(92dvh, 92vh) !important;
+                display: flex !important;
+                flex-direction: column !important;
+                overflow: hidden !important;
+                border-radius: 20px !important;
+            }
+            #add-modal > div > div:first-child {
+                flex: 0 0 auto !important;
+                padding: 14px 16px !important;
+            }
+            #add-modal > div > div:first-child h3 {
+                font-size: 1.05rem !important;
+                line-height: 1.3 !important;
+                padding-right: 8px;
+            }
+            #add-modal > div > div:nth-child(2) {
+                flex: 1 1 auto !important;
+                min-height: 0 !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch;
+                padding: 14px 16px 8px !important;
+            }
+            #add-modal .grid.grid-cols-2 {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 12px !important;
+            }
+            #add-modal .grid.grid-cols-2 > div,
+            #add-modal input,
+            #add-modal select,
+            #add-modal textarea {
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: 0 !important;
+                box-sizing: border-box !important;
+            }
+            #add-modal input,
+            #add-modal select,
+            #add-modal textarea {
+                min-height: 48px !important;
+                padding: 12px 14px !important;
+                font-size: 16px !important;
+            }
+            #add-modal .add-date-shell {
+                border-radius: 16px !important;
+                overflow: hidden !important;
+                border: 1px solid var(--w-line) !important;
+                background: var(--w-surface2) !important;
+                clip-path: inset(0 round 16px);
+            }
+            #add-modal .add-date-shell input[type="date"] {
+                border: 0 !important;
+                border-radius: 0 !important;
+                box-shadow: none !important;
+                background: transparent !important;
+                -webkit-appearance: none !important;
+                appearance: none !important;
+            }
+            #add-modal .add-date-shell input[type="date"]::-webkit-date-and-time-value {
+                text-align: left;
+            }
+            #add-modal .add-date-shell input[type="date"]::-webkit-calendar-picker-indicator {
+                margin-right: 2px;
+            }
+            #add-modal textarea {
+                min-height: 88px !important;
+                resize: vertical;
+            }
+            #add-modal > div > div:last-child {
+                flex: 0 0 auto !important;
+                display: flex !important;
+                flex-wrap: wrap !important;
+                gap: 10px !important;
+                padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px)) !important;
+            }
+            #add-modal #save-btn,
+            #add-modal #delete-btn {
+                min-height: 48px !important;
+                flex: 1 1 auto !important;
+                justify-content: center !important;
+            }
+            #add-modal button[onclick="hideAddModal()"] {
+                min-height: 44px;
+            }
+        }
+
+        /* ==================== DESKTOP ONLY (>=768) — Mobile bleibt unangetastet ==================== */
+        @media (min-width: 768px) {
+            .cards-grid {
+                align-items: stretch;
+            }
+            .cards-grid > .modern-card {
+                display: flex !important;
+                flex-direction: column !important;
+                overflow: hidden;
+            }
+            .buchung-split {
+                display: flex !important;
+                flex: 1 1 auto !important;
+                min-height: 0 !important;
+                align-items: stretch !important;
+                height: 100% !important;
+            }
+            .groups-col {
+                align-self: stretch;
+            }
+            #group-members-section,
+            #group-members-section.block,
+            #group-members-section.flex {
+                display: flex !important;
+                flex-direction: column !important;
+                align-self: stretch !important;
+                flex: 1 1 auto !important;
+                min-height: 0 !important;
+                height: auto !important;
+            }
+            #group-members-section.hidden {
+                display: none !important;
+            }
+            #group-members-list,
+            #group-members-list.max-h-\[220px\] {
+                flex: 1 1 auto !important;
+                max-height: none !important;
+                height: 100% !important;
+                min-height: 0 !important;
+                overflow-y: auto !important;
+            }
+            /* Kalender auf Desktop: kein eigener Scrollbalken, Seite scrollt */
+            .cal-scroll,
+            .cal-scroll.max-h-\[480px\] {
+                max-height: none !important;
+                height: auto !important;
+                overflow: visible !important;
+            }
+            .calendar-card {
+                overflow: visible !important;
             }
         }
 
@@ -1343,7 +1512,7 @@
 </head>
 <body class="bg-[#1d1d1d]"> <!-- Hintergrund passend zum Schwarz des Wappen-Logos -->
     <!-- Top Navigation -->
-    <nav class="bg-[#1d1d1d] border-b border-yellow-400/20 sticky top-0 z-[80]"> <!-- Dunkler Nav passend zum Logo -->
+    <nav class="bg-[#1d1d1d] border-b border-yellow-400/20 sticky top-0 z-50"> <!-- Dunkler Nav passend zum Logo -->
         <div class="max-w-7xl mx-auto px-6">
             <div class="nav-bar flex items-center justify-between h-16">
                 <div class="nav-brand flex items-center gap-x-4">
@@ -1369,7 +1538,7 @@
                     </div>
 
                     <div class="role-switcher flex items-center bg-slate-100 rounded-3xl p-1 text-sm">
-                        <button onclick="switchRole('mitarbeiter')" id="role-mitarbeiter"
+                        <button onclick="switchToMannschaft()" id="role-mitarbeiter"
                                 class="px-4 py-1.5 rounded-3xl flex items-center gap-x-2 text-sm font-medium transition-all active-role">
                             <i class="fa-solid fa-user mr-1.5"></i>
                             <span class="role-label">Mannschaft</span><span class="role-label-short">Mann.</span>
@@ -1438,7 +1607,7 @@
                             </div>
                         </div>
                         
-                        <div class="buchung-split flex gap-8 items-stretch">
+                        <div class="buchung-split flex gap-8">
                             <!-- Left: Groups List -->
                             <div class="groups-col w-[210px] flex-shrink-0">
                                 <div class="space-y-2" id="groups-list">
@@ -1447,8 +1616,8 @@
                             </div>
 
                             <!-- Right: Group Members -->
-                            <div id="group-members-section" class="members-col w-[280px] flex-shrink-0 hidden flex-col min-h-0">
-                                <div id="group-members-list" class="space-y-1 text-sm flex-1 min-h-0 overflow-auto pr-1">
+                            <div id="group-members-section" class="members-col w-[280px] flex-shrink-0 hidden">
+                                <div id="group-members-list" class="space-y-1 text-sm overflow-auto pr-1">
                                     <!-- Wird per JS gefüllt -->
                                 </div>
                             </div>
@@ -1464,9 +1633,11 @@
                         <div class="space-y-4">
                             <div>
                                 <label class="block text-xs font-semibold text-slate-500 mb-1.5">DATUM SUCHEN</label>
+                                <div class="day-search-box">
                                 <input type="date" id="day-search-input" 
-                                       class="w-full border border-slate-200 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-400"
+                                       class="w-full text-sm focus:outline-none"
                                        onchange="searchDayStats()">
+                                </div>
                             </div>
                             
                             <div id="day-stats" class="hidden bg-slate-50 rounded-2xl p-3 text-sm">
@@ -1509,7 +1680,7 @@
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="font-semibold text-lg">Nächste 7 Tage</h3>
                         </div>
-                        <div class="space-y-2 flex-1 min-h-0 overflow-auto pr-1" id="next7days-list">
+                        <div class="space-y-2 max-h-[280px] overflow-auto pr-1" id="next7days-list">
                             <!-- Wird per JS gefüllt -->
                         </div>
                     </div>
@@ -1666,7 +1837,7 @@
     </div>
 
     <div id="add-modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-[100]">
-        <div class="bg-white w-full max-w-lg mx-4 rounded-3xl shadow-xl modal">
+        <div class="bg-white w-full max-w-md mx-4 rounded-3xl shadow-xl modal">
             <div class="px-6 pt-6 pb-4 border-b flex items-center justify-between">
                 <h3 id="modal-title" class="font-semibold text-xl">Neuen Eintrag hinzufügen</h3>
                 <button onclick="hideAddModal()" class="text-slate-400 hover:text-slate-600 w-9 h-9 flex items-center justify-center">
@@ -1680,22 +1851,26 @@
                     <select id="modal-type" class="w-full border border-slate-200 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-400">
                         <option value="Urlaub">Urlaub</option>
                         <option value="AZA">AZA</option>
-                        <option value="OS">Sonderdienste</option>
+                        <option value="OS">OS</option>
                         <option value="Lehrgang">Lehrgang</option>
                         <option value="Krank">Krank</option>
-                        <option value="GV">Gerichtsverhandlung</option>
+                        <option value="GV">GV</option>
                     </select>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-semibold text-slate-500 mb-1.5">VON</label>
+                        <div class="add-date-shell">
                         <input type="date" id="modal-start" class="w-full border border-slate-200 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-400">
+                        </div>
                         <div id="date-warning-start" class="mt-1 min-h-[16px]" style="display:none;"></div>
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-500 mb-1.5">BIS</label>
+                        <div class="add-date-shell">
                         <input type="date" id="modal-end" class="w-full border border-slate-200 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-400">
+                        </div>
                         <div id="date-warning-end" class="mt-1 min-h-[16px]" style="display:none;"></div>
                     </div>
                 </div>
@@ -1748,22 +1923,21 @@
                 </button>
             </div>
             
-            <!-- Scrollbarer Inhalt -->
-            <div class="flex-1 overflow-auto p-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h4 class="font-medium">Mitarbeiterliste</h4>
-                    <button onclick="addNewMannschaftMember()" class="flex items-center gap-x-2 bg-yellow-400 hover:bg-yellow-500 text-black px-4 py-2 rounded-2xl text-sm font-semibold">
-                        <i class="fa-solid fa-plus mr-2"></i> Neues Mitglied
-                    </button>
-                </div>
-                
-                <table class="w-full border-collapse text-sm">
-                    <thead class="sticky top-0 z-[50] bg-white shadow-sm">
-                        <tr class="bg-slate-100">
+            <div class="flex-shrink-0 px-6 pt-4 pb-3 flex justify-between items-center">
+                <h4 class="font-medium">Mitarbeiterliste</h4>
+                <button onclick="addNewMannschaftMember()" class="flex items-center gap-x-2 bg-yellow-400 hover:bg-yellow-500 text-black px-4 py-2 rounded-2xl text-sm font-semibold">
+                    <i class="fa-solid fa-plus mr-2"></i> Neues Mitglied
+                </button>
+            </div>
+            <div class="db-table-wrap flex-1 min-h-0 px-6 pb-4">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr>
                             <th class="border p-3 text-left font-semibold">Gruppe</th>
                             <th class="border p-3 text-left font-semibold">Name</th>
                             <th class="border p-3 text-left font-semibold">Vorname</th>
                             <th class="border p-3 text-left font-semibold">Verweildauer bis Ende <span class="font-normal text-slate-400">(MM/JJ)</span></th>
+                            <th class="border p-3 text-left font-semibold">QE</th>
                             <th class="border p-3 text-center font-semibold">Aktionen</th>
                         </tr>
                     </thead>
@@ -1792,22 +1966,19 @@
                 </button>
             </div>
 
-            <!-- Scrollbarer Inhalt -->
-            <div class="flex-1 overflow-auto p-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h4 class="font-medium">Gruppenführer-Liste</h4>
-                    <button onclick="addNewGruppenfuehrerMember()" class="flex items-center gap-x-2 bg-yellow-400 hover:bg-yellow-500 text-black px-4 py-2 rounded-2xl text-sm font-semibold">
-                        <i class="fa-solid fa-plus mr-2"></i> Neuer Gruppenführer
-                    </button>
-                </div>
-
-                <table class="w-full border-collapse text-sm">
-                    <thead class="sticky top-0 z-[50] bg-white shadow-sm">
-                        <tr class="bg-slate-100">
+            <div class="flex-shrink-0 px-6 pt-4 pb-3 flex justify-between items-center">
+                <h4 class="font-medium">Gruppenführer-Liste</h4>
+                <button onclick="addNewGruppenfuehrerMember()" class="flex items-center gap-x-2 bg-yellow-400 hover:bg-yellow-500 text-black px-4 py-2 rounded-2xl text-sm font-semibold">
+                    <i class="fa-solid fa-plus mr-2"></i> Neuer Gruppenführer
+                </button>
+            </div>
+            <div class="db-table-wrap flex-1 min-h-0 px-6 pb-4">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr>
                             <th class="border p-3 text-left font-semibold">Gruppe</th>
                             <th class="border p-3 text-left font-semibold">Name</th>
                             <th class="border p-3 text-left font-semibold">Vorname</th>
-                            <th class="border p-3 text-left font-semibold">QE</th>
                             <th class="border p-3 text-center font-semibold">Aktionen</th>
                         </tr>
                     </thead>
@@ -1836,21 +2007,18 @@
                 </button>
             </div>
 
-            <!-- Scrollbarer Inhalt -->
-            <div class="flex-1 overflow-auto p-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h4 class="font-medium">Zugführerliste</h4>
-                    <button onclick="addNewZugfuehrerMember()" class="flex items-center gap-x-2 bg-yellow-400 hover:bg-yellow-500 text-black px-4 py-2 rounded-2xl text-sm font-semibold">
-                        <i class="fa-solid fa-plus mr-2"></i> Neues Mitglied
-                    </button>
-                </div>
-
-                <table class="w-full border-collapse text-sm">
-                    <thead class="sticky top-0 z-[50] bg-white shadow-sm">
-                        <tr class="bg-slate-100">
+            <div class="flex-shrink-0 px-6 pt-4 pb-3 flex justify-between items-center">
+                <h4 class="font-medium">Zugführerliste</h4>
+                <button onclick="addNewZugfuehrerMember()" class="flex items-center gap-x-2 bg-yellow-400 hover:bg-yellow-500 text-black px-4 py-2 rounded-2xl text-sm font-semibold">
+                    <i class="fa-solid fa-plus mr-2"></i> Neues Mitglied
+                </button>
+            </div>
+            <div class="db-table-wrap flex-1 min-h-0 px-6 pb-4">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr>
                             <th class="border p-3 text-left font-semibold">Name</th>
                             <th class="border p-3 text-left font-semibold">Vorname</th>
-                            <th class="border p-3 text-left font-semibold">QE</th>
                             <th class="border p-3 text-center font-semibold">Aktionen</th>
                         </tr>
                     </thead>
@@ -2005,7 +2173,7 @@
         // Kalender-Navigation State (für Monatswechsel bis 2050)
         let currentCalendarYear = new Date().getFullYear();
         let currentCalendarMonth = new Date().getMonth(); // 0 = Januar ... 11 = Dezember
-        let currentCalendarFilter = null; // null = alle, '21', '22', '23', '26', 'stamm'
+        let currentCalendarFilter = null; // null = alle, 'mannschaft', '21', '22', '23', '26', 'stamm'
 
         const GROUPS = [
             { id: '21', name: '1. Gruppe', color: '#ef4444' },
@@ -2016,6 +2184,36 @@
         ];
 
         const GROUP_SORT_ORDER = { '21': 1, '22': 2, '23': 3, '26': 4, 'BeSi': 4, 'besi': 4, 'BESI': 4, 'Stamm': 5, 'hr': 5, 'stamm': 5 };
+        const OPERATIVE_GROUP_IDS = ['21', '22', '23', '26'];
+
+        function isOperativeGruppe(gruppe) {
+            const g = String(gruppe || '').trim();
+            if (OPERATIVE_GROUP_IDS.includes(g)) return true;
+            return g.toLowerCase() === 'besi';
+        }
+
+        function normalizeQE(value, fallback) {
+            const def = fallback || '2. QE';
+            if (!value) return def;
+            const v = String(value).trim().toLowerCase();
+            if (v.includes('3')) return '3. QE';
+            if (v.includes('2')) return '2. QE';
+            return def;
+        }
+
+        function calendarFilterOptions(filter) {
+            const opt = (value, label) =>
+                `<option value="${value}" ${filter === value ? 'selected' : ''}>${label}</option>`;
+            return [
+                `<option value="" ${filter === null || filter === '' ? 'selected' : ''}>Alle Gruppen</option>`,
+                opt('mannschaft', 'Mannschaft'),
+                opt('21', '1. Gruppe'),
+                opt('22', '2. Gruppe'),
+                opt('23', '3. Gruppe'),
+                opt('26', 'BeSi'),
+                opt('stamm', 'Stamm (ZF + GF)')
+            ].join('');
+        }
 
         function compareNachname(a, b) {
             return String(a || '').localeCompare(String(b || ''), 'de', { sensitivity: 'base' });
@@ -2071,42 +2269,15 @@
             return p ? personDisplayName(p) : (fullName || '').trim();
         }
 
-        function formatAbsenceType(type) {
-            const t = String(type || '').trim();
-            const key = t.toLowerCase();
-            if (key === 'os' || key.includes('sonderdienst')) return 'Sonderdienste';
-            if (key === 'gv' || key.includes('gerichtsverhandlung')) return 'Gerichtsverhandlung';
-            return t;
-        }
-
         function eventTitleMatchesMember(evTitle, member) {
             const t = (evTitle || '').trim();
-            if (!t || !member) return false;
-            if (t === (member.name || '').trim()) return true;
-            const nachname = (member.nachname || member.name || '').trim();
-            const vorname = (member.vorname || '').trim();
-            if (nachname && vorname) {
-                if (t === `${vorname} ${nachname}` || t === `${nachname} ${vorname}`) return true;
+            if (!t) return false;
+            if (t === member.name) return true;
+            if (member.nachname && member.vorname) {
+                return t === `${member.vorname} ${member.nachname}`.trim()
+                    || t === `${member.nachname} ${member.vorname}`.trim();
             }
-            if (nachname && t === nachname) return true;
-            return personNameMatches(t, { name: nachname, vorname: vorname });
-        }
-
-        function dateOnlyStr(value) {
-            if (!value) return '';
-            const s = String(value).trim();
-            if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10);
-            const d = value instanceof Date ? value : new Date(value);
-            if (isNaN(d.getTime())) return '';
-            return d.toLocaleDateString('en-CA', { timeZone: 'Europe/Berlin' });
-        }
-
-        function eventCoversDate(ev, dateStr) {
-            const day = dateOnlyStr(dateStr);
-            const start = dateOnlyStr(ev && ev.start);
-            const end = dateOnlyStr(ev && (ev.end || ev.start));
-            if (!day || !start || !end) return false;
-            return day >= start && day <= end;
+            return false;
         }
 
         // Ermittelt die tatsächliche Gruppen-ID einer Person anhand ihres Namens aus den
@@ -2140,6 +2311,7 @@
                     if (firebaseData && Array.isArray(firebaseData) && firebaseData.length > 0) {
                         mannschaft = firebaseData;
                         migrateMannschaftVerweildauer();
+                        migrateMannschaftQE();
                         localStorage.setItem('mannschaft', JSON.stringify(mannschaft));
                         return;
                     }
@@ -2160,6 +2332,7 @@
                 console.warn('Konnte Mannschaft-Datenbank nicht laden.');
             }
             migrateMannschaftVerweildauer();
+            migrateMannschaftQE();
         }
 
         function saveMannschaftToFirebase() {
@@ -2186,7 +2359,6 @@
                     const firebaseData = snapshot.val();
                     if (firebaseData && Array.isArray(firebaseData) && firebaseData.length > 0) {
                         gruppenfuehrer = firebaseData;
-                        migrateGruppenfuehrerQE();
                         localStorage.setItem('gruppenfuehrer', JSON.stringify(gruppenfuehrer));
                         return;
                     }
@@ -2206,7 +2378,6 @@
             } catch(e) {
                 console.warn('Konnte Gruppenführer-Datenbank nicht laden.');
             }
-            migrateGruppenfuehrerQE();
         }
 
         function saveGruppenfuehrerToFirebase() {
@@ -2233,7 +2404,6 @@
                     const firebaseData = snapshot.val();
                     if (firebaseData && Array.isArray(firebaseData) && firebaseData.length > 0) {
                         zugfuehrer = firebaseData;
-                        migrateZugfuehrerQE();
                         localStorage.setItem('zugfuehrer', JSON.stringify(zugfuehrer));
                         return;
                     }
@@ -2253,7 +2423,6 @@
             } catch(e) {
                 console.warn('Konnte Zugführer-Datenbank nicht laden.');
             }
-            migrateZugfuehrerQE();
         }
 
         function saveZugfuehrerToFirebase() {
@@ -2374,66 +2543,6 @@
             });
         }
 
-        const COP_MOBILE_MQ = '(max-width: 767px)';
-        function isCopMobile() {
-            return window.matchMedia(COP_MOBILE_MQ).matches;
-        }
-        function applyCopViewMode() {
-            const mobile = isCopMobile();
-            document.documentElement.classList.toggle('cop-mobile', mobile);
-            document.documentElement.classList.toggle('cop-desktop', !mobile);
-        }
-
-        function applyBookingListHeight() {
-            syncTopCardHeights();
-        }
-
-        function syncTopCardHeights() {
-            const grid = document.querySelector('.cards-grid');
-            if (!grid) return;
-            const cards = Array.from(grid.children).filter(el => el.classList.contains('modern-card'));
-            const booking = cards[0];
-            const tages = cards[1];
-            const next7 = cards[2];
-            const list = document.getElementById('group-members-list');
-
-            if (isCopMobile()) {
-                cards.forEach(c => { if (c) c.style.height = 'auto'; });
-                if (list) {
-                    list.style.height = '';
-                    list.style.maxHeight = '';
-                    list.style.minHeight = '';
-                }
-                return;
-            }
-            if (!booking || !tages || !next7) return;
-
-            booking.style.height = 'auto';
-            next7.style.height = 'auto';
-            tages.style.height = 'auto';
-            if (list) {
-                list.style.height = 'auto';
-                list.style.maxHeight = 'none';
-            }
-
-            const h = Math.ceil(tages.getBoundingClientRect().height);
-            if (h < 80) return;
-            booking.style.height = h + 'px';
-            next7.style.height = h + 'px';
-
-            const section = document.getElementById('group-members-section');
-            if (list && section && !section.classList.contains('hidden')) {
-                const split = booking.querySelector('.buchung-split');
-                const avail = Math.floor((split || booking).getBoundingClientRect().height);
-                if (avail > 40) {
-                    list.style.maxHeight = avail + 'px';
-                    list.style.height = avail + 'px';
-                    list.style.minHeight = '0px';
-                    list.style.overflowY = 'auto';
-                }
-            }
-        }
-
         function renderGroupMembers(groupId) {
             const section = document.getElementById('group-members-section');
             const listContainer = document.getElementById('group-members-list');
@@ -2483,47 +2592,47 @@
             }
 
             section.classList.remove('hidden');
-            section.classList.add('flex');
-            applyBookingListHeight();
+            section.classList.add('block');
+            if (window.matchMedia('(max-width: 767px)').matches) {
+                const bookingCard = section.closest('.modern-card');
+                if (bookingCard) bookingCard.style.height = 'auto';
+            } else {
+                section.classList.add('flex');
+                syncTopCardHeights();
+            }
             const header = document.getElementById('group-members-header');
             if (header) { header.classList.remove('hidden'); header.classList.add('flex'); }
             updateStats();
         }
 
+        function syncTopCardHeights() {
+            if (window.matchMedia('(max-width: 767px)').matches) return;
+            const grid = document.querySelector('.cards-grid');
+            if (!grid) return;
+            const cards = Array.from(grid.children).filter(el => el.classList.contains('modern-card'));
+            const booking = cards[0];
+            const tages = cards[1];
+            const next7 = cards[2];
+            if (!booking || !tages || !next7) return;
+            booking.style.height = 'auto';
+            next7.style.height = 'auto';
+            tages.style.height = 'auto';
+            const h = Math.ceil(tages.getBoundingClientRect().height);
+            if (h < 80) return;
+            booking.style.height = h + 'px';
+            next7.style.height = h + 'px';
+        }
+
         function hideGroupMembers() {
             const section = document.getElementById('group-members-section');
-            section.classList.remove('flex');
+            section.classList.remove('block');
             section.classList.add('hidden');
             const header = document.getElementById('group-members-header');
             if (header) { header.classList.remove('flex'); header.classList.add('hidden'); }
-            const list = document.getElementById('group-members-list');
-            if (list) {
-                list.style.height = '';
-                list.style.maxHeight = '';
-            }
-            syncTopCardHeights();
         }
 
         function quickAddForMember(fullName, groupId, groupColor) {
             showAddModal(null, fullName);
-        }
-
-        function calendarFilterOptions(filter) {
-            return `
-                <option value="" ${filter === null ? 'selected' : ''}>Alle Gruppen</option>
-                <option value="mannschaft" ${filter === 'mannschaft' ? 'selected' : ''}>Mannschaft</option>
-                <option value="21" ${filter === '21' ? 'selected' : ''}>1. Gruppe</option>
-                <option value="22" ${filter === '22' ? 'selected' : ''}>2. Gruppe</option>
-                <option value="23" ${filter === '23' ? 'selected' : ''}>3. Gruppe</option>
-                <option value="26" ${filter === '26' ? 'selected' : ''}>BeSi</option>
-                <option value="stamm" ${filter === 'stamm' ? 'selected' : ''}>Stamm (ZF + GF)</option>
-            `;
-        }
-
-        function openCalendarEvent(eventId) {
-            if (!eventId) return;
-            if (typeof canCreateBookings === 'function' && !canCreateBookings()) return;
-            editEvent(eventId);
         }
 
         function filterCalendar(filterValue) {
@@ -2542,7 +2651,7 @@
         function setDefaultDateForTagesrecherche() {
             const dateInput = document.getElementById('day-search-input');
             if (dateInput) {
-                dateInput.value = isoDateBerlin();
+                dateInput.value = todayISODateDE();
                 searchDayStats();
             }
         }
@@ -2588,46 +2697,41 @@
             let lehrgangCount = 0;
             let gvCount = 0;
 
-            const searchDate = dateOnlyStr(dateInput);
-            const operativeGroups = ['21','22','23','26'];
             events.forEach(ev => {
                 if (ev.status === 'rejected') return;
-                if (!operativeGroups.includes(ev.groupId) && ev.groupId !== '26') return;
-                if (!eventCoversDate(ev, searchDate)) return;
-                const type = String(ev.type || '').toLowerCase();
-                if (type === 'urlaub') urlaubCount++;
-                if (type === 'aza') azaCount++;
-                if (type === 'krank') krankCount++;
-                if (type === 'os' || type.includes('sonderdienst')) osCount++;
-                if (type.includes('lehrgang')) lehrgangCount++;
-                if (type === 'gv' || type.includes('gerichtsverhandlung')) gvCount++;
+                if (!isOperativeGruppe(ev.groupId)) return; // Stamm/GF/ZF nicht berücksichtigen
+                if (eventCoversDate(ev, dateInput)) {
+                    if (ev.type === 'Urlaub') urlaubCount++;
+                    if (ev.type === 'AZA') azaCount++;
+                    if (ev.type === 'Krank') krankCount++;
+                    if (ev.type === 'OS') osCount++;
+                    if (ev.type === 'Lehrgang') lehrgangCount++;
+                    if (ev.type === 'GV') gvCount++;
+                }
             });
 
+            let qe3Avail = 0;
+            let qe2Avail = 0;
             function personBookedOnSearchDay(member) {
                 if (!member) return false;
                 return events.some(ev => {
                     if (ev.status === 'rejected') return false;
-                    const samePerson = eventTitleMatchesMember(ev.title, member) || personNameMatches(ev.title, member);
-                    if (!samePerson) return false;
-                    return eventCoversDate(ev, searchDate);
+                    if (!eventTitleMatchesMember(ev.title, member) && !personNameMatches(ev.title, member)) return false;
+                    return eventCoversDate(ev, dateInput);
                 });
             }
-
-            let qe3Avail = 0;
-            let qe2Avail = 0;
-            const counted = new Set();
             function countAvailableQE(list, fallback) {
                 if (!Array.isArray(list)) return;
                 list.forEach(m => {
-                    const key = personDisplayName(m).toLowerCase();
-                    if (!key || counted.has(key)) return;
-                    counted.add(key);
                     if (personBookedOnSearchDay(m)) return;
                     if (normalizeQE(m.qe, fallback) === '3. QE') qe3Avail++;
                     else qe2Avail++;
                 });
             }
-            countAvailableQE(mannschaft, '2. QE');
+            countAvailableQE(
+                (mannschaft || []).filter(m => isOperativeGruppe(m.gruppe)),
+                '2. QE'
+            );
             countAvailableQE(gruppenfuehrer, '2. QE');
             countAvailableQE(zugfuehrer, '3. QE');
             const staerkeEl = document.getElementById('day-stats-staerke');
@@ -2646,7 +2750,6 @@
             if (gvEl) gvEl.textContent = gvCount;
 
             statsDiv.classList.remove('hidden');
-            syncTopCardHeights();
         }
 
         // ==================== NÄCHSTE 7 TAGE ====================
@@ -2655,30 +2758,28 @@
             if (!container) return;
             container.innerHTML = '';
 
-            const todayIso = isoDateBerlin();
-            const in7Iso = addDaysIso(todayIso, 7);
+            const today = dateOnly(todayISODateDE());
+            const in7Days = new Date(today);
+            in7Days.setDate(today.getDate() + 7);
 
             const upcoming = events
                 .filter(ev => {
                     if (ev.status === 'rejected') return false;
-                    const start = String(ev.start || '').slice(0, 10);
-                    const end = String(ev.end || ev.start || '').slice(0, 10);
-                    if (!/^\d{4}-\d{2}-\d{2}$/.test(start)) return false;
-                    return start <= in7Iso && end >= todayIso;
+                    const start = dateOnly(ev.start);
+                    const end = dateOnly(ev.end || ev.start);
+                    if (!start || !end) return false;
+                    return start <= in7Days && end >= today;
                 })
-                .sort((a, b) => String(a.start).localeCompare(String(b.start)));
+                .sort((a, b) => dateOnly(a.start) - dateOnly(b.start));
 
             if (upcoming.length === 0) {
                 container.innerHTML = `<div class="text-sm text-slate-400 px-2 py-3">Keine Abwesenheiten in den nächsten 7 Tagen</div>`;
-                syncTopCardHeights();
                 return;
             }
 
             upcoming.forEach(ev => {
                 const group = GROUPS.find(g => g.id === ev.groupId) || { color: '#64748b', name: ev.groupId };
-                const rangeLabel = (ev.end && ev.end !== ev.start)
-                    ? `${formatDateDE(ev.start)} – ${formatDateDE(ev.end)}`
-                    : formatDateDE(ev.start);
+                const startDate = new Date(ev.start);
 
                 const div = document.createElement('div');
                 div.className = `flex items-center gap-3 px-3 py-2 rounded-xl border border-slate-100 hover:bg-slate-50 cursor-pointer`;
@@ -2687,9 +2788,9 @@
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center justify-between">
                             <span class="font-medium text-sm">${ev.title}</span>
-                            <span class="text-[10px] text-slate-500 font-mono">${rangeLabel}</span>
+                            <span class="text-[10px] text-slate-500 font-mono">${startDate.toLocaleDateString('de-DE', {day:'2-digit', month:'2-digit'})}</span>
                         </div>
-                        <div class="text-xs text-slate-500">${formatAbsenceType(ev.type)} • ${group.name}</div>
+                        <div class="text-xs text-slate-500">${ev.type} • ${group.name}</div>
                     </div>
                 `;
                 div.onclick = () => {
@@ -2701,24 +2802,67 @@
                 };
                 container.appendChild(div);
             });
-            syncTopCardHeights();
         }
 
         function calendarBlockKey(member) {
             if (!member || member.isSeparator) return null;
-            if (member.isStamm || member.groupId === 'GF' || member.groupId === 'ZF' || member.groupId === 'hr') return 'stamm';
+            if (member.isStamm) return 'stamm';
             const g = String(member.groupId || '').trim();
-            if (/^besi$/i.test(g) || g === '26') return '26';
+            if (g.toLowerCase() === 'besi' || g === '26') return '26';
             return g;
         }
 
-        function isOperativeGruppe(gruppe) {
-            const g = String(gruppe || '').trim();
-            return ['21', '22', '23', '26'].includes(g) || /^besi$/i.test(g);
-        }
-
-        function calendarColgroup(daysInMonth) {
-            return `<colgroup><col class="cal-name-col">${Array.from({length: daysInMonth}, () => '<col class="cal-day-col">').join('')}</colgroup>`;
+        function renderCalendarMemberRow(member, year, month, daysInMonth) {
+            const group = GROUPS.find(g => g.id === member.groupId)
+                || (String(member.groupId).toLowerCase() === 'besi' ? GROUPS.find(g => g.id === '26') : null)
+                || { name: member.groupId, color: '#64748b' };
+            let cells = '';
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const dayEvents = events.filter(ev => {
+                    if (!eventTitleMatchesMember(ev.title, member)) return false;
+                    if (ev.status === 'rejected') return false;
+                    return eventCoversDate(ev, dateStr);
+                });
+                if (dayEvents.length > 0) {
+                    const ev = dayEvents[0];
+                    let bgColor = '#e5e7eb';
+                    let textColor = '#111827';
+                    const type = (ev.type || '').toLowerCase();
+                    const status = ev.status || 'pending';
+                    if (type.includes('os')) { bgColor = '#22c55e'; textColor = '#fff'; }
+                    else if (type.includes('lehrgang')) { bgColor = '#eab308'; textColor = '#111827'; }
+                    else if (type.includes('krank')) { bgColor = '#111827'; textColor = '#fff'; }
+                    else if (type.includes('urlaub')) {
+                        if (status === 'approved') { bgColor = '#b91c1c'; textColor = '#fff'; }
+                        else { bgColor = '#fda4af'; textColor = '#111827'; }
+                    } else if (type.includes('aza')) {
+                        if (status === 'approved') { bgColor = '#1e40af'; textColor = '#fff'; }
+                        else { bgColor = '#7dd3fc'; textColor = '#111827'; }
+                    } else if (type.includes('gv')) { bgColor = '#7c3aed'; textColor = '#fff'; }
+                    const created = ev.createdAt ? formatDateDE(ev.createdAt) : 'unbekannt';
+                    const statusDE = ev.status === 'pending' ? 'gewünscht' : (ev.status === 'approved' ? 'genehmigt' : ev.status);
+                    const lastActionInfo = ev.lastActionBy ? ` • Zuletzt gebucht von ${ev.lastActionBy}` : '';
+                    const canEditDot = currentRole === 'admin';
+                    const evIdSafe = String(ev.id || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+                    cells += `<td class="cal-day border${canEditDot ? ' cursor-pointer' : ''}"${canEditDot ? ` onclick="editEvent('${evIdSafe}')"` : ''} title="${ev.type} • Erstellt am ${created} • ${statusDE}${lastActionInfo}${ev.note ? ' – ' + ev.note : ''}${canEditDot ? ' • Klicken zum Bearbeiten' : ''}">
+                        <div class="cal-dot" style="background-color: ${bgColor}; color: ${textColor};"></div>
+                    </td>`;
+                } else {
+                    cells += `<td class="cal-day border"></td>`;
+                }
+            }
+            return `
+                <tr>
+                    <td class="cal-name sticky left-0 z-[20] bg-white border p-1.5 font-medium" title="${member.name}">
+                        <div class="flex items-center gap-x-1.5 min-w-0">
+                            <div class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: ${group.color}"></div>
+                            <span class="truncate">${member.name}</span>
+                        </div>
+                    </td>
+                    ${cells}
+                </tr>
+            `;
         }
 
         function calendarDayHeaderCells(year, month, daysInMonth, holidaysThisYear) {
@@ -2728,94 +2872,26 @@
                 const weekdayNum = date.getDay();
                 const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
                 const isHoliday = holidaysThisYear.has(dateStr);
+                const isSunday = weekdayNum === 0;
+                const isSaturday = weekdayNum === 6;
                 let headerClass = "cal-day border text-center";
                 if (isHoliday) headerClass += " bg-black text-white font-semibold";
-                else if (weekdayNum === 0) headerClass += " bg-gray-400 text-black";
-                else if (weekdayNum === 6) headerClass += " bg-gray-200";
+                else if (isSunday) headerClass += " bg-gray-400 text-black";
+                else if (isSaturday) headerClass += " bg-gray-200";
                 else headerClass += " bg-slate-50";
                 const weekday = date.toLocaleDateString('de-DE', {weekday: 'short'}).replace('.', '').slice(0, 2);
                 return `<th class="${headerClass}">${d}<br><span class="opacity-70">${weekday}</span></th>`;
             }).join('');
         }
 
-        function renderCalendarMemberRow(member, year, month, daysInMonth) {
-            const group = GROUPS.find(g => g.id === member.groupId) || { name: member.groupId, color: '#64748b' };
-            let cells = '';
-            for (let day = 1; day <= daysInMonth; day++) {
-                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                const dayEvents = events.filter(ev => {
-                    if (ev.status === 'rejected') return false;
-                    if (!eventTitleMatchesMember(ev.title, member) && !personNameMatches(ev.title, {
-                        name: member.nachname || member.name,
-                        vorname: member.vorname
-                    })) return false;
-                    return eventCoversDate(ev, dateStr);
-                });
-                if (dayEvents.length > 0) {
-                    const ev = dayEvents[0];
-                    let bgColor = '#e5e7eb';
-                    const type = (ev.type || '').toLowerCase();
-                    const status = ev.status || 'pending';
-                    if (type.includes('os')) bgColor = '#22c55e';
-                    else if (type.includes('lehrgang')) bgColor = '#eab308';
-                    else if (type.includes('krank')) bgColor = '#f8fafc';
-                    else if (type.includes('urlaub')) bgColor = status === 'approved' ? '#b91c1c' : '#fda4af';
-                    else if (type.includes('aza')) bgColor = status === 'approved' ? '#1e40af' : '#7dd3fc';
-                    else if (type.includes('gv')) bgColor = '#7c3aed';
-                    const evId = String(ev.id || '').replace(/'/g, '');
-                    const created = ev.createdAt ? formatDateDE(ev.createdAt) : 'unbekannt';
-                    const statusDE = ev.status === 'pending' ? 'gewünscht' : (ev.status === 'approved' ? 'genehmigt' : ev.status);
-                    const lastActionInfo = ev.lastActionBy ? ` • Zuletzt gebucht von ${ev.lastActionBy}` : '';
-                    cells += `<td class="cal-day has-dot border" onclick="openCalendarEvent('${evId}')" title="${formatAbsenceType(ev.type)} • Erstellt am ${created} • ${statusDE}${lastActionInfo}${ev.note ? ' – ' + ev.note : ''}">
-                        <button type="button" class="cal-dot" style="--dot-color:${bgColor};background-color:${bgColor}" onclick="event.stopPropagation();openCalendarEvent('${evId}')"></button>
-                    </td>`;
-                } else {
-                    cells += `<td class="cal-day border"></td>`;
-                }
-            }
-            return `<tr>
-                <td class="cal-name sticky left-0 z-[2] bg-white border p-1.5 font-medium" title="${member.name}">
-                    <div class="flex items-center gap-x-1.5 min-w-0">
-                        <div class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: ${group.color}"></div>
-                        <span class="truncate">${member.name}</span>
-                    </div>
-                </td>
-                ${cells}
-            </tr>`;
-        }
-
         function renderCalendarGroupTable(members, year, month, daysInMonth) {
-            return `<table class="cal-table text-sm">${calendarColgroup(daysInMonth)}
+            const colgroup = `<colgroup><col class="cal-name-col">${Array.from({length: daysInMonth}, () => '<col class="cal-day-col">').join('')}</colgroup>`;
+            return `<table class="cal-table text-sm">${colgroup}
                 <tbody>${members.map(m => renderCalendarMemberRow(m, year, month, daysInMonth)).join('')}</tbody>
             </table>`;
         }
 
         // ==================== MANN SCHAFT KALENDER ====================
-        function updateCalHeadOffset() {
-            const nav = document.querySelector('nav');
-            const h = nav ? Math.ceil(nav.getBoundingClientRect().height) : 64;
-            document.documentElement.style.setProperty('--cal-head-top', h + 'px');
-        }
-
-        function bindCalHeaderScrollSync() {
-            const wrap = document.querySelector('#monthly-view-unified .cal-scroll');
-            if (!wrap) return;
-            const blocks = Array.from(wrap.querySelectorAll('.cal-block'));
-            if (blocks.length < 2) return;
-            let lock = false;
-            blocks.forEach(block => {
-                block.addEventListener('scroll', () => {
-                    if (lock) return;
-                    lock = true;
-                    const x = block.scrollLeft;
-                    blocks.forEach(other => {
-                        if (other !== block) other.scrollLeft = x;
-                    });
-                    lock = false;
-                }, { passive: true });
-            });
-        }
-
         function renderMonthlyView() {
             const container = document.getElementById('monthly-view-unified');
             if (!container) return;
@@ -2831,6 +2907,7 @@
             const filter = currentCalendarFilter;
 
             const showStamm = (filter === null || filter === 'stamm');
+            const showMannschaft = (filter === null || filter === 'mannschaft' || ['21','22','23','26'].includes(filter));
 
             if (showStamm) {
                 const zf = sortPersonenByNachname(zugfuehrer).map(m => ({
@@ -2852,14 +2929,13 @@
                 memberList.push(...zf, ...gf);
             }
 
-            const showMannschaft = (filter === null || filter === 'mannschaft' || ['21','22','23','26'].includes(filter));
-
             if (showMannschaft) {
                 let mannList = sortMannschaftList(
                     mannschaft.filter(m => {
-                        if (filter === null || filter === 'mannschaft') return ['21','22','23','26'].includes(String(m.gruppe)) || /^besi$/i.test(String(m.gruppe||''));
-                        if (filter === '26') return String(m.gruppe) === '26' || /^besi$/i.test(String(m.gruppe||''));
-                        return String(m.gruppe) === filter;
+                        if (!isOperativeGruppe(m.gruppe)) return false;
+                        if (filter === null || filter === 'mannschaft') return true;
+                        if (filter === '26') return m.gruppe === '26' || String(m.gruppe).toLowerCase() === 'besi';
+                        return m.gruppe === filter;
                     })
                 ).map(m => ({
                     name: personDisplayName(m),
@@ -2875,6 +2951,17 @@
                 memberList.push(...mannList);
             }
 
+            const calGroups = [];
+            const calGrouped = {};
+            memberList.forEach(m => {
+                const key = calendarBlockKey(m);
+                if (!key) return;
+                if (!calGrouped[key]) {
+                    calGrouped[key] = [];
+                    calGroups.push(key);
+                }
+                calGrouped[key].push(m);
+            });
             if (memberList.length === 0) {
                 container.innerHTML = `
                     <div class="flex justify-end mb-3 px-1">
@@ -2893,17 +2980,6 @@
 
             const monthDate = new Date(year, month);
             const monthName = monthDate.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
-            const monthLabel = monthDate.toLocaleDateString('de-DE', { month: 'long' });
-
-            const BLOCK_ORDER = ['stamm', '21', '22', '23', '26'];
-            const calGrouped = {};
-            memberList.forEach(m => {
-                const key = calendarBlockKey(m);
-                if (!key) return;
-                if (!calGrouped[key]) calGrouped[key] = [];
-                calGrouped[key].push(m);
-            });
-            const calGroups = BLOCK_ORDER.filter(k => calGrouped[k] && calGrouped[k].length);
 
             const tableHTML = `
                 <div class="cal-toolbar mb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3 px-1">
@@ -2953,14 +3029,17 @@
                     <div class="cal-head-pin">
                     <div class="cal-block cal-block-head">
                     <table class="cal-table text-sm">
-                        ${calendarColgroup(daysInMonth)}
+                        <colgroup>
+                            <col class="cal-name-col">
+                            ${Array.from({length: daysInMonth}, () => '<col class="cal-day-col">').join('')}
+                        </colgroup>
                         <thead class="bg-white">
                             <tr>
-                                <th class="cal-name sticky left-0 z-[9] bg-white border p-1.5 text-left font-semibold shadow-sm cal-head-month">${monthLabel}</th>
+                                <th class="cal-name sticky left-0 z-[70] bg-white border p-1.5 text-left font-medium shadow-sm"></th>
                                 ${calendarDayHeaderCells(year, month, daysInMonth, holidaysThisYear)}
                             </tr>
                             <tr class="bg-white">
-                                <th class="cal-name sticky left-0 z-[9] bg-white border p-1 text-left text-xs font-semibold shadow-sm">Bemerkung</th>
+                                <th class="cal-name sticky left-0 z-[70] bg-white border p-1 text-left text-xs font-semibold shadow-sm">Bemerkung</th>
                                 ${Array.from({length: daysInMonth}, (_, i) => {
                                     const day = i + 1;
                                     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
@@ -2974,20 +3053,31 @@
                                 }).join('')}
                             </tr>
                             <tr class="bg-slate-200">
-                                <th class="cal-name sticky left-0 z-[9] bg-slate-200 border p-1 text-left text-xs font-semibold shadow-sm">Belegt</th>
+                                <th class="cal-name sticky left-0 z-[70] bg-slate-200 border p-1 text-left text-xs font-semibold shadow-sm">Belegt</th>
                                 ${Array.from({length: daysInMonth}, (_, i) => {
                                     const day = i + 1;
                                     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                                     const date = new Date(year, month, day);
                                     const weekdayNum = date.getDay();
                                     const isHoliday = holidaysThisYear.has(dateStr);
+                                    const isSunday = weekdayNum === 0;
+                                    const isSaturday = weekdayNum === 6;
+
                                     let thClass = "cal-day border font-mono";
-                                    if (isHoliday) thClass += " bg-black text-white";
-                                    else if (weekdayNum === 0) thClass += " bg-gray-400 text-black";
-                                    else if (weekdayNum === 6) thClass += " bg-gray-200";
+                                    if (isHoliday) {
+                                        thClass += " bg-black text-white";
+                                    } else if (isSunday) {
+                                        thClass += " bg-gray-400 text-black";
+                                    } else if (isSaturday) {
+                                        thClass += " bg-gray-200";
+                                    }
+
                                     let urlaub = 0;
                                     let aza = 0;
+
                                     events.forEach(ev => {
+                                        // Nur Buchungen der Mannschaft (Datenbank "mannschaft": 1. Gruppe, 2. Gruppe, 3. Gruppe, BeSi) zählen.
+                                        // Stamm-, Gruppenführer- und Zugführer-Buchungen (groupId 'hr', 'Stamm', 'GF', 'ZF') werden NICHT eingerechnet.
                                         if (!isOperativeGruppe(ev.groupId)) return;
                                         if (ev.status !== 'pending' && ev.status !== 'approved') return;
                                         if (eventCoversDate(ev, dateStr)) {
@@ -2995,9 +3085,11 @@
                                             if (ev.type === 'AZA') aza++;
                                         }
                                     });
+
                                     let color = '#166534';
                                     if (urlaub >= 6 && aza >= 3) color = '#b91c1c';
                                     else if (urlaub >= 6 || aza >= 3) color = '#854d0e';
+
                                     return `<th class="${thClass} belegt-cell" style="--bc: ${color}">${urlaub}/${aza}</th>`;
                                 }).join('')}
                             </tr>
@@ -3013,10 +3105,36 @@
                     </div>
                 </div>
             `;
+
             container.innerHTML = tableHTML;
             updateCurrentMonthDisplay();
-            updateCalHeadOffset();
             bindCalHeaderScrollSync();
+            updateCopNavHeight();
+        }
+
+        function updateCopNavHeight() {
+            const nav = document.querySelector('nav');
+            if (!nav) return;
+            document.documentElement.style.setProperty('--cop-nav-h', nav.offsetHeight + 'px');
+        }
+
+        function bindCalHeaderScrollSync() {
+            const wrap = document.querySelector('#monthly-view-unified .cal-scroll');
+            if (!wrap) return;
+            const blocks = Array.from(wrap.querySelectorAll('.cal-block'));
+            if (blocks.length < 2) return;
+            let lock = false;
+            blocks.forEach(block => {
+                block.addEventListener('scroll', () => {
+                    if (lock) return;
+                    lock = true;
+                    const x = block.scrollLeft;
+                    blocks.forEach(other => {
+                        if (other !== block) other.scrollLeft = x;
+                    });
+                    lock = false;
+                }, { passive: true });
+            });
         }
 
         function editRemark(dateStr, thElement) {
@@ -3066,147 +3184,6 @@
             showToast('Bemerkung gespeichert.');
         }
 
-        function renderStammCalendar() {
-            const container = document.getElementById('monthly-view-stamm');
-            if (!container) return;
-            container.innerHTML = '';
-
-            const year = currentCalendarYear;
-            const month = currentCalendarMonth;
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-            const holidaysThisYear = getHolidaysForYear(year);
-
-            let memberList = [
-                ...sortPersonenByNachname(gruppenfuehrer).map(m => ({
-                    name: personDisplayName(m),
-                    nachname: m.name,
-                    vorname: m.vorname,
-                    groupId: 'GF'
-                })),
-                ...sortPersonenByNachname(zugfuehrer).map(m => ({
-                    name: personDisplayName(m),
-                    nachname: m.name,
-                    vorname: m.vorname,
-                    groupId: 'ZF'
-                }))
-            ];
-
-            const groupOrder = { 'GF': 1, 'ZF': 2 };
-            memberList.sort((a, b) => {
-                const gA = groupOrder[a.groupId] || 99;
-                const gB = groupOrder[b.groupId] || 99;
-                if (gA !== gB) return gA - gB;
-                return compareNachname(a.nachname, b.nachname);
-            });
-            if (memberList.length === 0) {
-                container.innerHTML = `<div class="text-center py-6 text-slate-400 text-sm">Keine Gruppenführer oder Zugführer gefunden.</div>`;
-                return;
-            }
-
-            const monthName = new Date(year, month).toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
-
-            const tableHTML = `
-                <div class="mb-3 flex items-center justify-between px-1">
-                    <div class="font-semibold text-lg">${monthName} <span class="text-xs text-emerald-600">(Stamm)</span></div>
-                </div>
-                <div class="overflow-auto max-h-[420px] border border-slate-200 rounded-2xl">
-                    <table class="w-full border-collapse text-sm">
-                        <thead class="sticky top-0 z-[10] bg-white">
-                            <tr>
-                                <th class="sticky left-0 z-[70] bg-white border p-1.5 text-left font-medium min-w-[160px]">Stamm</th>
-                                ${Array.from({length: daysInMonth}, (_, i) => {
-                                    const d = i + 1;
-                                    const date = new Date(year, month, d);
-                                    const weekdayNum = date.getDay();
-                                    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-                                    const isHoliday = holidaysThisYear.has(dateStr);
-                                    const isSunday = weekdayNum === 0;
-                                    const isSaturday = weekdayNum === 6;
-                                    let headerClass = "border p-1 text-center min-w-[50px] text-xs";
-                                    if (isHoliday) headerClass += " bg-black text-white font-semibold";
-                                    else if (isSunday) headerClass += " bg-gray-400 text-black";
-                                    else if (isSaturday) headerClass += " bg-gray-200";
-                                    else headerClass += " bg-slate-50";
-                                    const weekday = date.toLocaleDateString('de-DE', {weekday: 'short'});
-                                    return `<th class="${headerClass}">${d}<br><span class="opacity-70">${weekday}</span></th>`;
-                                }).join('')}
-                            </tr>
-                            <tr class="bg-slate-200">
-                                <th class="sticky left-0 z-[70] bg-slate-200 border p-1 text-left text-xs font-semibold">Belegt</th>
-                                ${Array.from({length: daysInMonth}, (_, i) => {
-                                    const day = i + 1;
-                                    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                                    let urlaub = 0, aza = 0;
-                                    events.forEach(ev => {
-                                        if ((ev.status !== 'pending' && ev.status !== 'approved') || !ev.title) return;
-                                        const start = new Date(ev.start);
-                                        const end = new Date(ev.end || ev.start);
-                                        const current = new Date(dateStr);
-                                        if (current >= start && current <= end) {
-                                            if (ev.type === 'Urlaub') urlaub++;
-                                            if (ev.type === 'AZA') aza++;
-                                        }
-                                    });
-                                    let color = '#166534';
-                                    if (urlaub >= 6 && aza >= 3) color = '#b91c1c';
-                                    else if (urlaub >= 6 || aza >= 3) color = '#854d0e';
-                                    return `<th class="border p-1 text-center text-xs font-mono belegt-cell" style="--bc:${color}">${urlaub}/${aza}</th>`;
-                                }).join('')}
-                            </tr>
-                            <tr class="bg-white">
-                                <th class="sticky left-0 z-[70] bg-white border p-1 text-left text-xs font-semibold">Bemerkung</th>
-                                ${Array.from({length: daysInMonth}, (_, i) => {
-                                    const day = i + 1;
-                                    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                                    const remark = dailyRemarks[dateStr] || '';
-                                    const short = remark ? (remark.length > 10 ? remark.substring(0,10)+'…' : remark) : '—';
-                                    return `<th class="border p-1 text-center text-[10px] cursor-pointer hover:bg-amber-50" onclick="editRemark('${dateStr}', this)">${short}</th>`;
-                                }).join('')}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${memberList.map(member => {
-                                let cells = '';
-                                for (let day = 1; day <= daysInMonth; day++) {
-                                    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                                    const dayEvents = events.filter(ev => {
-                                        if (ev.status === 'rejected') return false;
-                                        if (!eventTitleMatchesMember(ev.title, member)) return false;
-                                        return eventCoversDate(ev, dateStr);
-                                    });
-                                    if (dayEvents.length > 0) {
-                                        const ev = dayEvents[0];
-                                        let bg = '#e5e7eb', tc = '#111827';
-                                        const t = (ev.type || '').toLowerCase();
-                                        const s = ev.status || 'pending';
-                                        if (t.includes('os')) { bg = '#22c55e'; tc = '#fff'; }
-                                        else if (t.includes('lehrgang')) { bg = '#eab308'; tc = '#111827'; }
-                                        else if (t.includes('krank')) { bg = '#111827'; tc = '#fff'; }
-                                        else if (t.includes('urlaub')) { bg = s === 'approved' ? '#b91c1c' : '#fda4af'; tc = s === 'approved' ? '#fff' : '#111827'; }
-                                        else if (t.includes('aza')) { bg = s === 'approved' ? '#1e40af' : '#7dd3fc'; tc = s === 'approved' ? '#fff' : '#111827'; }
-                                        else if (t.includes('gv')) { bg = '#7c3aed'; tc = '#fff'; }
-                                        cells += `<td class="border p-1 text-center"><div class="w-5 h-5 mx-auto rounded-full" style="background:${bg};color:${tc}"></div></td>`;
-                                    } else {
-                                        cells += `<td class="border p-1 text-center text-slate-300 text-xs">—</td>`;
-                                    }
-                                }
-                                let badgeColor = '#64748b';
-                                if (member.isStamm) {
-                                    badgeColor = '#475569';
-                                } else {
-                                    const g = GROUPS.find(gr => gr.id === member.groupId);
-                                    badgeColor = g ? g.color : '#64748b';
-                                }
-                                return `<tr><td class="sticky left-0 z-[20] bg-white border p-1.5 font-medium"><div class="flex items-center gap-x-2"><div class="w-3 h-3 rounded-full" style="background:${badgeColor}"></div>${member.name}</div></td>${cells}</tr>`;
-                            }).join('')}
-                        </tbody>
-                    </table>
-                </div>
-            `;
-            container.innerHTML = tableHTML;
-            updateCurrentMonthDisplay();
-        }
-
         function resetToCurrentMonth() {
             const today = new Date();
             currentCalendarYear = today.getFullYear();
@@ -3215,37 +3192,14 @@
             updateCurrentMonthDisplay();
         }
 
-        function isoDateBerlin(d) {
-            const parts = new Intl.DateTimeFormat('en-GB', {
-                timeZone: 'Europe/Berlin',
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit'
-            }).formatToParts(d || new Date());
-            const get = (t) => parts.find(p => p.type === t).value;
-            return `${get('year')}-${get('month')}-${get('day')}`;
-        }
-
-        function addDaysIso(iso, days) {
-            const [y, m, d] = String(iso).split('-').map(Number);
-            const dt = new Date(y, m - 1, d + days);
-            return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
-        }
-
-        function allocateEventId() {
-            if (typeof database !== 'undefined' && database.ref) {
-                return database.ref('events').push().key;
-            }
-            return 'local_' + Date.now();
-        }
-
         function formatDateDE(dateStr) {
             if (!dateStr) return '';
-            const m = String(dateStr).match(/^(\d{4})-(\d{2})-(\d{2})/);
-            if (m) return `${m[3]}.${m[2]}.${m[1]}`;
             const d = new Date(dateStr);
             if (isNaN(d.getTime())) return dateStr;
-            return isoDateBerlin(d).split('-').reverse().join('.');
+            const day = String(d.getDate()).padStart(2, '0');
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const year = d.getFullYear();
+            return `${day}.${month}.${year}`;
         }
 
         // ---------- Verweildauer-Prüfung bei Buchungen ----------
@@ -3403,49 +3357,25 @@
             if (changed) saveMannschaft();
         }
 
-        function normalizeQE(value, fallback) {
-            const def = fallback || '2. QE';
-            if (value == null || String(value).trim() === '') return def;
-            const v = String(value).trim().toLowerCase();
-            if (v.includes('3')) return '3. QE';
-            if (v.includes('2')) return '2. QE';
-            return def;
-        }
-
-        function migrateListQE(list, fallback) {
-            if (!Array.isArray(list)) return false;
+        function migrateMannschaftQE() {
+            if (!Array.isArray(mannschaft)) return;
             let changed = false;
-            list.forEach(member => {
+            mannschaft.forEach(member => {
                 if (!member) return;
-                const next = normalizeQE(member.qe, fallback);
+                const next = normalizeQE(member.qe);
                 if (member.qe !== next) {
                     member.qe = next;
                     changed = true;
                 }
             });
-            return changed;
+            if (changed) saveMannschaft();
         }
 
-        function migrateGruppenfuehrerQE() {
-            if (migrateListQE(gruppenfuehrer, '2. QE')) saveGruppenfuehrer();
-        }
-
-        function migrateZugfuehrerQE() {
-            if (migrateListQE(zugfuehrer, '3. QE')) saveZugfuehrer();
-        }
-
-        function saveGruppenfuehrerQE(index, value) {
-            const member = gruppenfuehrer[index];
+        function saveMannschaftQE(index, value) {
+            const member = mannschaft[index];
             if (!member) return;
-            member.qe = normalizeQE(value, '2. QE');
-            saveGruppenfuehrer();
-        }
-
-        function saveZugfuehrerQE(index, value) {
-            const member = zugfuehrer[index];
-            if (!member) return;
-            member.qe = normalizeQE(value, '3. QE');
-            saveZugfuehrer();
+            member.qe = normalizeQE(value);
+            saveMannschaft();
         }
 
         function getVerweildauerEnde(fullName) {
@@ -3458,11 +3388,33 @@
 
         const DWELL_OUT_OF_RANGE = 'Zeitpunkt außerhalb der Verweildauer';
 
+        const COP_TZ = 'Europe/Berlin';
+
+        function todayISODateDE() {
+            return new Date().toLocaleDateString('en-CA', { timeZone: COP_TZ });
+        }
+
         function dateOnly(value) {
             if (!value) return null;
+            if (typeof value === 'string') {
+                const iso = value.trim().slice(0, 10);
+                if (/^\d{4}-\d{2}-\d{2}$/.test(iso)) {
+                    const [y, m, d] = iso.split('-').map(Number);
+                    return new Date(y, m - 1, d);
+                }
+            }
             const d = (value instanceof Date) ? value : new Date(value);
             if (isNaN(d.getTime())) return null;
-            return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+            const parts = d.toLocaleDateString('en-CA', { timeZone: COP_TZ }).split('-');
+            return new Date(+parts[0], +parts[1] - 1, +parts[2]);
+        }
+
+        function eventCoversDate(ev, dateStr) {
+            const day = dateOnly(dateStr);
+            const start = dateOnly(ev && ev.start);
+            const end = dateOnly(ev && (ev.end || ev.start));
+            if (!day || !start || !end) return false;
+            return day >= start && day <= end;
         }
 
         function isOutsideVerweildauer(fullName, startStr, endStr) {
@@ -3483,35 +3435,19 @@
 
         function updateVerweildauerHint() {
             const hint = document.getElementById('verweildauer-hint');
-            const wrap = document.getElementById('modal-verweildauer-wrap');
-            const field = document.getElementById('modal-verweildauer');
-            const note = document.getElementById('modal-verweildauer-note');
+            if (!hint) return;
             const nameEl = document.getElementById('modal-name');
             const startEl = document.getElementById('modal-start');
             const endEl = document.getElementById('modal-end');
             const name = nameEl ? nameEl.value.trim() : '';
             const start = startEl ? startEl.value : '';
             const end = endEl ? endEl.value : '';
-            const ende = name ? getVerweildauerEnde(name) : null;
-            const mmjj = name ? (() => {
-                const member = (typeof mannschaft !== 'undefined')
-                    ? mannschaft.find(m => personNameMatches(name, m))
-                    : null;
-                return member ? formatVerweildauerMMYY(member.verweildauer) : '';
-            })() : '';
-
-            if (wrap && field) {
-                wrap.classList.add('hidden');
-            }
-
-            if (hint) {
-                if (name && start && isOutsideVerweildauer(name, start, end)) {
-                    hint.textContent = DWELL_OUT_OF_RANGE;
-                    hint.classList.remove('hidden');
-                } else {
-                    hint.textContent = '';
-                    hint.classList.add('hidden');
-                }
+            if (name && start && isOutsideVerweildauer(name, start, end)) {
+                hint.textContent = DWELL_OUT_OF_RANGE;
+                hint.classList.remove('hidden');
+            } else {
+                hint.textContent = '';
+                hint.classList.add('hidden');
             }
         }
 
@@ -3633,6 +3569,47 @@
         // ==================== EINSATZWÜNSCHE ====================
         let einsatzwuensche = [];
         let ewLastReadAt = 0;   // Zeitpunkt, zu dem ein Zugführer die Tabelle zuletzt geöffnet hat
+        let ewLiveBound = false;
+        let ewApplyingRemote = false;
+
+        function normalizeEinsatzwuensche(val) {
+            if (!val) return [];
+            const list = Array.isArray(val) ? val : Object.values(val);
+            const byId = {};
+            list.forEach(e => {
+                if (!e || typeof e !== 'object' || !e.id) return;
+                byId[e.id] = e;
+            });
+            return Object.values(byId);
+        }
+
+        function einsatzwuenscheAsMap(list) {
+            const map = {};
+            (list || []).forEach(e => {
+                if (e && e.id) map[e.id] = e;
+            });
+            return map;
+        }
+
+        function applyEinsatzwuenscheRemote(val) {
+            ewApplyingRemote = true;
+            einsatzwuensche = normalizeEinsatzwuensche(val);
+            try { localStorage.setItem('einsatzwuensche', JSON.stringify(einsatzwuensche)); } catch (e) {}
+            const entfernt = pruneEinsatzwuensche();
+            updateEinsatzwunschBadge();
+            const modal = document.getElementById('einsatzwunsch-modal');
+            if (modal && !modal.classList.contains('hidden')) renderEinsatzwuensche();
+            ewApplyingRemote = false;
+            return entfernt;
+        }
+
+        function bindEinsatzwuenscheLive() {
+            if (typeof database === 'undefined' || ewLiveBound) return;
+            ewLiveBound = true;
+            database.ref('einsatzwuensche/eintraege').on('value', snap => {
+                applyEinsatzwuenscheRemote(snap.val());
+            });
+        }
 
         // Datum direkt aus dem ISO-String formatieren (TT.MM.JJJJ).
         // Bewusst NICHT über new Date(iso).toLocaleDateString(): das interpretiert
@@ -3686,7 +3663,7 @@
             const vorher = einsatzwuensche.length;
             einsatzwuensche = einsatzwuensche.filter(e => !ewIstFaellig(e));
             const entfernt = vorher - einsatzwuensche.length;
-            if (entfernt > 0) saveEinsatzwuensche();
+            if (entfernt > 0 && !ewApplyingRemote) saveEinsatzwuensche();
             return entfernt;
         }
 
@@ -3696,57 +3673,58 @@
             if (!e) return;
             e.status = (e.status === status) ? 'offen' : status;   // erneuter Klick = zurücksetzen
             e.statusAt = Date.now();
-            saveEinsatzwuensche();
+            saveEinsatzwunschEintrag(e);
             renderEinsatzwuensche();
         }
 
         async function loadEinsatzwuensche() {
-            // Firebase ist führend; localStorage dient nur als Fallback ohne Netz.
+            // Lesestatus bleibt gerätebezogen, damit ein Zugführer den Badge
+            // der anderen nicht mitlöscht.
+            try {
+                ewLastReadAt = parseInt(localStorage.getItem('ewLastReadAt') || '0', 10) || 0;
+            } catch (e) {
+                ewLastReadAt = 0;
+            }
+
             if (typeof database !== 'undefined') {
                 try {
+                    bindEinsatzwuenscheLive();
                     const snap = await database.ref('einsatzwuensche/eintraege').once('value');
-                    const val = snap.val();
-                    einsatzwuensche = Array.isArray(val) ? val : (val ? Object.values(val) : []);
-
-                    const metaSnap = await database.ref('einsatzwuensche/lastReadAt').once('value');
-                    ewLastReadAt = metaSnap.val() || 0;
-
-                    try {
-                        localStorage.setItem('einsatzwuensche', JSON.stringify(einsatzwuensche));
-                        localStorage.setItem('ewLastReadAt', String(ewLastReadAt));
-                    } catch (e) {}
-                    pruneEinsatzwuensche();
-                    updateEinsatzwunschBadge();
+                    applyEinsatzwuenscheRemote(snap.val());
                     return;
                 } catch (e) {
                     console.warn('Einsatzwünsche konnten nicht aus Firebase geladen werden:', e);
                 }
             }
             try {
-                einsatzwuensche = JSON.parse(localStorage.getItem('einsatzwuensche') || '[]');
-                ewLastReadAt = parseInt(localStorage.getItem('ewLastReadAt') || '0', 10) || 0;
+                einsatzwuensche = normalizeEinsatzwuensche(JSON.parse(localStorage.getItem('einsatzwuensche') || '[]'));
             } catch (e) {
                 einsatzwuensche = [];
-                ewLastReadAt = 0;
             }
             pruneEinsatzwuensche();
             updateEinsatzwunschBadge();
         }
 
         function saveEinsatzwuensche() {
+            if (ewApplyingRemote) return;
             try { localStorage.setItem('einsatzwuensche', JSON.stringify(einsatzwuensche)); } catch (e) {}
             if (typeof database !== 'undefined') {
-                database.ref('einsatzwuensche/eintraege').set(einsatzwuensche)
+                database.ref('einsatzwuensche/eintraege').set(einsatzwuenscheAsMap(einsatzwuensche))
                     .catch(err => console.warn('Fehler beim Speichern der Einsatzwünsche:', err));
+            }
+        }
+
+        function saveEinsatzwunschEintrag(entry) {
+            if (!entry || !entry.id) return;
+            try { localStorage.setItem('einsatzwuensche', JSON.stringify(einsatzwuensche)); } catch (e) {}
+            if (typeof database !== 'undefined') {
+                database.ref('einsatzwuensche/eintraege/' + entry.id).set(entry)
+                    .catch(err => console.warn('Fehler beim Speichern eines Einsatzwunsches:', err));
             }
         }
 
         function saveEwLastRead() {
             try { localStorage.setItem('ewLastReadAt', String(ewLastReadAt)); } catch (e) {}
-            if (typeof database !== 'undefined') {
-                database.ref('einsatzwuensche/lastReadAt').set(ewLastReadAt)
-                    .catch(err => console.warn('Fehler beim Speichern des Lesestatus:', err));
-            }
         }
 
         // Badge zeigt an, ob es Einträge gibt, die neuer sind als das letzte Öffnen
@@ -3847,13 +3825,14 @@
             }
             if (err) err.classList.add('hidden');
 
-            einsatzwuensche.push({
+            const eintrag = {
                 id: 'ew_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
                 datum, anlass, ort, gewuenschtVon: von,
                 status: 'offen',
                 createdAt: Date.now()
-            });
-            saveEinsatzwuensche();
+            };
+            einsatzwuensche.push(eintrag);
+            saveEinsatzwunschEintrag(eintrag);
 
             document.getElementById('ew-datum').value = '';
             document.getElementById('ew-anlass').value = '';
@@ -3868,7 +3847,11 @@
             if (currentRole !== 'admin') return;            // nur Zugführer darf löschen
             if (!confirm('Einsatzwunsch wirklich löschen?')) return;
             einsatzwuensche = einsatzwuensche.filter(e => e.id !== id);
-            saveEinsatzwuensche();
+            try { localStorage.setItem('einsatzwuensche', JSON.stringify(einsatzwuensche)); } catch (e) {}
+            if (typeof database !== 'undefined') {
+                database.ref('einsatzwuensche/eintraege/' + id).remove()
+                    .catch(err => console.warn('Fehler beim Löschen eines Einsatzwunsches:', err));
+            }
             renderEinsatzwuensche();
             updateEinsatzwunschBadge();
         }
@@ -4052,7 +4035,6 @@
             renderNext7DaysAbsences();
             updateStats();
             renderMonthlyView();
-            renderStammCalendar();
         }
 
         // ==================== BERECHTIGUNGEN ====================
@@ -4290,6 +4272,11 @@
             if (ok) await applyRoleFromClaims();
         }
 
+        function switchToMannschaft() {
+            if (currentRole === 'manager' || currentRole === 'admin') return;
+            switchRole('mitarbeiter');
+        }
+
         async function switchToGruppenfuehrer() {
             await switchAccount();
         }
@@ -4385,7 +4372,7 @@
 
             const startInput = document.getElementById('modal-start');
             const endInput = document.getElementById('modal-end');
-            const today = isoDateBerlin();
+            const today = preselectedDate || todayISODateDE();
             startInput.value = today;
             endInput.value = today;
 
@@ -4453,7 +4440,6 @@
         }
 
         function saveEvent() {
-            if (!canCreateBookings()) return;
             // Werte aus dem Modal auslesen (das war der Fehler - Variablen waren undefined)
             const type = document.getElementById('modal-type').value;
             const start = document.getElementById('modal-start').value;
@@ -4471,7 +4457,7 @@
                 groupId = existing ? existing.groupId : null;
             }
             if (!groupId) {
-                alert('Person nicht in der Datenbank gefunden. Bitte Name prüfen (Nachname Vorname).');
+                alert('Person nicht in der Datenbank gefunden. Gruppe kann nicht zugeordnet werden.');
                 return;
             }
 
@@ -4480,7 +4466,7 @@
                 return;
             }
 
-            if (end && new Date(end) < new Date(start)) {
+            if (end && dateOnly(end) < dateOnly(start)) {
                 alert('Das "Bis"-Datum darf nicht vor dem "Von"-Datum liegen.');
                 return;
             }
@@ -4492,24 +4478,21 @@
             }
 
             const personForOverlap = findPersonByAnyName(name);
+            const newStart = dateOnly(start);
+            const newEnd = dateOnly(end || start);
             const overlapping = events.some(ev => {
                 if (editingEventId && ev.id === editingEventId) return false;
                 const samePerson = personForOverlap ? personNameMatches(ev.title, personForOverlap) : ev.title === name;
                 if (!samePerson || ev.status === 'rejected') return false;
-                const evStart = String(ev.start || '').slice(0, 10);
-                const evEnd = String(ev.end || ev.start || '').slice(0, 10);
-                const newEnd = String(end || start).slice(0, 10);
-                return evStart <= newEnd && evEnd >= start;
+                const evStart = dateOnly(ev.start);
+                const evEnd = dateOnly(ev.end || ev.start);
+                if (!evStart || !evEnd || !newStart || !newEnd) return false;
+                return evStart <= newEnd && evEnd >= newStart;
             });
             if (overlapping) {
                 if (!confirm('Für diese Person existiert bereits eine aktive Buchung im gewählten Zeitraum. Trotzdem fortfahren?')) {
                     return;
                 }
-            }
-
-            let status = 'pending';
-            if (currentRole === 'admin') {
-                status = 'approved';
             }
 
             let savedEvent = null;
@@ -4523,17 +4506,14 @@
                     events[index].end = end;
                     events[index].title = name;
                     events[index].note = note;
-                    events[index].status = status;
-                    if (status === 'approved' && !events[index].approvedAt) {
-                        events[index].approvedAt = new Date().toISOString();
-                    }
                     const actingLabel = getActingAccountLabel();
                     if (actingLabel) events[index].lastActionBy = actingLabel;
                     savedEvent = events[index];
                 }
             } else {
+                const status = currentRole === 'admin' ? 'approved' : 'pending';
                 savedEvent = {
-                    id: allocateEventId(),
+                    id: 'e' + Date.now(),
                     title: name,
                     start: start,
                     end: end || start,
@@ -4724,9 +4704,16 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
                                onblur="saveMannschaftVerweildauer(${originalIndex}, this.value)"
                                class="w-[5.75rem] border border-slate-200 rounded-xl px-2 py-1.5 text-sm text-center font-mono tracking-wide focus:outline-none focus:border-blue-400">
                     </td>
+                    <td class="border p-3">
+                        <select onchange="saveMannschaftQE(${originalIndex}, this.value)"
+                                class="border border-slate-200 rounded-xl px-2 py-1.5 text-sm bg-white focus:outline-none focus:border-blue-400">
+                            <option value="2. QE" ${normalizeQE(member.qe) === '2. QE' ? 'selected' : ''}>2. QE</option>
+                            <option value="3. QE" ${normalizeQE(member.qe) === '3. QE' ? 'selected' : ''}>3. QE</option>
+                        </select>
+                    </td>
                     <td class="border p-3 text-center">
-                        <button onclick="editMannschaftMember(${originalIndex})" class="text-blue-600 hover:text-blue-800 px-2 py-1 rounded hover:bg-blue-50 mr-1">✏️</button>
-                        <button onclick="deleteMannschaftMember(${originalIndex})" class="text-red-600 hover:text-red-800 px-2 py-1 rounded hover:bg-red-50">🗑️</button>
+                        <button type="button" class="db-act-btn" onclick="editMannschaftMember(${originalIndex})">Ändern</button>
+                        <button type="button" class="db-act-btn del" onclick="deleteMannschaftMember(${originalIndex})">Löschen</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -4749,12 +4736,16 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
                 }
             }
 
+            let qe = prompt("QE (2. QE oder 3. QE):", "2. QE");
+            if (qe === null) return;
+
             mannschaft.push({
                 id: Date.now(),
                 gruppe: gruppe,
                 name: name,
                 vorname: vorname,
-                verweildauer: verweildauer || ""
+                verweildauer: verweildauer || "",
+                qe: normalizeQE(qe)
             });
             saveMannschaft();
             renderMannschaftTable();
@@ -4805,10 +4796,14 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
                 newVerweildauer = formatted;
             }
 
+            let newQE = prompt("QE (2. QE oder 3. QE):", normalizeQE(member.qe));
+            if (newQE === null) return;
+
             member.gruppe = newGruppe;
             member.vorname = newVorname.trim();
             member.name = newName.trim();
             member.verweildauer = newVerweildauer;
+            member.qe = normalizeQE(newQE);
 
             saveMannschaft();
             renamePersonInEvents(oldVorname, oldName, member.vorname, member.name);
@@ -4853,16 +4848,9 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
                     <td class="border p-3">${member.gruppe}</td>
                     <td class="border p-3">${member.name}</td>
                     <td class="border p-3">${member.vorname}</td>
-                    <td class="border p-3">
-                        <select onchange="saveGruppenfuehrerQE(${index}, this.value)"
-                                class="border border-slate-200 rounded-xl px-2 py-1.5 text-sm bg-white focus:outline-none focus:border-blue-400">
-                            <option value="2. QE" ${normalizeQE(member.qe, '2. QE') === '2. QE' ? 'selected' : ''}>2. QE</option>
-                            <option value="3. QE" ${normalizeQE(member.qe, '2. QE') === '3. QE' ? 'selected' : ''}>3. QE</option>
-                        </select>
-                    </td>
                     <td class="border p-3 text-center">
-                        <button onclick="editGruppenfuehrerMember(${index})" class="text-blue-600 hover:text-blue-800 px-2 py-1 rounded hover:bg-blue-50 mr-1">✏️</button>
-                        <button onclick="deleteGruppenfuehrerMember(${index})" class="text-red-600 hover:text-red-800 px-2 py-1 rounded hover:bg-red-50">🗑️</button>
+                        <button type="button" class="db-act-btn" onclick="editGruppenfuehrerMember(${index})">Ändern</button>
+                        <button type="button" class="db-act-btn del" onclick="deleteGruppenfuehrerMember(${index})">Löschen</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -4881,8 +4869,7 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
                 id: Date.now(),
                 gruppe: gruppe,
                 name: name,
-                vorname: vorname,
-                qe: '2. QE'
+                vorname: vorname
             });
             saveGruppenfuehrer();
             renderGruppenfuehrerTable();
@@ -4901,13 +4888,10 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
             if (!newName) return;
             const newVorname = prompt("Neuer Vorname:", member.vorname || "");
             if (!newVorname) return;
-            let newQE = prompt("QE (2. QE oder 3. QE):", normalizeQE(member.qe, '2. QE'));
-            if (newQE === null) return;
 
             member.gruppe = newGruppe;
             member.vorname = newVorname.trim();
             member.name = newName.trim();
-            member.qe = normalizeQE(newQE, '2. QE');
             saveGruppenfuehrer();
             renamePersonInEvents(oldVorname, oldName, member.vorname, member.name);
             renderGruppenfuehrerTable();
@@ -4982,16 +4966,9 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
                 tr.innerHTML = `
                     <td class="border p-3">${member.name}</td>
                     <td class="border p-3">${member.vorname}</td>
-                    <td class="border p-3">
-                        <select onchange="saveZugfuehrerQE(${index}, this.value)"
-                                class="border border-slate-200 rounded-xl px-2 py-1.5 text-sm bg-white focus:outline-none focus:border-blue-400">
-                            <option value="2. QE" ${normalizeQE(member.qe, '3. QE') === '2. QE' ? 'selected' : ''}>2. QE</option>
-                            <option value="3. QE" ${normalizeQE(member.qe, '3. QE') === '3. QE' ? 'selected' : ''}>3. QE</option>
-                        </select>
-                    </td>
                     <td class="border p-3 text-center">
-                        <button onclick="editZugfuehrerMember(${index})" class="text-blue-600 hover:text-blue-800 px-2 py-1 rounded hover:bg-blue-50 mr-1">✏️</button>
-                        <button onclick="deleteZugfuehrerMember(${index})" class="text-red-600 hover:text-red-800 px-2 py-1 rounded hover:bg-red-50">🗑️</button>
+                        <button type="button" class="db-act-btn" onclick="editZugfuehrerMember(${index})">Ändern</button>
+                        <button type="button" class="db-act-btn del" onclick="deleteZugfuehrerMember(${index})">Löschen</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -5007,8 +4984,7 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
             zugfuehrer.push({
                 id: Date.now(),
                 name: name,
-                vorname: vorname,
-                qe: '3. QE'
+                vorname: vorname
             });
             saveZugfuehrer();
             renderZugfuehrerTable();
@@ -5025,12 +5001,9 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
             if (!newName) return;
             const newVorname = prompt("Neuer Vorname:", member.vorname || "");
             if (!newVorname) return;
-            let newQE = prompt("QE (2. QE oder 3. QE):", normalizeQE(member.qe, '3. QE'));
-            if (newQE === null) return;
 
             member.vorname = newVorname.trim();
             member.name = newName.trim();
-            member.qe = normalizeQE(newQE, '3. QE');
             saveZugfuehrer();
             renamePersonInEvents(oldVorname, oldName, member.vorname, member.name);
             renderZugfuehrerTable();
@@ -5090,7 +5063,7 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
                         <span class="inline-block w-2 h-2 rounded-full mr-1.5" style="background-color: ${group.color}"></span>
                         ${group.name}
                     </td>
-                    <td class="border p-3">${formatAbsenceType(ev.type)}</td>
+                    <td class="border p-3">${ev.type}</td>
                     <td class="border p-3 text-sm">${formatDateDE(ev.start)} ${ev.end && ev.end !== ev.start ? '– ' + formatDateDE(ev.end) : ''}</td>
                     <td class="border p-3 text-sm text-slate-500">${ev.note || '-'}</td>
                     <td class="border p-3 text-xs text-slate-500">
@@ -5115,6 +5088,16 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
             });
         }
 
+        function resolveFirebaseEventKey(ev, data) {
+            if (!ev || !data) return null;
+            if (isFirebaseEventKey(ev.id) && data[ev.id]) return ev.id;
+            const matches = Object.keys(data).filter(key => {
+                const fbEv = data[key] || {};
+                return key === ev.id || fbEv.id === ev.id;
+            });
+            return matches.length === 1 ? matches[0] : null;
+        }
+
         function updateOrDeleteInFirebase(ev, doDelete = false) {
             if (typeof database === 'undefined' || !ev) return;
 
@@ -5123,13 +5106,7 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
                 const data = snapshot.val();
                 if (!data) return;
 
-                let foundKey = null;
-                Object.keys(data).forEach(key => {
-                    const fbEv = data[key];
-                    if (fbEv.id === ev.id || (fbEv.title === ev.title && fbEv.start === ev.start)) {
-                        foundKey = key;
-                    }
-                });
+                const foundKey = resolveFirebaseEventKey(ev, data);
 
                 if (foundKey) {
                     if (doDelete) {
@@ -5240,7 +5217,7 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
                         <span class="inline-block w-2 h-2 rounded-full mr-1.5" style="background-color: ${group.color}"></span>
                         ${group.name}
                     </td>
-                    <td class="border p-3">${formatAbsenceType(ev.type)}</td>
+                    <td class="border p-3">${ev.type}</td>
                     <td class="border p-3 text-sm">${formatDateDE(ev.start)} ${ev.end && ev.end !== ev.start ? '– ' + formatDateDE(ev.end) : ''}</td>
                     <td class="border p-3 text-sm text-slate-500">${ev.note || '-'}</td>
                     <td class="border p-3 text-xs text-slate-500">
@@ -5264,18 +5241,15 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
          * vergangen ist (heute > Enddatum). Wirkt lokal und in Firebase.
          */
         function pruneExpiredApprovedBookings() {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
+            const today = dateOnly(todayISODateDE());
 
             const toRemove = [];
             events = events.filter(ev => {
                 if (ev.status !== 'approved') return true;
                 const endStr = ev.end || ev.start;
                 if (!endStr) return true;
-                const endDate = new Date(endStr);
-                endDate.setHours(0, 0, 0, 0);
-                // End-Tag ist vergangen → löschen
-                if (endDate < today) {
+                const endDate = dateOnly(endStr);
+                if (endDate && endDate < today) {
                     toRemove.push(ev);
                     return false;
                 }
@@ -5304,14 +5278,9 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
                 const eventsRef = database.ref('events');
                 eventsRef.once('value').then(snapshot => {
                     const data = snapshot.val();
-                    if (data) {
-                        Object.keys(data).forEach(key => {
-                            const fbEv = data[key];
-                            if (fbEv.id === eventId || (fbEv.title === ev.title && fbEv.start === ev.start)) {
-                                eventsRef.child(key).remove();
-                            }
-                        });
-                    }
+                    if (!data) return;
+                    const foundKey = resolveFirebaseEventKey(ev, data);
+                    if (foundKey) eventsRef.child(foundKey).remove();
                 });
             }
 
@@ -5354,15 +5323,27 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
             }
         }
 
-        async function initializeApp() {
-            applyCopViewMode();
-            initializeTailwind();
+        function cleanupDemoAndOldRejected() {
+            const demoNames = ["Anna Schmidt", "Lisa Müller", "Tom Berger", "Peter Sittlich"];
+            const retentionCutoff = new Date();
+            retentionCutoff.setMonth(retentionCutoff.getMonth() - 24);
+            const before = events.length;
+            events = events.filter(ev => {
+                if (ev.status === 'pending' && demoNames.includes(ev.title)) return false;
+                if (ev.status === 'rejected') {
+                    const refDate = ev.end || ev.start || ev.createdAt;
+                    if (refDate && dateOnly(refDate) && dateOnly(refDate) < dateOnly(retentionCutoff)) return false;
+                }
+                return true;
+            });
+            if (events.length !== before) {
+                saveToLocalStorage();
+                console.log('%c[Cleanup] Demo-Pending und veraltete abgelehnte Einträge entfernt (Datenminimierung).', 'color:#10b981');
+            }
+        }
 
-            try {
-                localStorage.removeItem('mannschaft');
-                localStorage.removeItem('gruppenfuehrer');
-                localStorage.removeItem('zugfuehrer');
-            } catch(e) {}
+        async function initializeApp() {
+            initializeTailwind();
 
             // Sicherstellen, dass die Mitgliederdatenbanken geladen sind, bevor Buchungen
             // anhand ihrer Namen der richtigen Gruppe zugeordnet werden.
@@ -5391,6 +5372,7 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
 
                     normalizeEventPersonNames();
                     normalizeEventGroupIds();
+                    cleanupDemoAndOldRejected();
                     pruneExpiredApprovedBookings();
                     setupFirebaseListener();
 
@@ -5407,6 +5389,7 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
                     loadInitialData();
                     normalizeEventPersonNames();
                     normalizeEventGroupIds();
+                    cleanupDemoAndOldRejected();
                     pruneExpiredApprovedBookings();
                     applyRoleFromClaims();
                     updateHeaderButtons();
@@ -5430,36 +5413,11 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
                 setDefaultDateForTagesrecherche();
             }
 
-            const todayBerlin = isoDateBerlin();
-            const [ty, tm] = todayBerlin.split('-').map(Number);
-            currentCalendarYear = ty;
-            currentCalendarMonth = tm - 1;
+            const todayInit = new Date();
+            currentCalendarYear = todayInit.getFullYear();
+            currentCalendarMonth = todayInit.getMonth();
             renderMonthlyView();
             setDefaultDateForTagesrecherche();
-
-            // Datenminimierung (Art. 5 Abs. 1 lit. c DSGVO): Demo-Pending-Anträge entfernen
-            // und sehr alte abgelehnte Einträge (> 24 Monate) bereinigen.
-            const demoNames = ["Anna Schmidt", "Lisa Müller", "Tom Berger", "Peter Sittlich"];
-            const retentionCutoff = new Date();
-            retentionCutoff.setMonth(retentionCutoff.getMonth() - 24);
-            const before = events.length;
-            events = events.filter(ev => {
-                if (ev.status === 'pending' && demoNames.includes(ev.title)) return false;
-                if (ev.status === 'rejected') {
-                    const refDate = ev.end || ev.start || ev.createdAt;
-                    if (refDate && new Date(refDate) < retentionCutoff) return false;
-                }
-                return true;
-            });
-            if (events.length !== before) {
-                saveToLocalStorage();
-                // Entfernte Einträge möglichst auch in Firebase bereinigen (best effort)
-                if (typeof database !== 'undefined') {
-                    // Einzelne Removes würden zu viele Reads erzeugen – hier nur lokal + Log.
-                    // Vollständige Firebase-Bereinigung erfolgt über Admin-Prozess / Rules.
-                }
-                console.log('%c[Cleanup] Demo-Pending und veraltete abgelehnte Einträge entfernt (Datenminimierung).', 'color:#10b981');
-            }
 
             document.addEventListener('keydown', function(e) {
                 if (e.key === "Escape") {
@@ -5478,14 +5436,6 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
                 }
             });
 
-            window.addEventListener('resize', () => {
-                applyCopViewMode();
-                syncTopCardHeights();
-                updateCalHeadOffset();
-            });
-            setTimeout(() => { syncTopCardHeights(); updateCalHeadOffset(); }, 50);
-            setTimeout(() => { syncTopCardHeights(); updateCalHeadOffset(); }, 300);
-
             console.log('%c[Urlaubsplaner] App ready with Firebase sync. Save button fixed in v1.2', 'color:#64748b');
         }
 
@@ -5496,6 +5446,8 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
             if (typeof database === 'undefined' || firebaseListenerActive) return;
 
             const eventsRef = database.ref('events');
+
+            bindEinsatzwuenscheLive();
 
             eventsRef.on('value', (snapshot) => {
                 const firebaseData = snapshot.val();
@@ -5536,12 +5488,26 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
             console.log('%c[Firebase] Live-Synchronisation aktiviert', 'color:#475569');
         }
 
+        function isFirebaseEventKey(id) {
+            return typeof id === 'string' && id.length > 0 && !id.startsWith('e');
+        }
+
         function saveEventToFirebase(eventData) {
             if (typeof database === 'undefined' || !eventData) return;
-            if (!eventData.id) eventData.id = allocateEventId();
-            database.ref('events').child(eventData.id).set(eventData).catch(err => {
-                console.warn('Firebase Save Fehler:', err);
-            });
+
+            const eventsRef = database.ref('events');
+
+            if (isFirebaseEventKey(eventData.id)) {
+                eventsRef.child(eventData.id).set(eventData);
+            } else {
+                const newRef = eventsRef.push();
+                eventData.id = newRef.key;
+                const cleanEvent = { ...eventData };
+                delete cleanEvent.id;
+                newRef.set(cleanEvent).catch(err => {
+                    console.warn('Firebase-Save fehlgeschlagen:', err);
+                });
+            }
         }
 
         function testFirebaseConnection() {
@@ -5579,6 +5545,12 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
                 await ensureLoggedIn();
             }
             initializeApp();
+            updateCopNavHeight();
+            syncTopCardHeights();
+            window.addEventListener('resize', () => {
+                updateCopNavHeight();
+                syncTopCardHeights();
+            });
         };
     
     </script>
