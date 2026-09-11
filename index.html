@@ -539,12 +539,6 @@
                 grid-template-columns: 1fr !important;
                 gap: 1rem !important;
             }
-            .nav-bar {
-                height: auto !important;
-                flex-wrap: wrap !important;
-                gap: 0.5rem !important;
-                padding: 0.5rem 0 !important;
-            }
             .tab-wrap { margin-right: 0.5rem !important; }
         }
 
@@ -1505,6 +1499,55 @@
             }
             .calendar-card {
                 overflow: visible !important;
+            }
+
+            .nav-bar {
+                height: 4rem !important;
+                flex-direction: row !important;
+                flex-wrap: nowrap !important;
+                align-items: center !important;
+                padding: 0 !important;
+            }
+            .nav-brand .cop-crest,
+            .nav-brand img {
+                height: 48px !important;
+                width: 48px !important;
+            }
+            .cop-mark h1 {
+                font-size: 1.45rem !important;
+                letter-spacing: 0.38em !important;
+            }
+            .cop-mark p {
+                display: block !important;
+                font-size: 8px !important;
+            }
+
+            .cal-table thead th.cal-day {
+                padding: 6px 0 !important;
+                font-size: 11px !important;
+                line-height: 1.25 !important;
+                overflow: visible !important;
+            }
+            .cal-table td.cal-day {
+                overflow: visible !important;
+                min-height: 28px !important;
+                padding: 4px 0 !important;
+            }
+            .cal-table .cal-dot,
+            .cal-scroll td .cal-dot {
+                display: block !important;
+                width: 16px !important;
+                height: 16px !important;
+                min-width: 16px !important;
+                min-height: 16px !important;
+                margin: 0 auto !important;
+                padding: 0 !important;
+                border: 0 !important;
+                border-radius: 50% !important;
+                -webkit-mask-image: none !important;
+                mask-image: none !important;
+                opacity: 1 !important;
+                visibility: visible !important;
             }
         }
 
@@ -2899,6 +2942,7 @@
 
             const year = currentCalendarYear;
             const month = currentCalendarMonth;
+            const monthLabel = new Date(year, month, 1).toLocaleDateString('de-DE', { month: 'long' });
             const daysInMonth = new Date(year, month + 1, 0).getDate();
             const holidaysThisYear = getHolidaysForYear(year);
 
@@ -3035,7 +3079,7 @@
                         </colgroup>
                         <thead class="bg-white">
                             <tr>
-                                <th class="cal-name sticky left-0 z-[70] bg-white border p-1.5 text-left font-medium shadow-sm"></th>
+                                <th class="cal-name sticky left-0 z-[70] bg-white border p-1.5 text-left font-semibold shadow-sm cal-head-month">${monthLabel}</th>
                                 ${calendarDayHeaderCells(year, month, daysInMonth, holidaysThisYear)}
                             </tr>
                             <tr class="bg-white">
