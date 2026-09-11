@@ -1458,6 +1458,7 @@
                 display: flex !important;
                 flex-direction: column !important;
                 overflow: hidden;
+                height: 100%;
             }
             .buchung-split {
                 display: flex !important;
@@ -1490,6 +1491,14 @@
                 min-height: 0 !important;
                 overflow-y: auto !important;
             }
+            #next7days-list,
+            #next7days-list.max-h-\[280px\] {
+                flex: 1 1 auto !important;
+                max-height: none !important;
+                min-height: 0 !important;
+                height: auto !important;
+                overflow-y: auto !important;
+            }
             /* Kalender auf Desktop: kein eigener Scrollbalken, Seite scrollt */
             .cal-scroll,
             .cal-scroll.max-h-\[480px\] {
@@ -1499,6 +1508,17 @@
             }
             .calendar-card {
                 overflow: visible !important;
+            }
+            .cal-head-pin {
+                position: -webkit-sticky !important;
+                position: sticky !important;
+                top: var(--cop-nav-h, 4rem) !important;
+                z-index: 70 !important;
+                background: var(--w-surface, #1d1d1d) !important;
+            }
+            .cal-block-head {
+                position: relative !important;
+                top: auto !important;
             }
 
             .nav-bar {
@@ -2657,13 +2677,15 @@
             const tages = cards[1];
             const next7 = cards[2];
             if (!booking || !tages || !next7) return;
-            booking.style.height = 'auto';
-            next7.style.height = 'auto';
-            tages.style.height = 'auto';
-            const h = Math.ceil(tages.getBoundingClientRect().height);
-            if (h < 80) return;
-            booking.style.height = h + 'px';
-            next7.style.height = h + 'px';
+            booking.style.height = '';
+            next7.style.height = '';
+            tages.style.height = '';
+            requestAnimationFrame(function() {
+                const h = Math.ceil(tages.getBoundingClientRect().height);
+                if (h < 80) return;
+                booking.style.height = h + 'px';
+                next7.style.height = h + 'px';
+            });
         }
 
         function hideGroupMembers() {
@@ -2793,6 +2815,7 @@
             if (gvEl) gvEl.textContent = gvCount;
 
             statsDiv.classList.remove('hidden');
+            syncTopCardHeights();
         }
 
         // ==================== NÄCHSTE 7 TAGE ====================
@@ -5588,9 +5611,11 @@ Gruppenführer & Zugführer: Können Status direkt ändern und genehmigen.`);
             if (typeof firebase !== 'undefined' && typeof database !== 'undefined') {
                 await ensureLoggedIn();
             }
-            initializeApp();
+            await initializeApp();
             updateCopNavHeight();
             syncTopCardHeights();
+            setTimeout(syncTopCardHeights, 80);
+            setTimeout(syncTopCardHeights, 320);
             window.addEventListener('resize', () => {
                 updateCopNavHeight();
                 syncTopCardHeights();
