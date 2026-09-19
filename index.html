@@ -4179,6 +4179,116 @@
             return String(v).trim();
         }
 
+        function applyTaktischePrintTheme(ws) {
+            const INK = 'FF1D1D1D';
+            const LINE = 'FF000000';
+            const GRAY = 'FFE6E6E6';
+            const GRAY2 = 'FFF2F2F2';
+            const WHITE = 'FFFFFFFF';
+            const thin = { style: 'thin', color: { argb: LINE } };
+            const med = { style: 'medium', color: { argb: LINE } };
+            const font = (size, bold) => ({ name: 'Calibri', size: size, bold: !!bold, color: { argb: INK } });
+            const fontInv = (size, bold) => ({ name: 'Calibri', size: size, bold: !!bold, color: { argb: WHITE } });
+            const fill = argb => ({ type: 'pattern', pattern: 'solid', fgColor: { argb: argb } });
+            const box = (t, l, b, r) => ({ top: t, left: l, bottom: b, right: r });
+
+            function styleRange(r1, c1, r2, c2, fn) {
+                for (let r = r1; r <= r2; r++) {
+                    for (let c = c1; c <= c2; c++) fn(ws.getCell(r, c), r, c);
+                }
+            }
+
+            styleRange(3, 1, 54, 8, (cell) => {
+                cell.font = Object.assign({}, cell.font || {}, font(10, false));
+            });
+
+            ['A3', 'A4', 'A6', 'A7', 'A8', 'E3'].forEach(addr => {
+                const cell = ws.getCell(addr);
+                cell.font = font(9, true);
+                cell.alignment = { vertical: 'middle', horizontal: 'left' };
+            });
+            ['B3', 'C3', 'B4', 'F3', 'B6', 'D6', 'B7', 'D7', 'B8', 'D8'].forEach(addr => {
+                const cell = ws.getCell(addr);
+                cell.font = font(11, addr === 'F3' || addr === 'B3');
+            });
+
+            const f3 = ws.getCell('F3');
+            f3.fill = fill(GRAY);
+            f3.font = font(12, true);
+            f3.alignment = { vertical: 'middle', horizontal: 'center' };
+            f3.border = box(med, med, med, med);
+
+            const a10 = ws.getCell('A10');
+            a10.font = fontInv(11, true);
+            a10.fill = fill(INK);
+            a10.alignment = { vertical: 'middle', horizontal: 'left' };
+            styleRange(10, 1, 10, 8, (cell) => {
+                cell.fill = fill(INK);
+                cell.font = fontInv(11, true);
+                cell.border = box(med, thin, med, thin);
+            });
+
+            ['A11', 'C11', 'E11', 'G11'].forEach(addr => {
+                const cell = ws.getCell(addr);
+                cell.fill = fill(INK);
+                cell.font = fontInv(11, true);
+                cell.alignment = { vertical: 'middle', horizontal: 'center' };
+            });
+            styleRange(11, 1, 11, 8, (cell) => {
+                cell.fill = fill(INK);
+                cell.font = fontInv(10, true);
+                cell.alignment = { vertical: 'middle', horizontal: 'center' };
+                cell.border = box(thin, thin, thin, thin);
+            });
+
+            styleRange(12, 1, 12, 8, (cell) => {
+                cell.fill = fill(GRAY);
+                cell.font = font(10, true);
+                cell.alignment = { vertical: 'middle', horizontal: 'left' };
+                cell.border = box(thin, thin, med, thin);
+            });
+
+            styleRange(13, 1, 22, 8, (cell, r) => {
+                cell.fill = fill(r % 2 === 0 ? GRAY2 : WHITE);
+                cell.font = font(10, false);
+                cell.alignment = { vertical: 'middle', horizontal: 'left' };
+                cell.border = box(thin, thin, thin, thin);
+            });
+
+            styleRange(23, 1, 23, 8, (cell, r, c) => {
+                const isLabel = c === 1 || c === 3 || c === 5 || c === 7;
+                cell.fill = fill(isLabel ? INK : GRAY);
+                cell.font = isLabel ? fontInv(9, true) : font(11, true);
+                cell.alignment = { vertical: 'middle', horizontal: 'center' };
+                cell.border = box(med, thin, med, thin);
+            });
+
+            styleRange(24, 1, 25, 8, (cell) => {
+                cell.font = font(9, false);
+                cell.alignment = { vertical: 'middle', horizontal: 'center' };
+                cell.border = box(thin, thin, thin, thin);
+            });
+
+            ['A27', 'A28', 'A32', 'A36'].forEach(addr => {
+                const cell = ws.getCell(addr);
+                cell.font = font(10, true);
+                cell.fill = fill(GRAY);
+            });
+
+            const groups = [[1, 2], [3, 4], [5, 6], [7, 8]];
+            groups.forEach(([c1, c2]) => {
+                for (let r = 11; r <= 25; r++) {
+                    ws.getCell(r, c1).border = Object.assign({}, ws.getCell(r, c1).border, { left: med });
+                    ws.getCell(r, c2).border = Object.assign({}, ws.getCell(r, c2).border, { right: med });
+                }
+            });
+
+            ws.pageSetup.fitToPage = true;
+            ws.pageSetup.fitToWidth = 1;
+            ws.pageSetup.fitToHeight = 1;
+            ws.pageSetup.orientation = 'portrait';
+        }
+
         async function exportTaktischeExcel() {
             if (currentRole !== 'admin') return;
             const dateEl = document.getElementById('taktische-date');
@@ -4200,6 +4310,26 @@
                 await wb.xlsx.load(b64ToArrayBuffer(TAKTISCHE_TEMPLATE_B64));
                 const ws = wb.worksheets[0];
                 if (!ws) throw new Error('Vorlage ohne Tabelle');
+
+                // Seitenränder und Drucklayout der Vorlage beibehalten
+                // (ExcelJS setzt sonst Standardränder 0,7"). Werte aus Taktische COP.xlsx.
+                ws.pageSetup = ws.pageSetup || {};
+                ws.pageSetup.paperSize = 9;
+                ws.pageSetup.orientation = 'portrait';
+                ws.pageSetup.horizontalDpi = 300;
+                ws.pageSetup.verticalDpi = 300;
+                ws.pageSetup.usePrinterDefaults = false;
+                ws.pageSetup.margins = {
+                    left: 0.23622047244094491,
+                    right: 0.23622047244094491,
+                    top: 0.74803149606299213,
+                    bottom: 0.39370078740157483,
+                    header: 0.31496062992125984,
+                    footer: 0.31496062992125984
+                };
+                ws.headerFooter = ws.headerFooter || {};
+                ws.headerFooter.scaleWithDoc = false;
+                ws.headerFooter.alignWithMargins = false;
 
                 const lead12 = {
                     A12: taktischeCellText(ws, 'A12'),
@@ -4248,25 +4378,30 @@
                     cell.value = { formula: formula, result: q3v + '/' + q2v };
                 }
                 const lastNameF = 'TRIM(RIGHT(SUBSTITUTE(TRIM({c}),\" \",REPT(\" \",99)),99))';
-                const extra2 = c =>
-                    'IF(OR(' + c + '=\"\",ISNUMBER(SEARCH(\"Engels\",' + c + '&\"\"))),0,' +
-                    'IF(COUNTIF(' + c.charAt(0) + '13:' + c.charAt(0) + '22,' + lastNameF.replace('{c}', c) + ')>0,0,1))';
+                const extra2 = c => {
+                    const nameCol = c.charAt(0);
+                    const adj = String.fromCharCode(nameCol.charCodeAt(0) + 1);
+                    return 'IF(OR(' + c + '=\"\",ISNUMBER(SEARCH(\"Engels\",' + c + '&\"\"))),0,' +
+                        'IF(SUMPRODUCT((' + nameCol + '13:' + nameCol + '22=' + lastNameF.replace('{c}', c) + ')*(' + adj + '13:' + adj + '22=\"\"))>0,0,1))';
+                };
                 const extra3 = c => 'IF(ISNUMBER(SEARCH(\"Engels\",' + c + '&\"\")),1,0)';
+                const counted = (nameCol, adjCol) => 'COUNTIFS(' + nameCol + '13:' + nameCol + '22,\"<>\",' + adjCol + '13:' + adjCol + '22,\"\")';
                 setStrength('B23',
-                    extra3('A12') + '&\"/\"&(COUNTA(A13:A22)+' + extra2('A12') + ')',
+                    extra3('A12') + '&\"/\"&(' + counted('A', 'B') + '+' + extra2('A12') + ')',
                     g21q3, g21q2);
                 setStrength('D23',
-                    extra3('C12') + '&\"/\"&(COUNTA(C13:C22)+' + extra2('C12') + ')',
+                    extra3('C12') + '&\"/\"&(' + counted('C', 'D') + '+' + extra2('C12') + ')',
                     g22q3, g22q2);
                 setStrength('F23',
-                    extra3('E12') + '&\"/\"&(COUNTA(E13:E22)+' + extra2('E12') + ')',
+                    extra3('E12') + '&\"/\"&(' + counted('E', 'F') + '+' + extra2('E12') + ')',
                     g23q3, g23q2);
                 setStrength('H23',
-                    extra3('G12') + '&\"/\"&(COUNTA(G13:G22)+' + extra2('G12') + ')',
+                    extra3('G12') + '&\"/\"&(' + counted('G', 'H') + '+' + extra2('G12') + ')',
                     g26q3, g26q2);
                 setStrength('F3',
                     '(' + extra3('A12') + '+' + extra3('C12') + '+' + extra3('E12') + '+' + extra3('G12') + '+' + extra3('B8') +
-                    '+IF(B6=\"\",0,1)+IF(B7=\"\",0,1))&\"/\"&(COUNTA(A13:A22)+COUNTA(C13:C22)+COUNTA(E13:E22)+COUNTA(G13:G22)+' +
+                    '+IF(B6=\"\",0,1)+IF(B7=\"\",0,1))&\"/\"&(' +
+                    counted('A', 'B') + '+' + counted('C', 'D') + '+' + counted('E', 'F') + '+' + counted('G', 'H') + '+' +
                     extra2('A12') + '+' + extra2('C12') + '+' + extra2('E12') + '+' + extra2('G12') +
                     '+IF(OR(B8=\"\",ISNUMBER(SEARCH(\"Engels\",B8&\"\"))),0,1))',
                     q3, q2);
@@ -4274,6 +4409,7 @@
                 writeNames('C', g22.names);
                 writeNames('E', g23.names);
                 writeNames('G', g26.names);
+                applyTaktischePrintTheme(ws);
 
                 const buf = await wb.xlsx.writeBuffer();
                 const blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
