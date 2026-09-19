@@ -15,6 +15,7 @@
     <!-- SheetJS: echter Excel-Export. Fehlt es (CDN blockiert), greift automatisch der CSV-Fallback. -->
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 
     <script>
       const firebaseConfig = {
@@ -4179,114 +4180,50 @@
             return String(v).trim();
         }
 
-        function applyTaktischePrintTheme(ws) {
-            const INK = 'FF1D1D1D';
-            const LINE = 'FF000000';
-            const GRAY = 'FFE6E6E6';
-            const GRAY2 = 'FFF2F2F2';
-            const WHITE = 'FFFFFFFF';
-            const thin = { style: 'thin', color: { argb: LINE } };
-            const med = { style: 'medium', color: { argb: LINE } };
-            const font = (size, bold) => ({ name: 'Calibri', size: size, bold: !!bold, color: { argb: INK } });
-            const fontInv = (size, bold) => ({ name: 'Calibri', size: size, bold: !!bold, color: { argb: WHITE } });
-            const fill = argb => ({ type: 'pattern', pattern: 'solid', fgColor: { argb: argb } });
-            const box = (t, l, b, r) => ({ top: t, left: l, bottom: b, right: r });
-
-            function styleRange(r1, c1, r2, c2, fn) {
-                for (let r = r1; r <= r2; r++) {
-                    for (let c = c1; c <= c2; c++) fn(ws.getCell(r, c), r, c);
+        async function restoreTaktischePageLayout(outBuf) {
+            if (typeof JSZip === 'undefined') return outBuf;
+            const ORIG_MARGINS = '<pageMargins left="0.23622047244094491" right="0.23622047244094491" top="0.74803149606299213" bottom="0.39370078740157483" header="0.31496062992125984" footer="0.31496062992125984"/>';
+            const ORIG_SETUP = '<pageSetup paperSize="9" orientation="portrait" r:id="rId1"/>';
+            const ORIG_HF = '<headerFooter scaleWithDoc="0" alignWithMargins="0"/>';
+            try {
+                const outZip = await JSZip.loadAsync(outBuf);
+                const srcZip = await JSZip.loadAsync(b64ToArrayBuffer(TAKTISCHE_TEMPLATE_B64));
+                let sheet = await outZip.file('xl/worksheets/sheet1.xml').async('string');
+                if (/<pageMargins\b/.test(sheet)) sheet = sheet.replace(/<pageMargins\b[^>]*\/>/g, ORIG_MARGINS);
+                else sheet = sheet.replace('</worksheet>', ORIG_MARGINS + '</worksheet>');
+                if (/<pageSetup\b/.test(sheet)) {
+                    sheet = sheet.replace(/<pageSetup\b[^>]*\/>/g, ORIG_SETUP);
+                    sheet = sheet.replace(/<pageSetup\b[^>]*><\/pageSetup>/g, ORIG_SETUP);
+                } else sheet = sheet.replace('</worksheet>', ORIG_SETUP + '</worksheet>');
+                if (/<headerFooter\b/.test(sheet)) {
+                    sheet = sheet.replace(/<headerFooter\b[^>]*\/>/g, ORIG_HF);
+                    sheet = sheet.replace(/<headerFooter\b[\s\S]*?<\/headerFooter>/g, ORIG_HF);
                 }
+                outZip.file('xl/worksheets/sheet1.xml', sheet);
+                const printer = srcZip.file('xl/printerSettings/printerSettings1.bin');
+                if (printer) outZip.file('xl/printerSettings/printerSettings1.bin', await printer.async('uint8array'));
+                const srcRels = srcZip.file('xl/worksheets/_rels/sheet1.xml.rels');
+                const outRelsFile = outZip.file('xl/worksheets/_rels/sheet1.xml.rels');
+                let rels = outRelsFile ? await outRelsFile.async('string') : (srcRels ? await srcRels.async('string') : '');
+                if (rels && rels.indexOf('printerSettings') === -1) {
+                    rels = rels.replace('</Relationships>',
+                        '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/printerSettings" Target="../printerSettings/printerSettings1.bin"/></Relationships>');
+                }
+                if (rels) outZip.file('xl/worksheets/_rels/sheet1.xml.rels', rels);
+                const ctFile = outZip.file('[Content_Types].xml');
+                if (ctFile) {
+                    let ct = await ctFile.async('string');
+                    if (ct.indexOf('printerSettings') === -1) {
+                        ct = ct.replace('</Types>',
+                            '<Default Extension="bin" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.printerSettings"/></Types>');
+                        outZip.file('[Content_Types].xml', ct);
+                    }
+                }
+                return await outZip.generateAsync({ type: 'arraybuffer', compression: 'DEFLATE' });
+            } catch (e) {
+                console.warn('Seitenränder der Vorlage konnten nicht exakt übernommen werden', e);
+                return outBuf;
             }
-
-            styleRange(3, 1, 54, 8, (cell) => {
-                cell.font = Object.assign({}, cell.font || {}, font(10, false));
-            });
-
-            ['A3', 'A4', 'A6', 'A7', 'A8', 'E3'].forEach(addr => {
-                const cell = ws.getCell(addr);
-                cell.font = font(9, true);
-                cell.alignment = { vertical: 'middle', horizontal: 'left' };
-            });
-            ['B3', 'C3', 'B4', 'F3', 'B6', 'D6', 'B7', 'D7', 'B8', 'D8'].forEach(addr => {
-                const cell = ws.getCell(addr);
-                cell.font = font(11, addr === 'F3' || addr === 'B3');
-            });
-
-            const f3 = ws.getCell('F3');
-            f3.fill = fill(GRAY);
-            f3.font = font(12, true);
-            f3.alignment = { vertical: 'middle', horizontal: 'center' };
-            f3.border = box(med, med, med, med);
-
-            const a10 = ws.getCell('A10');
-            a10.font = fontInv(11, true);
-            a10.fill = fill(INK);
-            a10.alignment = { vertical: 'middle', horizontal: 'left' };
-            styleRange(10, 1, 10, 8, (cell) => {
-                cell.fill = fill(INK);
-                cell.font = fontInv(11, true);
-                cell.border = box(med, thin, med, thin);
-            });
-
-            ['A11', 'C11', 'E11', 'G11'].forEach(addr => {
-                const cell = ws.getCell(addr);
-                cell.fill = fill(INK);
-                cell.font = fontInv(11, true);
-                cell.alignment = { vertical: 'middle', horizontal: 'center' };
-            });
-            styleRange(11, 1, 11, 8, (cell) => {
-                cell.fill = fill(INK);
-                cell.font = fontInv(10, true);
-                cell.alignment = { vertical: 'middle', horizontal: 'center' };
-                cell.border = box(thin, thin, thin, thin);
-            });
-
-            styleRange(12, 1, 12, 8, (cell) => {
-                cell.fill = fill(GRAY);
-                cell.font = font(10, true);
-                cell.alignment = { vertical: 'middle', horizontal: 'left' };
-                cell.border = box(thin, thin, med, thin);
-            });
-
-            styleRange(13, 1, 22, 8, (cell, r) => {
-                cell.fill = fill(r % 2 === 0 ? GRAY2 : WHITE);
-                cell.font = font(10, false);
-                cell.alignment = { vertical: 'middle', horizontal: 'left' };
-                cell.border = box(thin, thin, thin, thin);
-            });
-
-            styleRange(23, 1, 23, 8, (cell, r, c) => {
-                const isLabel = c === 1 || c === 3 || c === 5 || c === 7;
-                cell.fill = fill(isLabel ? INK : GRAY);
-                cell.font = isLabel ? fontInv(9, true) : font(11, true);
-                cell.alignment = { vertical: 'middle', horizontal: 'center' };
-                cell.border = box(med, thin, med, thin);
-            });
-
-            styleRange(24, 1, 25, 8, (cell) => {
-                cell.font = font(9, false);
-                cell.alignment = { vertical: 'middle', horizontal: 'center' };
-                cell.border = box(thin, thin, thin, thin);
-            });
-
-            ['A27', 'A28', 'A32', 'A36'].forEach(addr => {
-                const cell = ws.getCell(addr);
-                cell.font = font(10, true);
-                cell.fill = fill(GRAY);
-            });
-
-            const groups = [[1, 2], [3, 4], [5, 6], [7, 8]];
-            groups.forEach(([c1, c2]) => {
-                for (let r = 11; r <= 25; r++) {
-                    ws.getCell(r, c1).border = Object.assign({}, ws.getCell(r, c1).border, { left: med });
-                    ws.getCell(r, c2).border = Object.assign({}, ws.getCell(r, c2).border, { right: med });
-                }
-            });
-
-            ws.pageSetup.fitToPage = true;
-            ws.pageSetup.fitToWidth = 1;
-            ws.pageSetup.fitToHeight = 1;
-            ws.pageSetup.orientation = 'portrait';
         }
 
         async function exportTaktischeExcel() {
@@ -4409,9 +4346,8 @@
                 writeNames('C', g22.names);
                 writeNames('E', g23.names);
                 writeNames('G', g26.names);
-                applyTaktischePrintTheme(ws);
-
-                const buf = await wb.xlsx.writeBuffer();
+                let buf = await wb.xlsx.writeBuffer();
+                buf = await restoreTaktischePageLayout(buf);
                 const blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
                 const a = document.createElement('a');
                 a.href = URL.createObjectURL(blob);
