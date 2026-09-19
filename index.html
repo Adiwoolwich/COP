@@ -4183,45 +4183,27 @@
         async function restoreTaktischePageLayout(outBuf) {
             if (typeof JSZip === 'undefined') return outBuf;
             const ORIG_MARGINS = '<pageMargins left="0.23622047244094491" right="0.23622047244094491" top="0.74803149606299213" bottom="0.39370078740157483" header="0.31496062992125984" footer="0.31496062992125984"/>';
-            const ORIG_SETUP = '<pageSetup paperSize="9" orientation="portrait" r:id="rId1"/>';
-            const ORIG_HF = '<headerFooter scaleWithDoc="0" alignWithMargins="0"/>';
             try {
                 const outZip = await JSZip.loadAsync(outBuf);
-                const srcZip = await JSZip.loadAsync(b64ToArrayBuffer(TAKTISCHE_TEMPLATE_B64));
-                let sheet = await outZip.file('xl/worksheets/sheet1.xml').async('string');
-                if (/<pageMargins\b/.test(sheet)) sheet = sheet.replace(/<pageMargins\b[^>]*\/>/g, ORIG_MARGINS);
-                else sheet = sheet.replace('</worksheet>', ORIG_MARGINS + '</worksheet>');
+                const sheetFile = outZip.file('xl/worksheets/sheet1.xml');
+                if (!sheetFile) return outBuf;
+                let sheet = await sheetFile.async('string');
+                if (/<pageMargins\b/.test(sheet)) {
+                    sheet = sheet.replace(/<pageMargins\b[^>]*\/>/g, ORIG_MARGINS);
+                }
                 if (/<pageSetup\b/.test(sheet)) {
-                    sheet = sheet.replace(/<pageSetup\b[^>]*\/>/g, ORIG_SETUP);
-                    sheet = sheet.replace(/<pageSetup\b[^>]*><\/pageSetup>/g, ORIG_SETUP);
-                } else sheet = sheet.replace('</worksheet>', ORIG_SETUP + '</worksheet>');
-                if (/<headerFooter\b/.test(sheet)) {
-                    sheet = sheet.replace(/<headerFooter\b[^>]*\/>/g, ORIG_HF);
-                    sheet = sheet.replace(/<headerFooter\b[\s\S]*?<\/headerFooter>/g, ORIG_HF);
+                    sheet = sheet.replace(/<pageSetup\b([^>]*)\/>/g, function (m, attrs) {
+                        let a = attrs
+                            .replace(/\s+r:id="[^"]*"/g, '')
+                            .replace(/\s+paperSize="[^"]*"/g, '')
+                            .replace(/\s+orientation="[^"]*"/g, '');
+                        return '<pageSetup paperSize="9" orientation="portrait"' + a + '/>';
+                    });
                 }
                 outZip.file('xl/worksheets/sheet1.xml', sheet);
-                const printer = srcZip.file('xl/printerSettings/printerSettings1.bin');
-                if (printer) outZip.file('xl/printerSettings/printerSettings1.bin', await printer.async('uint8array'));
-                const srcRels = srcZip.file('xl/worksheets/_rels/sheet1.xml.rels');
-                const outRelsFile = outZip.file('xl/worksheets/_rels/sheet1.xml.rels');
-                let rels = outRelsFile ? await outRelsFile.async('string') : (srcRels ? await srcRels.async('string') : '');
-                if (rels && rels.indexOf('printerSettings') === -1) {
-                    rels = rels.replace('</Relationships>',
-                        '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/printerSettings" Target="../printerSettings/printerSettings1.bin"/></Relationships>');
-                }
-                if (rels) outZip.file('xl/worksheets/_rels/sheet1.xml.rels', rels);
-                const ctFile = outZip.file('[Content_Types].xml');
-                if (ctFile) {
-                    let ct = await ctFile.async('string');
-                    if (ct.indexOf('printerSettings') === -1) {
-                        ct = ct.replace('</Types>',
-                            '<Default Extension="bin" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.printerSettings"/></Types>');
-                        outZip.file('[Content_Types].xml', ct);
-                    }
-                }
                 return await outZip.generateAsync({ type: 'arraybuffer', compression: 'DEFLATE' });
             } catch (e) {
-                console.warn('Seitenränder der Vorlage konnten nicht exakt übernommen werden', e);
+                console.warn('Seitenränder konnten nicht übernommen werden', e);
                 return outBuf;
             }
         }
