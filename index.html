@@ -4249,6 +4249,9 @@
                 ws.headerFooter = ws.headerFooter || {};
                 ws.headerFooter.scaleWithDoc = false;
                 ws.headerFooter.alignWithMargins = false;
+                ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'].forEach(col => {
+                    ws.getColumn(col).width = 2.18;
+                });
 
                 const lead12 = {
                     A12: taktischeCellText(ws, 'A12'),
