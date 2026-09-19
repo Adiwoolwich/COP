@@ -4180,34 +4180,6 @@
             return String(v).trim();
         }
 
-        async function restoreTaktischePageLayout(outBuf) {
-            if (typeof JSZip === 'undefined') return outBuf;
-            const ORIG_MARGINS = '<pageMargins left="0.23622047244094491" right="0.23622047244094491" top="0.74803149606299213" bottom="0.39370078740157483" header="0.31496062992125984" footer="0.31496062992125984"/>';
-            try {
-                const outZip = await JSZip.loadAsync(outBuf);
-                const sheetFile = outZip.file('xl/worksheets/sheet1.xml');
-                if (!sheetFile) return outBuf;
-                let sheet = await sheetFile.async('string');
-                if (/<pageMargins\b/.test(sheet)) {
-                    sheet = sheet.replace(/<pageMargins\b[^>]*\/>/g, ORIG_MARGINS);
-                }
-                if (/<pageSetup\b/.test(sheet)) {
-                    sheet = sheet.replace(/<pageSetup\b([^>]*)\/>/g, function (m, attrs) {
-                        let a = attrs
-                            .replace(/\s+r:id="[^"]*"/g, '')
-                            .replace(/\s+paperSize="[^"]*"/g, '')
-                            .replace(/\s+orientation="[^"]*"/g, '');
-                        return '<pageSetup paperSize="9" orientation="portrait"' + a + '/>';
-                    });
-                }
-                outZip.file('xl/worksheets/sheet1.xml', sheet);
-                return await outZip.generateAsync({ type: 'arraybuffer', compression: 'DEFLATE' });
-            } catch (e) {
-                console.warn('Seitenränder konnten nicht übernommen werden', e);
-                return outBuf;
-            }
-        }
-
         async function exportTaktischeExcel() {
             if (currentRole !== 'admin') return;
             const dateEl = document.getElementById('taktische-date');
@@ -4238,6 +4210,8 @@
                 ws.pageSetup.horizontalDpi = 300;
                 ws.pageSetup.verticalDpi = 300;
                 ws.pageSetup.usePrinterDefaults = false;
+                ws.pageSetup.fitToPage = false;
+                ws.pageSetup.scale = 100;
                 ws.pageSetup.margins = {
                     left: 0.23622047244094491,
                     right: 0.23622047244094491,
@@ -4249,8 +4223,10 @@
                 ws.headerFooter = ws.headerFooter || {};
                 ws.headerFooter.scaleWithDoc = false;
                 ws.headerFooter.alignWithMargins = false;
+                // A4 210mm, Ränder je 6mm => 198mm nutzbar.
+                // 8 Spalten füllen die Breite: Excel-Breite (px-5)/7 ≈ 12.65
                 ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'].forEach(col => {
-                    ws.getColumn(col).width = 2.18;
+                    ws.getColumn(col).width = 12.65;
                 });
 
                 const lead12 = {
@@ -4331,8 +4307,7 @@
                 writeNames('C', g22.names);
                 writeNames('E', g23.names);
                 writeNames('G', g26.names);
-                let buf = await wb.xlsx.writeBuffer();
-                buf = await restoreTaktischePageLayout(buf);
+                const buf = await wb.xlsx.writeBuffer();
                 const blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
                 const a = document.createElement('a');
                 a.href = URL.createObjectURL(blob);
